@@ -5,8 +5,10 @@ package ogr.user12043.talkOnLan.util;
  * part of project: talk-onLan
  */
 public class Constants {
-    public static String discoveryPacketRequestData = "talk-onLan_APPLICATION_DISCOVERY_REQUEST";
-    public static String discoveryPacketResponseData = "talk-onLan_APPLICATION_DISCOVERY_RESPONSE";
-    public static int receivePort = 8888;
-    public static int sendPort = 9999;
+    public static final String DISCOVERY_PACKET_REQUEST = "talk-onLan_APPLICATION_DISCOVERY_REQUEST";
+    public static final String DISCOVERY_PACKET_RESPONSE = "talk-onLan_APPLICATION_DISCOVERY_RESPONSE";
+    public static final int RECEIVE_PORT = 8888;
+    public static final int SEND_PORT = 9999;
+    public static final int RECEIVE_TIMEOUT = 5000;
+    public static final int DISCOVERY_INTERVAL = 3000;
 }
