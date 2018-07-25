@@ -10,5 +10,27 @@ public class User {
     private String userName;
     private InetAddress address;
 
+    public User() {
+    }
 
+    public User(String userName, InetAddress address) {
+        this.userName = userName;
+        this.address = address;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public InetAddress getAddress() {
+        return address;
+    }
+
+    public void setAddress(InetAddress address) {
+        this.address = address;
+    }
 }

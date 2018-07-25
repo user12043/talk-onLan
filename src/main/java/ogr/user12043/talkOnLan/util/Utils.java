@@ -1,5 +1,7 @@
 package ogr.user12043.talkOnLan.util;
 
+import ogr.user12043.talkOnLan.User;
+
 import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,4 +12,5 @@ import java.util.Set;
  */
 public class Utils {
     public static Set<InetAddress> buddyAddresses = new HashSet<>();
+    public static Set<User> buddies = new HashSet<>();
 }

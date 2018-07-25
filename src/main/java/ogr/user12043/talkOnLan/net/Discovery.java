@@ -1,6 +1,9 @@
 package ogr.user12043.talkOnLan.net;
 
+import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.ui.MainPanel;
 import ogr.user12043.talkOnLan.util.Constants;
+import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,23 +69,28 @@ public class Discovery {
     }
 
     public void receive() throws IOException {
-        byte[] buffer = Constants.DISCOVERY_PACKET_REQUEST.getBytes();
+        byte[] buffer = Constants.DISCOVERY_COMMAND_REQUEST.getBytes();
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         receiveSocket.receive(packet);
-        LOGGER.info("Discovery package received! -> " + packet.getAddress() + ":" + packet.getPort());
         String data = new String(packet.getData()).trim();
-        if (data.equals(Constants.DISCOVERY_PACKET_REQUEST)) {
-            byte[] response = Constants.DISCOVERY_PACKET_RESPONSE.getBytes();
+        if (data.equals(Constants.DISCOVERY_COMMAND_REQUEST)) {
+            LOGGER.info("Discovery package received from " + packet.getAddress() + ":" + packet.getPort());
+            byte[] response = Constants.DISCOVERY_COMMAND_RESPONSE.getBytes();
             DatagramPacket responsePacket = new DatagramPacket(response, response.length, packet.getAddress(), packet.getPort());
             receiveSocket.send(responsePacket);
-            LOGGER.info("Response sent to: " + packet.getAddress() + ":" + packet.getPort());
+            LOGGER.info("Discovery response sent to: " + packet.getAddress() + ":" + packet.getPort());
+        } else if (data.equals(Constants.DISCOVERY_COMMAND_USERNAME)) {
+            byte[] response = (Constants.DISCOVERY_COMMAND_USERNAME + Constants.COMMAND_SEPERATOR + Properties.username).getBytes();
+            DatagramPacket responsePacket = new DatagramPacket(response, response.length, packet.getAddress(), packet.getPort());
+            receiveSocket.send(responsePacket);
+            LOGGER.info("Username response sent to: " + packet.getAddress() + ":" + packet.getPort());
         } else {
             LOGGER.error("Error, not valid package!" + packet.getAddress() + ":" + packet.getPort());
         }
     }
 
     public void send() throws IOException {
-        byte[] request = Constants.DISCOVERY_PACKET_REQUEST.getBytes();
+        byte[] request = Constants.DISCOVERY_COMMAND_REQUEST.getBytes();
         DatagramPacket packet = new DatagramPacket(request, request.length, InetAddress.getByName("255.255.255.255"), Constants.RECEIVE_PORT);
         sendSocket.send(packet);
         LOGGER.info("Discovery package sent!" + packet.getAddress() + ":" + packet.getPort());
@@ -107,20 +115,43 @@ public class Discovery {
         }*/
         //</editor-fold>
 
-        byte[] response = Constants.DISCOVERY_PACKET_RESPONSE.getBytes();
+        byte[] response = Constants.DISCOVERY_COMMAND_RESPONSE.getBytes();
         DatagramPacket responsePacket = new DatagramPacket(response, response.length);
         sendSocket.receive(responsePacket);
         // Ignore if already found
         if (Utils.buddyAddresses.contains(responsePacket.getAddress())) {
             return;
         }
-        LOGGER.info("Discovery response received!" + responsePacket.getAddress() + ":" + responsePacket.getPort());
+        LOGGER.info("Discovery response received from " + responsePacket.getAddress() + ":" + responsePacket.getPort());
 
         String responseData = new String(responsePacket.getData()).trim();
-        if (responseData.equals(Constants.DISCOVERY_PACKET_RESPONSE)) {
+        if (responseData.equals(Constants.DISCOVERY_COMMAND_RESPONSE)) {
             LOGGER.info("Found buddy!" + responsePacket.getAddress() + ":" + responsePacket.getPort());
             Utils.buddyAddresses.add(responsePacket.getAddress());
-            // TODO create user
+            // Request username
+            byte[] usernameRequest = Constants.DISCOVERY_COMMAND_USERNAME.getBytes();
+            DatagramPacket usernameRequestPacket = new DatagramPacket(usernameRequest, usernameRequest.length, responsePacket.getAddress(), Constants.SEND_PORT);
+            sendSocket.send(usernameRequestPacket);
+            LOGGER.info("Username request package sent to " + usernameRequestPacket.getAddress() + ":" + usernameRequestPacket.getPort());
+            byte[] usernameResponse = new byte[Constants.DISCOVERY_COMMAND_USERNAME.length() + 512];
+            DatagramPacket usernameResponsePacket = new DatagramPacket(usernameResponse, usernameResponse.length);
+            sendSocket.receive(usernameResponsePacket);
+            LOGGER.info("Username response received from " + usernameResponsePacket.getAddress() + ":" + usernameResponsePacket.getPort());
+            String usernameResponseData = new String(usernameResponsePacket.getData()).trim();
+            if (
+                    usernameResponseData.startsWith(Constants.DISCOVERY_COMMAND_USERNAME) &&
+                            usernameResponseData.contains("" + Constants.COMMAND_SEPERATOR)
+                    ) {
+                String username = usernameResponseData.substring(usernameResponseData.indexOf(Constants.COMMAND_SEPERATOR) + 1);
+                LOGGER.info("Adding user: " + username);
+                User user = new User(username, usernameResponsePacket.getAddress());
+                Utils.buddies.add(user);
+                MainPanel.refresh();
+            } else {
+                LOGGER.debug("Invalid username response from " + usernameResponsePacket.getAddress() + ":" + usernameResponsePacket.getPort() + ", " + usernameResponseData);
+            }
+        } else {
+            LOGGER.debug("Invalid discovery response from " + responsePacket.getAddress() + ":" + responsePacket.getPort());
         }
     }
 }
