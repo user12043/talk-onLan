@@ -45,17 +45,12 @@ public class NetworkService {
                 }
             }
         }
-        String receiveData = new String(receivePacket.getData()).trim();
+        String receivedData = new String(receivePacket.getData()).trim();
         // Process data
-        switch (receiveData) {
-            case Constants.DISCOVERY_COMMAND_REQUEST: {
-                DiscoveryService.sendDiscoveryResponse(receivePacket);
-                break;
-            }
-            case Constants.DISCOVERY_COMMAND_RESPONSE: {
-                DiscoveryService.receiveDiscoveryResponse(receivePacket);
-                break;
-            }
+        if (Constants.DISCOVERY_COMMAND_REQUEST.equals(receivedData)) {
+            DiscoveryService.sendDiscoveryResponse(receivePacket);
+        } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_RESPONSE)) {
+            DiscoveryService.receiveDiscoveryResponse(receivePacket, receivedData);
         }
     }
 

@@ -1,7 +1,9 @@
 package ogr.user12043.talkOnLan.net;
 
 import ogr.user12043.talkOnLan.Main;
+import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.util.Constants;
+import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,24 +23,33 @@ class DiscoveryService {
         byte[] request = Constants.DISCOVERY_COMMAND_REQUEST.getBytes();
         DatagramPacket sendPacket = new DatagramPacket(request, request.length, address, Constants.RECEIVE_PORT);
         NetworkService.sendSocket.send(sendPacket);
-        LOGGER.info("Discovery package sent to " + sendPacket.getAddress() + ":" + sendPacket.getPort());
+        LOGGER.debug("Discovery package sent to " + sendPacket.getAddress() + ":" + sendPacket.getPort());
     }
 
     static void sendDiscoveryResponse(DatagramPacket receivedRequestPacket) throws IOException {
-        LOGGER.info("Discovery package received from " + receivedRequestPacket.getAddress() + ":" + receivedRequestPacket.getPort());
-        byte[] discoveryResponse = Constants.DISCOVERY_COMMAND_RESPONSE.getBytes();
+        /*if (Utils.buddyAddresses.contains(receivedRequestPacket.getAddress())) {
+            return;
+        }*/
+        LOGGER.debug("Discovery request received from " + receivedRequestPacket.getAddress() + ":" + receivedRequestPacket.getPort());
+        byte[] discoveryResponse = (Constants.DISCOVERY_COMMAND_RESPONSE + Constants.COMMAND_SEPERATOR + Properties.username).getBytes();
         DatagramPacket discoveryResponsePacket = new DatagramPacket(discoveryResponse, discoveryResponse.length, receivedRequestPacket.getAddress(), Constants.RECEIVE_PORT);
         NetworkService.sendSocket.send(discoveryResponsePacket);
-        LOGGER.info("Discovery response sent to: " + discoveryResponsePacket.getAddress() + ":" + discoveryResponsePacket.getPort());
+        LOGGER.debug("Discovery response sent to: " + discoveryResponsePacket.getAddress() + ":" + discoveryResponsePacket.getPort());
     }
 
-    static void receiveDiscoveryResponse(DatagramPacket receivedResponsePacket) {
-        LOGGER.info("Discovery response received from " + receivedResponsePacket.getAddress() + ":" + receivedResponsePacket.getPort());
+    static void receiveDiscoveryResponse(DatagramPacket receivedResponsePacket, String receivedData) {
         if (Utils.buddyAddresses.contains(receivedResponsePacket.getAddress())) {
             return;
         }
+        LOGGER.debug("Discovery response received from " + receivedResponsePacket.getAddress() + ":" + receivedResponsePacket.getPort());
         Utils.buddyAddresses.add(receivedResponsePacket.getAddress());
-        // TODO request username
-        Main.mainPanel.buddiesPanel.addBuddy(receivedResponsePacket.getAddress());
+        User user = new User();
+        user.setAddress(receivedResponsePacket.getAddress());
+        int index = receivedData.indexOf(Constants.COMMAND_SEPERATOR);
+        if (index != -1) {
+            user.setUserName(receivedData.substring(index + 1));
+        }
+
+        Main.mainPanel.buddiesPanel.addBuddy(user);
     }
 }

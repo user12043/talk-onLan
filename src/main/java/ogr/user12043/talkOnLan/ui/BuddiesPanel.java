@@ -1,5 +1,7 @@
 package ogr.user12043.talkOnLan.ui;
 
+import ogr.user12043.talkOnLan.User;
+
 import javax.swing.*;
 import java.awt.*;
 import java.net.InetAddress;
@@ -19,9 +21,9 @@ public class BuddiesPanel extends JPanel {
         buddyButtons = new ArrayList<>();
     }
 
-    public void addBuddy(InetAddress address) {
-        JButton button = new JButton(address.toString());
-        button.setText(address.toString());
+    public void addBuddy(User user) {
+        InetAddress address = user.getAddress();
+        JButton button = new JButton((user.getUserName() + " - " + address.toString()));
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 0;
@@ -32,7 +34,8 @@ public class BuddiesPanel extends JPanel {
         revalidate();
     }
 
-    public void removeBuddy(InetAddress address) {
+    public void removeBuddy(User user) {
+        InetAddress address = user.getAddress();
         for (ListIterator<JButton> iterator = buddyButtons.listIterator(); iterator.hasNext(); ) {
             JButton button = iterator.next();
             if (button.getText().equals(address.toString())) {
