@@ -1,6 +1,8 @@
 package ogr.user12043.talkOnLan.net;
 
+import ogr.user12043.talkOnLan.Main;
 import ogr.user12043.talkOnLan.util.Constants;
+import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,7 +44,6 @@ public class NetworkService {
     }
 
     private static void send() throws IOException {
-        byte[] request = Constants.DISCOVERY_COMMAND_REQUEST.getBytes();
         //<editor-fold desc="Broadcast the message over all the network interfaces" defaultstate=collapsed>
         Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
@@ -56,12 +57,28 @@ public class NetworkService {
                     continue;
                 }
                 // Send the broadcast package!
-                DatagramPacket sendPacket = new DatagramPacket(request, request.length, broadcastAddress, Constants.RECEIVE_PORT);
-                sendSocket.send(sendPacket);
-                LOGGER.info("Discovery package sent to " + sendPacket.getAddress() + ":" + sendPacket.getPort() + " over " + networkInterface.getDisplayName());
+                DiscoveryService.sendDiscoveryRequest(broadcastAddress);
             }
         }
         //</editor-fold>
+    }
+
+    private static void refresh() throws IOException {
+        for (InetAddress address : Utils.buddyAddresses) {
+            DiscoveryService.sendDiscoveryRequest(address);
+
+            byte[] buffer = new byte[Constants.BUFFER_LENGTH];
+            DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
+            try {
+                receiveSocket.receive(receivePacket);
+                return;
+            } catch (SocketTimeoutException ignored) {
+            }
+
+            //Remove buddy if no response or invalid response received
+            Utils.buddyAddresses.remove(address);
+            Main.mainPanel.removeBuddy(address);
+        }
     }
 
     private static void initConnections() throws UnknownHostException, SocketException {
@@ -87,7 +104,7 @@ public class NetworkService {
                     Thread.sleep(Constants.DISCOVERY_INTERVAL);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Error on send()" + e);
             } finally {
                 sendSocket.close();
                 LOGGER.info("Send socket closed");
@@ -101,15 +118,27 @@ public class NetworkService {
                     receive();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("Error on receive()" + e);
             } finally {
                 receiveSocket.close();
                 LOGGER.info("Receive socket closed");
             }
         });
 
+        Thread refreshThread = new Thread(() -> {
+            try {
+                while (!end) {
+                    refresh();
+                    Thread.sleep(Constants.DISCOVERY_INTERVAL);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error on refresh()" + e);
+            }
+        });
+
         sendThread.start();
         receiveThread.start();
+        refreshThread.start();
     }
 
     public static void end() {

@@ -1,12 +1,14 @@
 package ogr.user12043.talkOnLan.ui;
 
 import ogr.user12043.talkOnLan.net.NetworkService;
-import ogr.user12043.talkOnLan.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by user12043 on 25.07.2018 - 11:04
@@ -17,27 +19,31 @@ public class MainPanel extends JFrame {
 
     private JButton button_startDiscovery;
     private JButton button_endDiscovery;
+    List<JButton> buddyButtons;
 
     public MainPanel() {
         initComponents();
-    }
-
-    public void refresh() {
-//        mainPanel.removeAll();
-        removeAll();
-        /*for (User buddy : Utils.buddies) {
-            mainPanel.add(new JLabel(buddy.getUserName() + " | " + buddy.getAddress()));
-        }*/
-        for (InetAddress address : Utils.buddyAddresses) {
-            add(new JLabel(address.toString()));
-        }
-
-        pack();
+        buddyButtons = new ArrayList<>();
     }
 
     public void addBuddy(InetAddress address) {
-        add(new JLabel(address.toString()));
+        JButton button = new JButton(address.toString());
+        button.setText(address.toString());
+        add(button);
+        buddyButtons.add(button);
         pack();
+    }
+
+    // TODO remove not working
+    public void removeBuddy(InetAddress address) {
+        for (ListIterator<JButton> iterator = buddyButtons.listIterator(); iterator.hasNext(); ) {
+            JButton button = iterator.next();
+            if (button.getText().equals(address.toString())) {
+                remove(button);
+                iterator.remove();
+                pack();
+            }
+        }
     }
 
     private void initComponents() {
