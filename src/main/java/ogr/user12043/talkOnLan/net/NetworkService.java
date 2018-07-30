@@ -1,20 +1,22 @@
 package ogr.user12043.talkOnLan.net;
 
-import ogr.user12043.talkOnLan.Main;
 import ogr.user12043.talkOnLan.util.Constants;
-import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by user12043 on 26.07.2018 - 11:53
  * part of project: talk-onLan
  */
 public class NetworkService {
+    private static ExecutorService service = Executors.newFixedThreadPool(3);
     private static final Logger LOGGER = LogManager.getLogger(NetworkService.class);
     static DatagramSocket sendSocket;
     private static DatagramSocket receiveSocket;
@@ -28,8 +30,22 @@ public class NetworkService {
             receiveSocket.receive(receivePacket);
         } catch (SocketTimeoutException ignored) {
         }
-        String receiveData = new String(receivePacket.getData()).trim();
 
+        Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
+        while (interfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
+            if (networkInterface.isLoopback() || !networkInterface.isUp()) {
+                continue; // skip loopback or disconnected interface
+            }
+
+            for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
+                final InetAddress receivePacketAddress = receivePacket.getAddress();
+                if (receivePacketAddress == null || receivePacketAddress.equals(interfaceAddress.getAddress())) {
+                    return;
+                }
+            }
+        }
+        String receiveData = new String(receivePacket.getData()).trim();
         // Process data
         switch (receiveData) {
             case Constants.DISCOVERY_COMMAND_REQUEST: {
@@ -44,6 +60,8 @@ public class NetworkService {
     }
 
     private static void send() throws IOException {
+        DiscoveryService.sendDiscoveryRequest(InetAddress.getByName("255.255.255.255"));
+
         //<editor-fold desc="Broadcast the message over all the network interfaces" defaultstate=collapsed>
         Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
@@ -63,24 +81,6 @@ public class NetworkService {
         //</editor-fold>
     }
 
-    private static void refresh() throws IOException {
-        for (InetAddress address : Utils.buddyAddresses) {
-            DiscoveryService.sendDiscoveryRequest(address);
-
-            byte[] buffer = new byte[Constants.BUFFER_LENGTH];
-            DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
-            try {
-                receiveSocket.receive(receivePacket);
-                return;
-            } catch (SocketTimeoutException ignored) {
-            }
-
-            //Remove buddy if no response or invalid response received
-            Utils.buddyAddresses.remove(address);
-            Main.mainPanel.removeBuddy(address);
-        }
-    }
-
     private static void initConnections() throws UnknownHostException, SocketException {
         if (sendSocket == null) {
             sendSocket = new DatagramSocket(Constants.SEND_PORT);
@@ -96,7 +96,7 @@ public class NetworkService {
     public static void start() throws UnknownHostException, SocketException {
         initConnections();
         end = false;
-        Thread sendThread = new Thread(() -> {
+        Runnable sendThread = () -> {
             try {
                 // Do task until end = true
                 while (!end) {
@@ -104,41 +104,29 @@ public class NetworkService {
                     Thread.sleep(Constants.DISCOVERY_INTERVAL);
                 }
             } catch (Exception e) {
-                LOGGER.error("Error on send()" + e);
-            } finally {
+                LOGGER.error("Error on send() " + Arrays.toString(e.getStackTrace()));
+            }/* finally {
                 sendSocket.close();
                 LOGGER.info("Send socket closed");
-            }
-        });
+            }*/
+        };
 
-        Thread receiveThread = new Thread(() -> {
+        Runnable receiveThread = (() -> {
             try {
                 // Do task until end = true
                 while (!end) {
                     receive();
                 }
             } catch (Exception e) {
-                LOGGER.error("Error on receive()" + e);
-            } finally {
+                LOGGER.error("Error on receive() " + Arrays.toString(e.getStackTrace()));
+            }/* finally {
                 receiveSocket.close();
                 LOGGER.info("Receive socket closed");
-            }
+            }*/
         });
 
-        Thread refreshThread = new Thread(() -> {
-            try {
-                while (!end) {
-                    refresh();
-                    Thread.sleep(Constants.DISCOVERY_INTERVAL);
-                }
-            } catch (Exception e) {
-                LOGGER.error("Error on refresh()" + e);
-            }
-        });
-
-        sendThread.start();
-        receiveThread.start();
-        refreshThread.start();
+        service.execute(sendThread);
+        service.execute(receiveThread);
     }
 
     public static void end() {

@@ -13,5 +13,6 @@ public class Constants {
     public static final int SEND_PORT = 9999;
     public static final int RECEIVE_TIMEOUT = 5000;
     public static final int DISCOVERY_INTERVAL = 3000;
+    public static final int REFRESH_INTERVAL = 6000;
     public static final int BUFFER_LENGTH = 64;
 }

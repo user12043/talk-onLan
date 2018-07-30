@@ -39,6 +39,6 @@ class DiscoveryService {
         }
         Utils.buddyAddresses.add(receivedResponsePacket.getAddress());
         // TODO request username
-        Main.mainPanel.addBuddy(receivedResponsePacket.getAddress());
+        Main.mainPanel.buddiesPanel.addBuddy(receivedResponsePacket.getAddress());
     }
 }
