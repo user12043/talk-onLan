@@ -44,7 +44,7 @@ public class NetworkService {
             DiscoveryService.sendDiscoveryResponse(receivePacket);
         } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_RESPONSE)) {
             DiscoveryService.receiveDiscoveryResponse(receivePacket, receivedData);
-        } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_MESSAGE)) {
+        } else if (receivedData.startsWith(Constants.COMMAND_MESSAGE)) {
             MessageService.receiveMessage(receivePacket, receivedData);
         }
     }

@@ -1,6 +1,10 @@
 package ogr.user12043.talkOnLan.ui;
 
+import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.net.NetworkService;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by user12043 on 31.07.2018 - 12:05
@@ -8,6 +12,7 @@ import ogr.user12043.talkOnLan.net.NetworkService;
  */
 public class MainUI extends javax.swing.JFrame {
 
+    public Set<MessagePanel> messagePanels;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
     private javax.swing.JButton jButton_endDiscovery;
@@ -19,6 +24,28 @@ public class MainUI extends javax.swing.JFrame {
      */
     public MainUI() {
         initComponents();
+        messagePanels = new HashSet<>();
+    }
+
+    public MessagePanel createMessagePanel(User user) {
+        MessagePanel messagePanel = new MessagePanel(this, false, user);
+        messagePanels.add(messagePanel);
+        return messagePanel;
+    }
+
+    public void receiveMessage(User user, String message) {
+        final boolean panelExists = messagePanels.stream().anyMatch(messagePanel -> {
+            if (messagePanel.getUser().equals(user)) {
+                messagePanel.receiveMessage(message);
+                return true;
+            }
+            return false;
+        });
+        if (!panelExists) {
+            final MessagePanel messagePanel = createMessagePanel(user);
+            messagePanel.setVisible(true);
+            messagePanel.receiveMessage(message);
+        }
     }
 
     /**

@@ -7,7 +7,8 @@ package ogr.user12043.talkOnLan.util;
 public class Constants {
     public static final String DISCOVERY_COMMAND_REQUEST = "talk-onLan_APPLICATION_DISCOVERY_REQUEST";
     public static final String DISCOVERY_COMMAND_RESPONSE = "talk-onLan_APPLICATION_DISCOVERY_RESPONSE";
-    public static final String DISCOVERY_COMMAND_MESSAGE = "talk-onLan_APPLICATION_MESSAGE";
+    public static final String COMMAND_MESSAGE = "talk-onLan_APPLICATION_MESSAGE";
+    public static final String COMMAND_MESSAGE_END = "talk-onLan_MESSAGE_END";
     public static final char COMMAND_SEPARATOR = '|';
     public static final int RECEIVE_PORT = 8888;
     public static final int SEND_PORT = 9999;

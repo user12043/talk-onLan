@@ -49,7 +49,7 @@ class DiscoveryService {
         if (index != -1) {
             user.setUserName(receivedData.substring(index + 1));
         }
-
+        Utils.buddies.add(user);
         Main.mainUI.buddiesPanel.addBuddy(user);
     }
 }

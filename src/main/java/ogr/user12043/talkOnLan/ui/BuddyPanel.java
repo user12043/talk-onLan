@@ -1,5 +1,6 @@
 package ogr.user12043.talkOnLan.ui;
 
+import ogr.user12043.talkOnLan.Main;
 import ogr.user12043.talkOnLan.User;
 
 /**
@@ -8,6 +9,7 @@ import ogr.user12043.talkOnLan.User;
  */
 public class BuddyPanel extends javax.swing.JPanel {
 
+    private User user;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_message;
     private javax.swing.JLabel jLabel_address;
@@ -19,6 +21,7 @@ public class BuddyPanel extends javax.swing.JPanel {
      */
     public BuddyPanel(User user) {
         initComponents();
+        this.user = user;
         jLabel_name.setText(user.getUserName());
         jLabel_address.setText(user.getAddress().toString());
     }
@@ -44,6 +47,11 @@ public class BuddyPanel extends javax.swing.JPanel {
         jLabel_address.setText("address");
 
         jButton_message.setText("Message");
+        jButton_message.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_messageActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -69,4 +77,8 @@ public class BuddyPanel extends javax.swing.JPanel {
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton_messageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_messageActionPerformed
+        Main.mainUI.createMessagePanel(user);
+    }//GEN-LAST:event_jButton_messageActionPerformed
 }

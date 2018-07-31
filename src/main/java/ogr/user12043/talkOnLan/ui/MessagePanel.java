@@ -1,6 +1,12 @@
 package ogr.user12043.talkOnLan.ui;
 
 import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.net.MessageService;
+import ogr.user12043.talkOnLan.util.Constants;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
 
 /**
  * Created by user12043 on 31.07.2018 - 16:22
@@ -9,6 +15,8 @@ import ogr.user12043.talkOnLan.User;
 public class MessagePanel extends javax.swing.JDialog {
 
     private User user;
+    private String receivingMessage;
+    private int lineNumber;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_send;
     private javax.swing.JPanel jPanel_dialog;
@@ -22,6 +30,38 @@ public class MessagePanel extends javax.swing.JDialog {
     public MessagePanel(java.awt.Frame parent, boolean modal, User user) {
         super(parent, modal);
         initComponents();
+        receivingMessage = "";
+        lineNumber = 0;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void sendMessage() {
+        String sendingMessage = jTextArea_content.getText();
+        sendingMessage += Constants.COMMAND_MESSAGE_END;
+        try {
+            MessageService.sendMessage(user.getAddress(), sendingMessage);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Cannot send the message!", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void receiveMessage(String message) {
+        if (message.endsWith(Constants.COMMAND_SEPARATOR + Constants.COMMAND_MESSAGE_END)) {
+            addMessage(message, false);
+            receivingMessage = "";
+        } else {
+            receivingMessage += receivingMessage;
+        }
+    }
+
+    private void addMessage(String message, boolean own) {
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.anchor = ((own) ? GridBagConstraints.LAST_LINE_END : GridBagConstraints.LAST_LINE_START);
+        JLabel label = new JLabel(message, (own ? SwingConstants.RIGHT : SwingConstants.LEFT));
+        jPanel_dialog.add(label, constraints);
     }
 
     /**
