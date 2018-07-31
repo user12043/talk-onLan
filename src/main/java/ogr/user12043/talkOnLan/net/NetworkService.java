@@ -1,13 +1,13 @@
 package ogr.user12043.talkOnLan.net;
 
 import ogr.user12043.talkOnLan.util.Constants;
+import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -16,9 +16,9 @@ import java.util.concurrent.Executors;
  * part of project: talk-onLan
  */
 public class NetworkService {
-    private static ExecutorService service = Executors.newFixedThreadPool(3);
     private static final Logger LOGGER = LogManager.getLogger(NetworkService.class);
     static DatagramSocket sendSocket;
+    private static ExecutorService service = Executors.newFixedThreadPool(3);
     private static DatagramSocket receiveSocket;
     private static boolean end; // Control field for threads. (To safely terminate)
 
@@ -31,18 +31,11 @@ public class NetworkService {
         } catch (SocketTimeoutException ignored) {
         }
 
-        Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
-        while (interfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
-            if (networkInterface.isLoopback() || !networkInterface.isUp()) {
-                continue; // skip loopback or disconnected interface
-            }
-
-            for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
-                final InetAddress receivePacketAddress = receivePacket.getAddress();
-                if (receivePacketAddress == null || receivePacketAddress.equals(interfaceAddress.getAddress())) {
-                    return;
-                }
+        for (InterfaceAddress hostAddress : Utils.hostAddresses) {
+            final InetAddress receivePacketAddress = receivePacket.getAddress();
+            final InetAddress localhost = hostAddress.getAddress();
+            if (receivePacketAddress == null || receivePacketAddress.getHostAddress().equals(localhost.getHostAddress())) {
+                return;
             }
         }
         String receivedData = new String(receivePacket.getData()).trim();
@@ -51,6 +44,8 @@ public class NetworkService {
             DiscoveryService.sendDiscoveryResponse(receivePacket);
         } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_RESPONSE)) {
             DiscoveryService.receiveDiscoveryResponse(receivePacket, receivedData);
+        } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_MESSAGE)) {
+            MessageService.receiveMessage(receivePacket, receivedData);
         }
     }
 
@@ -58,19 +53,22 @@ public class NetworkService {
         DiscoveryService.sendDiscoveryRequest(InetAddress.getByName("255.255.255.255"));
 
         //<editor-fold desc="Broadcast the message over all the network interfaces" defaultstate=collapsed>
-        Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
-        while (interfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = (NetworkInterface) interfaces.nextElement();
-            if (networkInterface.isLoopback() || !networkInterface.isUp()) {
-                continue; // skip loopback or disconnected interface
-            }
-            for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
-                InetAddress broadcastAddress = interfaceAddress.getBroadcast();
-                if (broadcastAddress == null) {
-                    continue;
+        for (NetworkInterface networkInterface : Utils.networkInterfaces) {
+            if (networkInterface.isUp()) {
+                for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
+                    InetAddress broadcastAddress = interfaceAddress.getBroadcast();
+                    if (broadcastAddress == null) {
+                        continue;
+                    }
+                    // Send the broadcast package!
+                    DiscoveryService.sendDiscoveryRequest(broadcastAddress);
                 }
-                // Send the broadcast package!
-                DiscoveryService.sendDiscoveryRequest(broadcastAddress);
+
+                // If interface is got up after program start, its host address will be added.
+                Utils.hostAddresses.addAll(networkInterface.getInterfaceAddresses());
+            } else {
+                // If interface is got down after program start, its host address will be removed.
+                Utils.hostAddresses.removeAll(networkInterface.getInterfaceAddresses());
             }
         }
         //</editor-fold>
@@ -98,6 +96,7 @@ public class NetworkService {
                     send();
                     Thread.sleep(Constants.DISCOVERY_INTERVAL);
                 }
+                LOGGER.debug("Send end");
             } catch (Exception e) {
                 LOGGER.error("Error on send() " + Arrays.toString(e.getStackTrace()));
             }/* finally {
@@ -112,6 +111,7 @@ public class NetworkService {
                 while (!end) {
                     receive();
                 }
+                LOGGER.debug("Receive end");
             } catch (Exception e) {
                 LOGGER.error("Error on receive() " + Arrays.toString(e.getStackTrace()));
             }/* finally {

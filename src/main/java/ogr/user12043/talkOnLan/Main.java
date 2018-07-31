@@ -1,7 +1,10 @@
 package ogr.user12043.talkOnLan;
 
-import ogr.user12043.talkOnLan.ui.MainPanel;
+import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Properties;
+import ogr.user12043.talkOnLan.util.Utils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 
@@ -10,19 +13,19 @@ import javax.swing.*;
  * part of project: talk-onLan
  */
 public class Main {
-    public static MainPanel mainPanel;
+    private static final Logger LOGGER = LogManager.getLogger(Main.class);
+    public static MainUI mainUI;
 
     public static void main(String args[]) {
         try {
             Properties.username = "user1";
-            /*MainPanel mainPanel = MainPanel.get();
-            mainPanel.setVisible(true);*/
+            Utils.initInterfaces();
             SwingUtilities.invokeLater(() -> {
-                mainPanel = new MainPanel();
-                mainPanel.setVisible(true);
+                mainUI = new MainUI();
+                mainUI.setVisible(true);
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Unexpected error happened!: ", e);
         }
     }
 }

@@ -31,25 +31,25 @@ class DiscoveryService {
             return;
         }*/
         LOGGER.debug("Discovery request received from " + receivedRequestPacket.getAddress() + ":" + receivedRequestPacket.getPort());
-        byte[] discoveryResponse = (Constants.DISCOVERY_COMMAND_RESPONSE + Constants.COMMAND_SEPERATOR + Properties.username).getBytes();
+        byte[] discoveryResponse = (Constants.DISCOVERY_COMMAND_RESPONSE + Constants.COMMAND_SEPARATOR + Properties.username).getBytes();
         DatagramPacket discoveryResponsePacket = new DatagramPacket(discoveryResponse, discoveryResponse.length, receivedRequestPacket.getAddress(), Constants.RECEIVE_PORT);
         NetworkService.sendSocket.send(discoveryResponsePacket);
         LOGGER.debug("Discovery response sent to: " + discoveryResponsePacket.getAddress() + ":" + discoveryResponsePacket.getPort());
     }
 
     static void receiveDiscoveryResponse(DatagramPacket receivedResponsePacket, String receivedData) {
+        LOGGER.debug("Discovery response received from " + receivedResponsePacket.getAddress() + ":" + receivedResponsePacket.getPort());
         if (Utils.buddyAddresses.contains(receivedResponsePacket.getAddress())) {
             return;
         }
-        LOGGER.debug("Discovery response received from " + receivedResponsePacket.getAddress() + ":" + receivedResponsePacket.getPort());
         Utils.buddyAddresses.add(receivedResponsePacket.getAddress());
         User user = new User();
         user.setAddress(receivedResponsePacket.getAddress());
-        int index = receivedData.indexOf(Constants.COMMAND_SEPERATOR);
+        int index = receivedData.indexOf(Constants.COMMAND_SEPARATOR);
         if (index != -1) {
             user.setUserName(receivedData.substring(index + 1));
         }
 
-        Main.mainPanel.buddiesPanel.addBuddy(user);
+        Main.mainUI.buddiesPanel.addBuddy(user);
     }
 }
