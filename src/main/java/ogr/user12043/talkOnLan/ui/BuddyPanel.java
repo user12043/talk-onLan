@@ -79,6 +79,6 @@ public class BuddyPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton_messageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_messageActionPerformed
-        Main.mainUI.createMessagePanel(user);
+        Main.mainUI.getMessagePanelOfUser(user).setVisible(true);
     }//GEN-LAST:event_jButton_messageActionPerformed
 }

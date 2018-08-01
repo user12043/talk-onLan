@@ -31,9 +31,10 @@ public class BuddiesPanel extends javax.swing.JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = buddyPanels.size();
-        c.weightx = 1.0;
+        c.weightx = 0.5;
         BuddyPanel buddyPanel = new BuddyPanel(user);
         add(buddyPanel, c);
+        buddyPanels.add(buddyPanel);
         revalidate();
     }
 

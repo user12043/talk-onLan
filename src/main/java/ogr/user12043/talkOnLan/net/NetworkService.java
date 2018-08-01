@@ -5,6 +5,7 @@ import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.*;
 import java.util.Arrays;
@@ -18,8 +19,9 @@ import java.util.concurrent.Executors;
 public class NetworkService {
     private static final Logger LOGGER = LogManager.getLogger(NetworkService.class);
     static DatagramSocket sendSocket;
-    private static ExecutorService service = Executors.newFixedThreadPool(3);
     private static DatagramSocket receiveSocket;
+    private static ServerSocket tcpReceiveSocket;
+    private static ExecutorService service = Executors.newFixedThreadPool(3);
     private static boolean end; // Control field for threads. (To safely terminate)
 
     private static void receive() throws IOException {
@@ -28,9 +30,11 @@ public class NetworkService {
         DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
         try {
             receiveSocket.receive(receivePacket);
-        } catch (SocketTimeoutException ignored) {
+        } catch (SocketTimeoutException e) {
+            return;
         }
 
+        // Return if source is localhost
         for (InterfaceAddress hostAddress : Utils.hostAddresses) {
             final InetAddress receivePacketAddress = receivePacket.getAddress();
             final InetAddress localhost = hostAddress.getAddress();
@@ -38,14 +42,30 @@ public class NetworkService {
                 return;
             }
         }
+
         String receivedData = new String(receivePacket.getData()).trim();
         // Process data
         if (Constants.DISCOVERY_COMMAND_REQUEST.equals(receivedData)) {
             DiscoveryService.sendDiscoveryResponse(receivePacket);
         } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_RESPONSE)) {
             DiscoveryService.receiveDiscoveryResponse(receivePacket, receivedData);
-        } else if (receivedData.startsWith(Constants.COMMAND_MESSAGE)) {
+        }/* else if (receivedData.startsWith(Constants.COMMAND_MESSAGE)) {
             MessageService.receiveMessage(receivePacket, receivedData);
+        }*/
+    }
+
+    private static void receiveTCP() throws IOException {
+        final Socket incomingSocket;
+        try {
+            incomingSocket = tcpReceiveSocket.accept();
+        } catch (SocketTimeoutException e) {
+            return;
+        }
+        DataInputStream inputStream = new DataInputStream(incomingSocket.getInputStream());
+        String message = inputStream.readUTF();
+        if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) {
+            message = message.replace((Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR), "");
+            MessageService.receiveMessage(incomingSocket.getInetAddress(), incomingSocket.getPort(), message);
         }
     }
 
@@ -74,7 +94,7 @@ public class NetworkService {
         //</editor-fold>
     }
 
-    private static void initConnections() throws UnknownHostException, SocketException {
+    private static void initConnections() throws IOException {
         if (sendSocket == null) {
             sendSocket = new DatagramSocket(Constants.SEND_PORT);
             sendSocket.setBroadcast(true);
@@ -84,9 +104,13 @@ public class NetworkService {
             receiveSocket.setBroadcast(true);
             receiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
         }
+        if (tcpReceiveSocket == null) {
+            tcpReceiveSocket = new ServerSocket(Constants.RECEIVE_PORT);
+            tcpReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+        }
     }
 
-    public static void start() throws UnknownHostException, SocketException {
+    public static void start() throws IOException {
         initConnections();
         end = false;
         Runnable sendThread = () -> {
@@ -99,10 +123,7 @@ public class NetworkService {
                 LOGGER.debug("Send end");
             } catch (Exception e) {
                 LOGGER.error("Error on send() " + Arrays.toString(e.getStackTrace()));
-            }/* finally {
-                sendSocket.close();
-                LOGGER.info("Send socket closed");
-            }*/
+            }
         };
 
         Runnable receiveThread = (() -> {
@@ -114,14 +135,23 @@ public class NetworkService {
                 LOGGER.debug("Receive end");
             } catch (Exception e) {
                 LOGGER.error("Error on receive() " + Arrays.toString(e.getStackTrace()));
-            }/* finally {
-                receiveSocket.close();
-                LOGGER.info("Receive socket closed");
-            }*/
+            }
+        });
+
+        Runnable receiveTcpThread = (() -> {
+            try {
+                while (!end) {
+                    receiveTCP();
+                }
+                LOGGER.debug("ReceiveTCP end");
+            } catch (Exception e) {
+                LOGGER.error("Error on receiveTCP() " + Arrays.toString(e.getStackTrace()));
+            }
         });
 
         service.execute(sendThread);
         service.execute(receiveThread);
+        service.execute(receiveTcpThread);
     }
 
     public static void end() {

@@ -19,6 +19,7 @@ public class Main {
     public static void main(String args[]) {
         try {
             Properties.username = "user1";
+            System.setProperty("java.net.preferIPv4Stack", "true"); // Set prefer to ipv4 addresses in java
             Utils.initInterfaces();
             SwingUtilities.invokeLater(() -> {
                 mainUI = new MainUI();

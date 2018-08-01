@@ -29,8 +29,13 @@
                   <Component id="buddiesPanel" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="jButton_startDiscovery" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="181" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jButton_addManually" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jButton_hostAddresses" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="jButton_endDiscovery" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -44,6 +49,8 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jButton_endDiscovery" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButton_startDiscovery" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButton_addManually" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButton_hostAddresses" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="buddiesPanel" pref="288" max="32767" attributes="0"/>
@@ -64,6 +71,7 @@
     <Component class="javax.swing.JButton" name="jButton_endDiscovery">
       <Properties>
         <Property name="text" type="java.lang.String" value="End Discovery"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_endDiscoveryActionPerformed"/>
@@ -76,5 +84,23 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout"/>
     </Container>
+    <Component class="javax.swing.JButton" name="jButton_addManually">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Add Manually"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_addManuallyActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton_hostAddresses">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="My Address(es)"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_hostAddressesActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>

@@ -1,8 +1,16 @@
 package ogr.user12043.talkOnLan.ui;
 
 import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.net.DiscoveryService;
 import ogr.user12043.talkOnLan.net.NetworkService;
+import ogr.user12043.talkOnLan.util.Utils;
 
+import javax.swing.*;
+import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,10 +20,12 @@ import java.util.Set;
  */
 public class MainUI extends javax.swing.JFrame {
 
-    public Set<MessagePanel> messagePanels;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
+    private Set<MessagePanel> messagePanels;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton_addManually;
     private javax.swing.JButton jButton_endDiscovery;
+    private javax.swing.JButton jButton_hostAddresses;
     private javax.swing.JButton jButton_startDiscovery;
     // End of variables declaration//GEN-END:variables
 
@@ -27,7 +37,12 @@ public class MainUI extends javax.swing.JFrame {
         messagePanels = new HashSet<>();
     }
 
-    public MessagePanel createMessagePanel(User user) {
+    public MessagePanel getMessagePanelOfUser(User user) {
+        for (MessagePanel panel : messagePanels) {
+            if (panel.getUser().equals(user)) {
+                return panel;
+            }
+        }
         MessagePanel messagePanel = new MessagePanel(this, false, user);
         messagePanels.add(messagePanel);
         return messagePanel;
@@ -37,12 +52,13 @@ public class MainUI extends javax.swing.JFrame {
         final boolean panelExists = messagePanels.stream().anyMatch(messagePanel -> {
             if (messagePanel.getUser().equals(user)) {
                 messagePanel.receiveMessage(message);
+                messagePanel.setVisible(true);
                 return true;
             }
             return false;
         });
         if (!panelExists) {
-            final MessagePanel messagePanel = createMessagePanel(user);
+            final MessagePanel messagePanel = getMessagePanelOfUser(user);
             messagePanel.setVisible(true);
             messagePanel.receiveMessage(message);
         }
@@ -60,6 +76,8 @@ public class MainUI extends javax.swing.JFrame {
         jButton_startDiscovery = new javax.swing.JButton();
         jButton_endDiscovery = new javax.swing.JButton();
         buddiesPanel = new ogr.user12043.talkOnLan.ui.BuddiesPanel();
+        jButton_addManually = new javax.swing.JButton();
+        jButton_hostAddresses = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -71,9 +89,26 @@ public class MainUI extends javax.swing.JFrame {
         });
 
         jButton_endDiscovery.setText("End Discovery");
+        jButton_endDiscovery.setEnabled(false);
         jButton_endDiscovery.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton_endDiscoveryActionPerformed(evt);
+            }
+        });
+
+        jButton_addManually.setText("Add Manually");
+        jButton_addManually.setEnabled(false);
+        jButton_addManually.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_addManuallyActionPerformed(evt);
+            }
+        });
+
+        jButton_hostAddresses.setText("My Address(es)");
+        jButton_hostAddresses.setEnabled(false);
+        jButton_hostAddresses.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_hostAddressesActionPerformed(evt);
             }
         });
 
@@ -87,8 +122,13 @@ public class MainUI extends javax.swing.JFrame {
                                         .addComponent(buddiesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jButton_startDiscovery)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 181, Short.MAX_VALUE)
-                                                .addComponent(jButton_endDiscovery)))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jButton_addManually)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jButton_hostAddresses)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jButton_endDiscovery)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -97,7 +137,9 @@ public class MainUI extends javax.swing.JFrame {
                                 .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jButton_endDiscovery)
-                                        .addComponent(jButton_startDiscovery))
+                                        .addComponent(jButton_startDiscovery)
+                                        .addComponent(jButton_addManually)
+                                        .addComponent(jButton_hostAddresses))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(buddiesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
                                 .addContainerGap())
@@ -109,6 +151,10 @@ public class MainUI extends javax.swing.JFrame {
     private void jButton_startDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_startDiscoveryActionPerformed
         try {
             NetworkService.start();
+            jButton_startDiscovery.setEnabled(false);
+            jButton_addManually.setEnabled(true);
+            jButton_hostAddresses.setEnabled(true);
+            jButton_endDiscovery.setEnabled(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -116,5 +162,38 @@ public class MainUI extends javax.swing.JFrame {
 
     private void jButton_endDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_endDiscoveryActionPerformed
         NetworkService.end();
+        jButton_startDiscovery.setEnabled(true);
+        jButton_addManually.setEnabled(false);
+        jButton_hostAddresses.setEnabled(false);
+        jButton_endDiscovery.setEnabled(false);
     }//GEN-LAST:event_jButton_endDiscoveryActionPerformed
+
+    private void jButton_addManuallyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_addManuallyActionPerformed
+        String input = JOptionPane.showInputDialog(this, "Enter ip address", "Direct IP", JOptionPane.QUESTION_MESSAGE);
+        if (input != null && !input.isEmpty()) {
+            InetAddress address;
+            try {
+                address = InetAddress.getByName(input);
+            } catch (UnknownHostException e) {
+                JOptionPane.showMessageDialog(this, "Invalid input!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                DiscoveryService.sendDiscoveryRequest(address);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error on discovery!", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_jButton_addManuallyActionPerformed
+
+    private void jButton_hostAddressesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hostAddressesActionPerformed
+        StringBuilder builder = new StringBuilder();
+        for (InterfaceAddress hostAddress : Utils.hostAddresses) {
+            if (hostAddress.getAddress() instanceof Inet4Address) {
+                final String address = hostAddress.getAddress().toString();
+                builder.append(address.substring(1)).append("\n");
+            }
+        }
+        JOptionPane.showMessageDialog(this, builder.toString(), "Local IP addresses", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_jButton_hostAddressesActionPerformed
 }

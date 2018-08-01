@@ -16,10 +16,10 @@ import java.net.InetAddress;
  * Created by user12043 on 26.07.2018 - 11:57
  * part of project: talk-onLan
  */
-class DiscoveryService {
+public class DiscoveryService {
     private static final Logger LOGGER = LogManager.getLogger(DiscoveryService.class);
 
-    static void sendDiscoveryRequest(InetAddress address) throws IOException {
+    public static void sendDiscoveryRequest(InetAddress address) throws IOException {
         byte[] request = Constants.DISCOVERY_COMMAND_REQUEST.getBytes();
         DatagramPacket sendPacket = new DatagramPacket(request, request.length, address, Constants.RECEIVE_PORT);
         NetworkService.sendSocket.send(sendPacket);
@@ -35,6 +35,10 @@ class DiscoveryService {
         DatagramPacket discoveryResponsePacket = new DatagramPacket(discoveryResponse, discoveryResponse.length, receivedRequestPacket.getAddress(), Constants.RECEIVE_PORT);
         NetworkService.sendSocket.send(discoveryResponsePacket);
         LOGGER.debug("Discovery response sent to: " + discoveryResponsePacket.getAddress() + ":" + discoveryResponsePacket.getPort());
+        // Send a new discovery request to source address if request received from unknown address
+        if (!Utils.buddyAddresses.contains(receivedRequestPacket.getAddress())) {
+            sendDiscoveryRequest(receivedRequestPacket.getAddress());
+        }
     }
 
     static void receiveDiscoveryResponse(DatagramPacket receivedResponsePacket, String receivedData) {
