@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -22,6 +23,7 @@ public class Utils {
 
     public static List<NetworkInterface> networkInterfaces = new ArrayList<>();
     public static Set<InterfaceAddress> hostAddresses = new HashSet<>();
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy");
 
     public static void initInterfaces() {
         try {
@@ -37,5 +39,9 @@ public class Utils {
         } catch (SocketException e) {
             LOGGER.error("Error on getting network devices info");
         }
+    }
+
+    public static String formatDate(Date date) {
+        return dateFormat.format(date);
     }
 }

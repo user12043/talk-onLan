@@ -5,10 +5,12 @@ import ogr.user12043.talkOnLan.net.MessageService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 /**
- * Created by user12043 on 31.07.2018 - 16:22 part of project: talk-onLan
+ * Created by user12043 on 31.07.2018 - 16:22
+ * part of project: talk-onLan
  */
 class MessagePanel extends javax.swing.JDialog {
 
@@ -43,8 +45,8 @@ class MessagePanel extends javax.swing.JDialog {
         String sendingMessage = jTextArea_content.getText();
         try {
             MessageService.sendMessage(user.getAddress(), sendingMessage);
-            addMessage(jTextArea_content.getText(), true);
-            jTextArea_content.setText("");
+            addMessage(sendingMessage, true);
+//            jTextArea_content.setText("");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Cannot send the message!", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
@@ -56,24 +58,20 @@ class MessagePanel extends javax.swing.JDialog {
 
     private void addMessage(String message, boolean own) {
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.anchor = ((own) ? GridBagConstraints.LAST_LINE_END : GridBagConstraints.LAST_LINE_START);
         constraints.gridy = lineNumber;
         constraints.weightx = 0.5;
         constraints.gridx = ((own) ? 1 : 0);
+        constraints.gridwidth = 2;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-//        JTextArea textArea = new JTextArea(message);
-//        textArea.setLineWrap(true);
-//        textArea.setWrapStyleWord(true);
-//        textArea.setRows(0);
-//        textArea.setColumns(80);
-        JTextPane textPane = new JTextPane();
-        textPane.setContentType("text/html");
-        textPane.setText("<p style=\"text-align: " + ((own) ? ("right") : ("left")) + "\">" + message + "</p>");
-        textPane.setEditable(false);
+        MessageBox messageBox = new MessageBox(user, message, own);
         lineNumber++;
-//        jPanel_dialog.add(textArea, constraints);
-        jPanel_dialog.add(textPane, constraints);
-        pack();
+        jPanel_dialog.add(messageBox, constraints);
+        /*JPanel jPanel = new JPanel();
+        constraints.weightx = 0.5;
+        constraints.gridx = ((own) ? 0 : 2);
+        constraints.gridwidth = 1;
+        jPanel_dialog.add(jPanel, constraints);*/
+        revalidate();
     }
 
     /**
@@ -95,6 +93,15 @@ class MessagePanel extends javax.swing.JDialog {
 
         jTextArea_content.setColumns(20);
         jTextArea_content.setRows(5);
+        jTextArea_content.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextArea_contentKeyPressed(evt);
+            }
+
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextArea_contentKeyReleased(evt);
+            }
+        });
         jScrollPane_content.setViewportView(jTextArea_content);
 
         jButton_send.setText("Send");
@@ -108,6 +115,7 @@ class MessagePanel extends javax.swing.JDialog {
         jScrollPane_dialog.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane_dialog.setAutoscrolls(true);
 
+        jPanel_dialog.setAutoscrolls(true);
         jPanel_dialog.setLayout(new java.awt.GridBagLayout());
         jScrollPane_dialog.setViewportView(jPanel_dialog);
 
@@ -118,7 +126,7 @@ class MessagePanel extends javax.swing.JDialog {
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jScrollPane_content, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane_content, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
                                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                                 .addComponent(jButton_send)
                                                 .addGap(0, 0, Short.MAX_VALUE))
@@ -129,7 +137,7 @@ class MessagePanel extends javax.swing.JDialog {
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jScrollPane_dialog, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                .addComponent(jScrollPane_dialog, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
                                 .addGap(18, 18, 18)
                                 .addComponent(jScrollPane_content, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -143,4 +151,17 @@ class MessagePanel extends javax.swing.JDialog {
     private void jButton_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_sendActionPerformed
         sendMessage();
     }//GEN-LAST:event_jButton_sendActionPerformed
+
+    private void jTextArea_contentKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea_contentKeyPressed
+        final int keyCode = evt.getKeyCode();
+        if (keyCode == KeyEvent.VK_ENTER) {
+            jButton_send.doClick();
+        }
+    }//GEN-LAST:event_jTextArea_contentKeyPressed
+
+    private void jTextArea_contentKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea_contentKeyReleased
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            jTextArea_content.setText("");
+        }
+    }//GEN-LAST:event_jTextArea_contentKeyReleased
 }
