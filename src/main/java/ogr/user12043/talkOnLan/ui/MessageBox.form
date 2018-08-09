@@ -23,11 +23,13 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="jLabel_left" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jTextArea_content" pref="0" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Component id="jLabel_left" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="32767" attributes="0"/>
+                  <Component id="jLabel_time" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jTextArea_content" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLabel_right" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -38,12 +40,14 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel_left" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel_right" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jTextArea_content" pref="22" max="32767" attributes="0"/>
+              <Component id="jLabel_time" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jTextArea_content" alignment="3" max="-2" attributes="0"/>
+                  <Component id="jLabel_right" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel_left" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -53,21 +57,21 @@
     <Component class="javax.swing.JLabel" name="jLabel_left">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="((own) ? user.getUserName() : Utils.formatDate(new Date()))" type="code"/>
+          <Connection code="user.getUserName()" type="code"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel_right">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="((!own) ? user.getUserName() : Utils.formatDate(new Date()))" type="code"/>
+          <Connection code="user.getUserName()" type="code"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextArea" name="jTextArea_content">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
-        <Property name="columns" type="int" value="50"/>
+        <Property name="columns" type="int" value="25"/>
         <Property name="lineWrap" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="message" type="code"/>
@@ -77,6 +81,11 @@
           <Color id="Text Cursor"/>
         </Property>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel_time">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JLabel(getDate(), getDateAligment())"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

@@ -3,6 +3,7 @@ package ogr.user12043.talkOnLan.ui;
 import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.util.Utils;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.Date;
 
@@ -17,6 +18,7 @@ public class MessageBox extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel_left;
     private javax.swing.JLabel jLabel_right;
+    private javax.swing.JLabel jLabel_time;
     private javax.swing.JTextArea jTextArea_content;
     // End of variables declaration//GEN-END:variables
 
@@ -28,10 +30,19 @@ public class MessageBox extends javax.swing.JPanel {
         this.message = message;
         this.own = own;
         initComponents();
+        this.jLabel_right.setVisible(own);
+        this.jLabel_left.setVisible(!own);
+        if (own) {
+            jTextArea_content.setBackground(Color.CYAN);
+        }
     }
 
     private String getDate() {
         return Utils.formatDate(new Date());
+    }
+
+    private int getDateAligment() {
+        return own ? SwingConstants.RIGHT : SwingConstants.LEFT;
     }
 
     /**
@@ -47,15 +58,16 @@ public class MessageBox extends javax.swing.JPanel {
         jLabel_left = new javax.swing.JLabel();
         jLabel_right = new javax.swing.JLabel();
         jTextArea_content = new javax.swing.JTextArea();
+        jLabel_time = new javax.swing.JLabel(getDate(), getDateAligment());
 
         setMaximumSize(new Dimension(300, Integer.MAX_VALUE));
 
-        jLabel_left.setText(((own) ? user.getUserName() : Utils.formatDate(new Date())));
+        jLabel_left.setText(user.getUserName());
 
-        jLabel_right.setText(((!own) ? user.getUserName() : Utils.formatDate(new Date())));
+        jLabel_right.setText(user.getUserName());
 
         jTextArea_content.setEditable(false);
-        jTextArea_content.setColumns(50);
+        jTextArea_content.setColumns(25);
         jTextArea_content.setLineWrap(true);
         jTextArea_content.setText(message);
         jTextArea_content.setWrapStyleWord(true);
@@ -67,22 +79,26 @@ public class MessageBox extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel_left)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextArea_content, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jLabel_time, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel_left)
-                        .addGap(18, 18, Short.MAX_VALUE)
+                        .addComponent(jTextArea_content)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel_right)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel_left)
-                    .addComponent(jLabel_right))
+                .addContainerGap()
+                .addComponent(jLabel_time, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextArea_content, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextArea_content, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel_right)
+                    .addComponent(jLabel_left))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents

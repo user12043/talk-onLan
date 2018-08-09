@@ -50,7 +50,6 @@ class MessagePanel extends javax.swing.JDialog {
         try {
             MessageService.sendMessage(user.getAddress(), sendingMessage);
             addMessage(sendingMessage, true);
-//            jTextArea_content.setText("");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Cannot send the message!", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
@@ -62,14 +61,15 @@ class MessagePanel extends javax.swing.JDialog {
 
     private void addMessage(String message, boolean own) {
         GridBagConstraints constraints = new GridBagConstraints();
+//        constraints.gridx = ((own) ? 1 : 0);
+        // TODO size does not reducing on reduce panel size
         constraints.gridy = lineNumber;
-        constraints.weightx = 0.5;
-        constraints.gridx = ((own) ? 1 : 0);
-        constraints.gridwidth = 2;
         constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0d;
+        constraints.insets = new Insets(0, 0, 20, 0);
         MessageBox messageBox = new MessageBox(user, message, own);
-        lineNumber++;
         jPanel_dialog.add(messageBox, constraints);
+        lineNumber++;
         revalidate();
     }
 
