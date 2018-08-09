@@ -17,6 +17,7 @@ class MessagePanel extends javax.swing.JDialog {
     private User user;
     private StringBuilder receivingMessage;
     private int lineNumber;
+    private boolean shiftPressed;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_send;
     private javax.swing.JPanel jPanel_dialog;
@@ -43,6 +44,9 @@ class MessagePanel extends javax.swing.JDialog {
 
     private void sendMessage() {
         String sendingMessage = jTextArea_content.getText();
+        if (sendingMessage.isEmpty()) {
+            return;
+        }
         try {
             MessageService.sendMessage(user.getAddress(), sendingMessage);
             addMessage(sendingMessage, true);
@@ -66,11 +70,6 @@ class MessagePanel extends javax.swing.JDialog {
         MessageBox messageBox = new MessageBox(user, message, own);
         lineNumber++;
         jPanel_dialog.add(messageBox, constraints);
-        /*JPanel jPanel = new JPanel();
-        constraints.weightx = 0.5;
-        constraints.gridx = ((own) ? 0 : 2);
-        constraints.gridwidth = 1;
-        jPanel_dialog.add(jPanel, constraints);*/
         revalidate();
     }
 
@@ -154,14 +153,24 @@ class MessagePanel extends javax.swing.JDialog {
 
     private void jTextArea_contentKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea_contentKeyPressed
         final int keyCode = evt.getKeyCode();
-        if (keyCode == KeyEvent.VK_ENTER) {
-            jButton_send.doClick();
+        if (keyCode == KeyEvent.VK_SHIFT) {
+            shiftPressed = true;
+        } else if (keyCode == KeyEvent.VK_ENTER) {
+            if (!shiftPressed) {
+                jButton_send.doClick();
+            } else {
+                jTextArea_content.append("\n");
+            }
         }
     }//GEN-LAST:event_jTextArea_contentKeyPressed
 
     private void jTextArea_contentKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea_contentKeyReleased
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            jTextArea_content.setText("");
+            if (!shiftPressed) {
+                jTextArea_content.setText("");
+            }
+        } else if (evt.getKeyCode() == KeyEvent.VK_SHIFT) {
+            shiftPressed = false;
         }
     }//GEN-LAST:event_jTextArea_contentKeyReleased
 }
