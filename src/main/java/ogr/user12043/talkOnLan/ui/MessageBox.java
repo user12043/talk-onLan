@@ -11,10 +11,10 @@ import java.util.Date;
  * Created by user12043 on 02.08.2018 - 08:45
  * part of project: talk-onLan
  */
-public class MessageBox extends javax.swing.JPanel {
-    private User user;
-    private String message;
-    private boolean own;
+class MessageBox extends javax.swing.JPanel {
+    private final User user;
+    private final String message;
+    private final boolean own;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel_left;
     private javax.swing.JLabel jLabel_right;
@@ -41,7 +41,7 @@ public class MessageBox extends javax.swing.JPanel {
         return Utils.formatDate(new Date());
     }
 
-    private int getDateAligment() {
+    private int getDateAlignment() {
         return own ? SwingConstants.RIGHT : SwingConstants.LEFT;
     }
 
@@ -58,7 +58,7 @@ public class MessageBox extends javax.swing.JPanel {
         jLabel_left = new javax.swing.JLabel();
         jLabel_right = new javax.swing.JLabel();
         jTextArea_content = new javax.swing.JTextArea();
-        jLabel_time = new javax.swing.JLabel(getDate(), getDateAligment());
+        jLabel_time = new javax.swing.JLabel(getDate(), getDateAlignment());
 
         setMaximumSize(new Dimension(300, Integer.MAX_VALUE));
 

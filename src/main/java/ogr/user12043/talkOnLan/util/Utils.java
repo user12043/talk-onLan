@@ -16,14 +16,12 @@ import java.util.*;
  * part of project: talk-onLan
  */
 public class Utils {
+    public static final Set<InetAddress> buddyAddresses = new HashSet<>();
+    public static final Set<User> buddies = new HashSet<>();
+    public static final List<NetworkInterface> networkInterfaces = new ArrayList<>();
+    public static final Set<InterfaceAddress> hostAddresses = new HashSet<>();
     private static final Logger LOGGER = LogManager.getLogger(Constants.class);
-
-    public static Set<InetAddress> buddyAddresses = new HashSet<>();
-    public static Set<User> buddies = new HashSet<>();
-
-    public static List<NetworkInterface> networkInterfaces = new ArrayList<>();
-    public static Set<InterfaceAddress> hostAddresses = new HashSet<>();
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy");
 
     public static void initInterfaces() {
         try {
@@ -31,7 +29,7 @@ public class Utils {
             while (enumeration.hasMoreElements()) {
                 NetworkInterface networkInterface = enumeration.nextElement();
                 if (networkInterface.isLoopback() || !networkInterface.isUp()) {
-                    continue; // skip loopback or disconnected interface
+                    continue; // skip loop back or disconnected interface
                 }
                 networkInterfaces.add(networkInterface);
                 hostAddresses.addAll(networkInterface.getInterfaceAddresses());

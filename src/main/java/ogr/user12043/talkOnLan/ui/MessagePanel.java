@@ -16,8 +16,8 @@ import java.io.IOException;
  */
 class MessagePanel extends javax.swing.JDialog {
 
-    private User user;
-    private StringBuilder receivingMessage;
+    private final User user;
+    private final StringBuilder receivingMessage;
     private int lineNumber;
     private boolean shiftPressed;
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -32,8 +32,8 @@ class MessagePanel extends javax.swing.JDialog {
     /**
      * Creates new form MessagePanel
      */
-    MessagePanel(java.awt.Frame parent, boolean modal, User user) {
-        super(parent, modal);
+    MessagePanel(Frame parent, User user) {
+        super(parent, false);
         initComponents();
         receivingMessage = new StringBuilder();
         lineNumber = 0;

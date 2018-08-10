@@ -7,9 +7,9 @@ import ogr.user12043.talkOnLan.User;
  * Created by user12043 on 31.07.2018 - 12:11
  * part of project: talk-onLan
  */
-public class BuddyPanel extends javax.swing.JPanel {
+class BuddyPanel extends javax.swing.JPanel {
 
-    private User user;
+    private final User user;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_message;
     private javax.swing.JLabel jLabel_address;

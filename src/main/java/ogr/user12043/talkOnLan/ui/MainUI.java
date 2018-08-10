@@ -21,7 +21,7 @@ import java.util.Set;
 public class MainUI extends javax.swing.JFrame {
 
     public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
-    private Set<MessagePanel> messagePanels;
+    private final Set<MessagePanel> messagePanels;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_addManually;
     private javax.swing.JButton jButton_endDiscovery;
@@ -43,7 +43,7 @@ public class MainUI extends javax.swing.JFrame {
                 return panel;
             }
         }
-        MessagePanel messagePanel = new MessagePanel(this, false, user);
+        MessagePanel messagePanel = new MessagePanel(this, user);
         messagePanels.add(messagePanel);
         return messagePanel;
     }

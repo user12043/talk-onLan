@@ -8,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by ME99735 on 10.08.2018 - 09:03
@@ -16,7 +15,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class FileTransferService {
     private static final Logger LOGGER = LogManager.getLogger(FileTransferService.class);
-    private static final AtomicInteger atomicInteger = new AtomicInteger(0);
 
     public static void sendFileRequest(InetAddress address, File file) throws IOException {
         Socket socket = null;
@@ -33,7 +31,7 @@ public class FileTransferService {
             outputStream.writeUTF(Constants.COMMAND_FILE_TRANSFER_REQUEST + Constants.COMMAND_SEPARATOR + file.length() + Constants.COMMAND_SEPARATOR + file.getName());
             LOGGER.info("file send request sent to " + address);
 
-            // Receive okey response
+            // Receive ok response
             String response = inputStream.readUTF();
             if (!response.equals(Constants.COMMAND_FILE_TRANSFER_RESPONSE)) {
                 LOGGER.info("invalid send file response from " + address);
@@ -54,7 +52,7 @@ public class FileTransferService {
         }
     }
 
-    public static void receiveFile(Socket incomingSocket, long fileLength, String fileName) throws IOException {
+    public static void receiveFile(Socket incomingSocket, String fileName) throws IOException {
         DataOutputStream outputStream;
         DataInputStream inputStream;
         DataOutputStream fileOutputStream = null;

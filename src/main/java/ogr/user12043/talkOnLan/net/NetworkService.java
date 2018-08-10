@@ -21,7 +21,7 @@ public class NetworkService {
     static DatagramSocket sendSocket;
     private static DatagramSocket receiveSocket;
     private static ServerSocket messageReceiveSocket;
-    private static ExecutorService service = Executors.newFixedThreadPool(3);
+    private static final ExecutorService service = Executors.newFixedThreadPool(3);
     private static boolean end; // Control field for threads. (To safely terminate)
 
     private static void receive() throws IOException {
@@ -73,7 +73,7 @@ public class NetworkService {
                     throw new Exception();
                 }
                 long size = Long.parseLong(arguments[1]);
-                FileTransferService.receiveFile(incomingSocket, size, arguments[2]);
+                FileTransferService.receiveFile(incomingSocket, arguments[2]);
             } catch (IOException e) {
                 throw e;
             } catch (Exception e) {

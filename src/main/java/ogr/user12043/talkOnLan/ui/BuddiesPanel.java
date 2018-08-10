@@ -3,7 +3,6 @@ package ogr.user12043.talkOnLan.ui;
 import ogr.user12043.talkOnLan.User;
 
 import java.awt.*;
-import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +14,7 @@ public class BuddiesPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-    private Set<BuddyPanel> buddyPanels;
+    private final Set<BuddyPanel> buddyPanels;
 
     /**
      * Creates new form BuddiesPanel
@@ -26,7 +25,6 @@ public class BuddiesPanel extends javax.swing.JPanel {
     }
 
     public void addBuddy(User user) {
-        InetAddress address = user.getAddress();
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
