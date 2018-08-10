@@ -29,7 +29,7 @@ class BuddyPanel extends javax.swing.JPanel {
         initComponents();
         this.user = user;
         jLabel_name.setText(user.getUserName());
-        jLabel_address.setText(user.getAddress().toString());
+        jLabel_address.setText(" on " + user.getAddress().toString().replace("/", ""));
     }
 
 
@@ -46,6 +46,8 @@ class BuddyPanel extends javax.swing.JPanel {
         jLabel_address = new javax.swing.JLabel();
         jButton_message = new javax.swing.JButton();
         jButton_file = new javax.swing.JButton();
+
+        setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
 
         jLabel_name.setFont(jLabel_name.getFont().deriveFont(jLabel_name.getFont().getSize() + 6f));
         jLabel_name.setText("name");
@@ -76,11 +78,11 @@ class BuddyPanel extends javax.swing.JPanel {
                                 .addComponent(jLabel_name)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel_address)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton_message)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton_file)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

@@ -28,6 +28,7 @@ public class MainUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton_hardDiscovery;
     private javax.swing.JButton jButton_hostAddresses;
     private javax.swing.JButton jButton_startDiscovery;
+    private javax.swing.JScrollPane jScrollPane_buddiesPanel;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -103,12 +104,14 @@ public class MainUI extends javax.swing.JFrame {
 
         jButton_startDiscovery = new javax.swing.JButton();
         jButton_endDiscovery = new javax.swing.JButton();
-        buddiesPanel = new ogr.user12043.talkOnLan.ui.BuddiesPanel();
         jButton_addManually = new javax.swing.JButton();
         jButton_hostAddresses = new javax.swing.JButton();
         jButton_hardDiscovery = new javax.swing.JButton();
+        jScrollPane_buddiesPanel = new javax.swing.JScrollPane();
+        buddiesPanel = new ogr.user12043.talkOnLan.ui.BuddiesPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(0, 250));
 
         jButton_startDiscovery.setText("Start Discovery");
         jButton_startDiscovery.addActionListener(new java.awt.event.ActionListener() {
@@ -149,14 +152,16 @@ public class MainUI extends javax.swing.JFrame {
             }
         });
 
+        jScrollPane_buddiesPanel.setAutoscrolls(true);
+        jScrollPane_buddiesPanel.setViewportView(buddiesPanel);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(buddiesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jButton_startDiscovery)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -165,10 +170,10 @@ public class MainUI extends javax.swing.JFrame {
                                                 .addComponent(jButton_addManually)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(jButton_hostAddresses)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jButton_endDiscovery)
-                                                .addGap(0, 4, Short.MAX_VALUE)))
-                                .addContainerGap())
+                                                .addGap(12, 12, 12)
+                                                .addComponent(jButton_endDiscovery))
+                                        .addComponent(jScrollPane_buddiesPanel))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -180,8 +185,8 @@ public class MainUI extends javax.swing.JFrame {
                                         .addComponent(jButton_addManually)
                                         .addComponent(jButton_hostAddresses)
                                         .addComponent(jButton_hardDiscovery))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(buddiesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jScrollPane_buddiesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
                                 .addContainerGap())
         );
 
