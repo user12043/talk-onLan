@@ -1,10 +1,12 @@
 package ogr.user12043.talkOnLan.net;
 
+import ogr.user12043.talkOnLan.Main;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -16,7 +18,7 @@ import java.net.Socket;
 public class FileTransferService {
     private static final Logger LOGGER = LogManager.getLogger(FileTransferService.class);
 
-    public static void sendFileRequest(InetAddress address, File file) throws IOException {
+    public static void sendFile(InetAddress address, File file) throws IOException, SecurityException {
         Socket socket = null;
         DataOutputStream outputStream;
         DataInputStream inputStream;
@@ -33,14 +35,20 @@ public class FileTransferService {
 
             // Receive ok response
             String response = inputStream.readUTF();
-            if (!response.equals(Constants.COMMAND_FILE_TRANSFER_RESPONSE)) {
-                LOGGER.info("invalid send file response from " + address);
-                return;
-            }
-            LOGGER.info("sending file to " + address);
-            byte[] buffer = new byte[Constants.BUFFER_LENGTH];
-            while (fileInputStream.read(buffer) != -1) {
-                outputStream.write(buffer);
+            switch (response) {
+                case Constants.COMMAND_FILE_TRANSFER_RESPONSE_ACCEPT:
+                    LOGGER.info("sending file to " + address);
+                    byte[] buffer = new byte[Constants.BUFFER_LENGTH];
+                    while (fileInputStream.read(buffer) != -1) {
+                        outputStream.write(buffer);
+                    }
+                    ProgressMonitorInputStream stream = new ProgressMonitorInputStream(null, "t", fileInputStream);
+                    ProgressMonitor progressMonitor = new ProgressMonitor(null, "fds", "fs", 0, 100);
+                    break;
+                case Constants.COMMAND_FILE_TRANSFER_RESPONSE_REJECT:
+                    throw new SecurityException();
+                default:
+                    LOGGER.info("invalid send file response received from " + address);
             }
         } finally {
             if (socket != null) {
@@ -52,25 +60,32 @@ public class FileTransferService {
         }
     }
 
-    public static void receiveFile(Socket incomingSocket, String fileName) throws IOException {
+    static void receiveFile(Socket incomingSocket, String fileName, long fileSize) throws IOException {
         DataOutputStream outputStream;
         DataInputStream inputStream;
         DataOutputStream fileOutputStream = null;
         try {
             outputStream = new DataOutputStream(incomingSocket.getOutputStream());
             inputStream = new DataInputStream(incomingSocket.getInputStream());
-            File outputFile = new File(Properties.fileReceiveFolder + "/" + fileName);
-            outputFile.getParentFile().mkdirs();
-            fileOutputStream = new DataOutputStream(new FileOutputStream(outputFile, false));
-            // send response
-            outputStream.writeUTF(Constants.COMMAND_FILE_TRANSFER_RESPONSE);
-            LOGGER.info("file send response sent to " + incomingSocket.getInetAddress());
+            if (Main.mainUI.confirmFileReceive(incomingSocket.getInetAddress(), fileName, fileSize)) {
+                File outputFile = new File(Properties.fileReceiveFolder + "/" + fileName);
+                outputFile.getParentFile().mkdirs();
+                fileOutputStream = new DataOutputStream(new FileOutputStream(outputFile, false));
 
-            byte[] buffer = new byte[Constants.BUFFER_LENGTH];
-            while (inputStream.read(buffer) != -1) {
-                fileOutputStream.write(buffer);
+                // send allow response
+                outputStream.writeUTF(Constants.COMMAND_FILE_TRANSFER_RESPONSE_ACCEPT);
+                LOGGER.info("file send allow response sent to " + incomingSocket.getInetAddress());
+
+                byte[] buffer = new byte[Constants.BUFFER_LENGTH];
+                while (inputStream.read(buffer) != -1) {
+                    fileOutputStream.write(buffer);
+                }
+                LOGGER.info("file received from " + incomingSocket.getInetAddress());
+            } else {
+                // send deny response
+                outputStream.writeUTF(Constants.COMMAND_FILE_TRANSFER_RESPONSE_REJECT);
+                LOGGER.info("file send deny response sent to " + incomingSocket.getInetAddress());
             }
-            LOGGER.info("file received from " + incomingSocket.getInetAddress());
         } finally {
             if (fileOutputStream != null) {
                 fileOutputStream.close();

@@ -2,6 +2,11 @@ package ogr.user12043.talkOnLan.ui;
 
 import ogr.user12043.talkOnLan.Main;
 import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.net.FileTransferService;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by user12043 on 31.07.2018 - 12:11
@@ -11,6 +16,7 @@ class BuddyPanel extends javax.swing.JPanel {
 
     private final User user;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton_file;
     private javax.swing.JButton jButton_message;
     private javax.swing.JLabel jLabel_address;
     private javax.swing.JLabel jLabel_name;
@@ -39,6 +45,7 @@ class BuddyPanel extends javax.swing.JPanel {
         jLabel_name = new javax.swing.JLabel();
         jLabel_address = new javax.swing.JLabel();
         jButton_message = new javax.swing.JButton();
+        jButton_file = new javax.swing.JButton();
 
         jLabel_name.setFont(jLabel_name.getFont().deriveFont(jLabel_name.getFont().getSize() + 6f));
         jLabel_name.setText("name");
@@ -53,6 +60,13 @@ class BuddyPanel extends javax.swing.JPanel {
             }
         });
 
+        jButton_file.setText("File");
+        jButton_file.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_fileActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -64,6 +78,8 @@ class BuddyPanel extends javax.swing.JPanel {
                                 .addComponent(jLabel_address)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jButton_message)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton_file)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -73,7 +89,8 @@ class BuddyPanel extends javax.swing.JPanel {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel_name)
                                         .addComponent(jLabel_address)
-                                        .addComponent(jButton_message))
+                                        .addComponent(jButton_message)
+                                        .addComponent(jButton_file))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -81,4 +98,20 @@ class BuddyPanel extends javax.swing.JPanel {
     private void jButton_messageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_messageActionPerformed
         Main.mainUI.getMessagePanelOfUser(user).setVisible(true);
     }//GEN-LAST:event_jButton_messageActionPerformed
+
+    private void jButton_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_fileActionPerformed
+        JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
+        final int state = chooser.showOpenDialog(this);
+        if (state != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        File file = chooser.getSelectedFile();
+        try {
+            FileTransferService.sendFile(user.getAddress(), file);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, ("Unable to send file:\n" + e), "ERROR", JOptionPane.ERROR_MESSAGE);
+        } catch (SecurityException e) {
+            JOptionPane.showMessageDialog(this, ("File did not send. Target user rejected send request"), "WARNING", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton_fileActionPerformed
 }

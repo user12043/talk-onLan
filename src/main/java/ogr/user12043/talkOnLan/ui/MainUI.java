@@ -20,11 +20,12 @@ import java.util.Set;
  */
 public class MainUI extends javax.swing.JFrame {
 
-    public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
     private final Set<MessagePanel> messagePanels;
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
     private javax.swing.JButton jButton_addManually;
     private javax.swing.JButton jButton_endDiscovery;
+    private javax.swing.JButton jButton_hardDiscovery;
     private javax.swing.JButton jButton_hostAddresses;
     private javax.swing.JButton jButton_startDiscovery;
     // End of variables declaration//GEN-END:variables
@@ -64,6 +65,33 @@ public class MainUI extends javax.swing.JFrame {
         }
     }
 
+    public boolean confirmFileReceive(InetAddress senderAddress, String fileName, long fileSize) {
+        final User user = new User();
+        final boolean buddyExists = Utils.buddies.stream().anyMatch(u -> {
+            if (u.getAddress().equals(senderAddress)) {
+                user.setUserName(u.getUserName());
+                user.setAddress(u.getAddress());
+                return true;
+            }
+            return false;
+        });
+        if (buddyExists) {
+            String fileSizeString = "";
+            if (fileSize < 1024) {
+                fileSizeString = (fileSize + " Bytes");
+            } else if (fileSize < 1024 * 1024) {
+                fileSizeString = (fileSize / 1024) + " KB";
+            } else if (fileSize < 1024 * 1024 * 1024) {
+                fileSizeString = (fileSize / 1024 / 1024) + " MB";
+            }
+
+            String message = user.getUserName() + " on " + user.getAddress() + " wants to send you this file:\n" + fileName + " (" + fileSizeString + ")\nAccept the file?";
+            final int option = JOptionPane.showConfirmDialog(this, message, "Confirm file receive", JOptionPane.YES_NO_OPTION);
+            return option == 0;
+        }
+        return false;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -78,6 +106,7 @@ public class MainUI extends javax.swing.JFrame {
         buddiesPanel = new ogr.user12043.talkOnLan.ui.BuddiesPanel();
         jButton_addManually = new javax.swing.JButton();
         jButton_hostAddresses = new javax.swing.JButton();
+        jButton_hardDiscovery = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -112,6 +141,14 @@ public class MainUI extends javax.swing.JFrame {
             }
         });
 
+        jButton_hardDiscovery.setText("Hard Discovery");
+        jButton_hardDiscovery.setEnabled(false);
+        jButton_hardDiscovery.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_hardDiscoveryActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -123,12 +160,14 @@ public class MainUI extends javax.swing.JFrame {
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jButton_startDiscovery)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jButton_hardDiscovery)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(jButton_addManually)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(jButton_hostAddresses)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(jButton_endDiscovery)
-                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                                .addGap(0, 4, Short.MAX_VALUE)))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -139,7 +178,8 @@ public class MainUI extends javax.swing.JFrame {
                                         .addComponent(jButton_endDiscovery)
                                         .addComponent(jButton_startDiscovery)
                                         .addComponent(jButton_addManually)
-                                        .addComponent(jButton_hostAddresses))
+                                        .addComponent(jButton_hostAddresses)
+                                        .addComponent(jButton_hardDiscovery))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(buddiesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
                                 .addContainerGap())
@@ -152,17 +192,20 @@ public class MainUI extends javax.swing.JFrame {
         try {
             NetworkService.start();
             jButton_startDiscovery.setEnabled(false);
+            jButton_hardDiscovery.setEnabled(true);
             jButton_addManually.setEnabled(true);
             jButton_hostAddresses.setEnabled(true);
             jButton_endDiscovery.setEnabled(true);
         } catch (Exception e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Unable to start discovery. Check network connectivity", "ERROR", JOptionPane.ERROR_MESSAGE);
+            jButton_endDiscovery.doClick();
         }
     }//GEN-LAST:event_jButton_startDiscoveryActionPerformed
 
     private void jButton_endDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_endDiscoveryActionPerformed
         NetworkService.end();
         jButton_startDiscovery.setEnabled(true);
+        jButton_hardDiscovery.setEnabled(false);
         jButton_addManually.setEnabled(false);
         jButton_hostAddresses.setEnabled(false);
         jButton_endDiscovery.setEnabled(false);
@@ -196,4 +239,12 @@ public class MainUI extends javax.swing.JFrame {
         }
         JOptionPane.showMessageDialog(this, builder.toString(), "Local IP addresses", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jButton_hostAddressesActionPerformed
+
+    private void jButton_hardDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hardDiscoveryActionPerformed
+        try {
+            NetworkService.hardDiscovery();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error on discovery!", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton_hardDiscoveryActionPerformed
 }

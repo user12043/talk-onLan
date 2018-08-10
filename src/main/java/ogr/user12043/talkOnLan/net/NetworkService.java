@@ -18,10 +18,10 @@ import java.util.concurrent.Executors;
  */
 public class NetworkService {
     private static final Logger LOGGER = LogManager.getLogger(NetworkService.class);
+    private static final ExecutorService service = Executors.newFixedThreadPool(3);
     static DatagramSocket sendSocket;
     private static DatagramSocket receiveSocket;
     private static ServerSocket messageReceiveSocket;
-    private static final ExecutorService service = Executors.newFixedThreadPool(3);
     private static boolean end; // Control field for threads. (To safely terminate)
 
     private static void receive() throws IOException {
@@ -61,6 +61,13 @@ public class NetworkService {
         } catch (SocketTimeoutException e) {
             return;
         }
+
+        // Discover user if not discovered yet
+        final boolean exists = Utils.buddyAddresses.stream().anyMatch(address -> (address == incomingSocket.getInetAddress()));
+        if (!exists) {
+            DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
+        }
+
         DataInputStream inputStream = new DataInputStream(incomingSocket.getInputStream());
         String message = inputStream.readUTF();
         if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) {
@@ -72,8 +79,8 @@ public class NetworkService {
                 if (arguments.length > 3) {
                     throw new Exception();
                 }
-                long size = Long.parseLong(arguments[1]);
-                FileTransferService.receiveFile(incomingSocket, arguments[2]);
+                final long size = Long.parseLong(arguments[1]);
+                FileTransferService.receiveFile(incomingSocket, arguments[2], size);
             } catch (IOException e) {
                 throw e;
             } catch (Exception e) {
@@ -169,5 +176,20 @@ public class NetworkService {
 
     public static void end() {
         end = true;
+    }
+
+    public static void hardDiscovery() throws IOException {
+        for (InterfaceAddress hostAddress : Utils.hostAddresses) {
+            final InetAddress address = hostAddress.getAddress();
+            if (address instanceof Inet4Address) {
+                final String hostAddressString = address.toString().replace(address.getHostName(), "").replace("/", "");
+                for (int i = 0; i < 255; i++) {
+                    final String targetAddressString = hostAddressString.substring(0, hostAddressString.lastIndexOf('.') + 1) + i;
+                    System.out.println(targetAddressString);
+                    InetAddress targetAddress = Inet4Address.getByName(targetAddressString);
+                    DiscoveryService.sendDiscoveryRequest(targetAddress);
+                }
+            }
+        }
     }
 }

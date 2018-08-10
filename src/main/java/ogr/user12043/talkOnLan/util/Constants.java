@@ -10,7 +10,8 @@ public class Constants {
     public static final String COMMAND_MESSAGE = "talk-onLan_APPLICATION_MESSAGE";
     //    public static final String COMMAND_MESSAGE_END = "talk-onLan_MESSAGE_END";
     public static final String COMMAND_FILE_TRANSFER_REQUEST = "talk-onLan_FILE_TRANSFER_REQUEST";
-    public static final String COMMAND_FILE_TRANSFER_RESPONSE = "talk-onLan_FILE_TRANSFER_RESPONSE";
+    public static final String COMMAND_FILE_TRANSFER_RESPONSE_ACCEPT = "talk-onLan_FILE_TRANSFER_RESPONSE_ACCEPT";
+    public static final String COMMAND_FILE_TRANSFER_RESPONSE_REJECT = "talk-onLan_FILE_TRANSFER_RESPONSE_REJECT";
     public static final char COMMAND_SEPARATOR = '|';
     public static final int RECEIVE_PORT = 8888;
     public static final int SEND_PORT = 8889;

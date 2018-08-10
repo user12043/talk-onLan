@@ -23,6 +23,8 @@
               <Component id="jLabel_address" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jButton_message" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jButton_file" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -35,6 +37,7 @@
                   <Component id="jLabel_name" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel_address" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButton_message" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButton_file" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -68,6 +71,14 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_messageActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton_file">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="File"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton_fileActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
