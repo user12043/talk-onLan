@@ -1,11 +1,13 @@
 package ogr.user12043.talkOnLan.ui;
 
 import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.net.FileTransferService;
 import ogr.user12043.talkOnLan.net.MessageService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -20,6 +22,7 @@ class MessagePanel extends javax.swing.JDialog {
     private boolean shiftPressed;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_send;
+    private javax.swing.JButton jButton_sendFile;
     private javax.swing.JPanel jPanel_dialog;
     private javax.swing.JScrollPane jScrollPane_content;
     private javax.swing.JScrollPane jScrollPane_dialog;
@@ -61,7 +64,6 @@ class MessagePanel extends javax.swing.JDialog {
 
     private void addMessage(String message, boolean own) {
         GridBagConstraints constraints = new GridBagConstraints();
-//        constraints.gridx = ((own) ? 1 : 0);
         // TODO size does not reducing on reduce panel size
         constraints.gridy = lineNumber;
         constraints.fill = GridBagConstraints.HORIZONTAL;
@@ -87,6 +89,7 @@ class MessagePanel extends javax.swing.JDialog {
         jButton_send = new javax.swing.JButton();
         jScrollPane_dialog = new javax.swing.JScrollPane();
         jPanel_dialog = new javax.swing.JPanel();
+        jButton_sendFile = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -110,13 +113,18 @@ class MessagePanel extends javax.swing.JDialog {
             }
         });
 
-        jScrollPane_dialog.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        jScrollPane_dialog.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane_dialog.setAutoscrolls(true);
 
         jPanel_dialog.setAutoscrolls(true);
         jPanel_dialog.setLayout(new java.awt.GridBagLayout());
         jScrollPane_dialog.setViewportView(jPanel_dialog);
+
+        jButton_sendFile.setText("Send file");
+        jButton_sendFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_sendFileActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -128,7 +136,8 @@ class MessagePanel extends javax.swing.JDialog {
                                         .addComponent(jScrollPane_content, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
                                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                                 .addComponent(jButton_send)
-                                                .addGap(0, 0, Short.MAX_VALUE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(jButton_sendFile))
                                         .addComponent(jScrollPane_dialog, javax.swing.GroupLayout.Alignment.LEADING))
                                 .addContainerGap())
         );
@@ -140,7 +149,9 @@ class MessagePanel extends javax.swing.JDialog {
                                 .addGap(18, 18, 18)
                                 .addComponent(jScrollPane_content, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton_send)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jButton_send)
+                                        .addComponent(jButton_sendFile))
                                 .addContainerGap())
         );
 
@@ -173,4 +184,18 @@ class MessagePanel extends javax.swing.JDialog {
             shiftPressed = false;
         }
     }//GEN-LAST:event_jTextArea_contentKeyReleased
+
+    private void jButton_sendFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_sendFileActionPerformed
+        JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
+        final int state = chooser.showOpenDialog(this);
+        if (state != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        File file = chooser.getSelectedFile();
+        try {
+            FileTransferService.sendFileRequest(user.getAddress(), file);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, ("Unable to send file:\n" + e), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton_sendFileActionPerformed
 }

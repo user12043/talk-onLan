@@ -20,7 +20,7 @@ public class NetworkService {
     private static final Logger LOGGER = LogManager.getLogger(NetworkService.class);
     static DatagramSocket sendSocket;
     private static DatagramSocket receiveSocket;
-    private static ServerSocket tcpReceiveSocket;
+    private static ServerSocket messageReceiveSocket;
     private static ExecutorService service = Executors.newFixedThreadPool(3);
     private static boolean end; // Control field for threads. (To safely terminate)
 
@@ -54,10 +54,10 @@ public class NetworkService {
         }*/
     }
 
-    private static void receiveTCP() throws IOException {
+    private static void receiveMessage() throws IOException {
         final Socket incomingSocket;
         try {
-            incomingSocket = tcpReceiveSocket.accept();
+            incomingSocket = messageReceiveSocket.accept();
         } catch (SocketTimeoutException e) {
             return;
         }
@@ -66,6 +66,19 @@ public class NetworkService {
         if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) {
             message = message.replace((Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR), "");
             MessageService.receiveMessage(incomingSocket.getInetAddress(), incomingSocket.getPort(), message);
+        } else if (message.startsWith(Constants.COMMAND_FILE_TRANSFER_REQUEST + Constants.COMMAND_SEPARATOR)) {
+            final String[] arguments = message.split("\\" + Constants.COMMAND_SEPARATOR);
+            try {
+                if (arguments.length > 3) {
+                    throw new Exception();
+                }
+                long size = Long.parseLong(arguments[1]);
+                FileTransferService.receiveFile(incomingSocket, size, arguments[2]);
+            } catch (IOException e) {
+                throw e;
+            } catch (Exception e) {
+                LOGGER.error("invalid file send request from " + incomingSocket.getInetAddress());
+            }
         }
     }
 
@@ -104,9 +117,9 @@ public class NetworkService {
             receiveSocket.setBroadcast(true);
             receiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
         }
-        if (tcpReceiveSocket == null) {
-            tcpReceiveSocket = new ServerSocket(Constants.RECEIVE_PORT);
-            tcpReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+        if (messageReceiveSocket == null) {
+            messageReceiveSocket = new ServerSocket(Constants.RECEIVE_PORT);
+            messageReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
         }
     }
 
@@ -120,7 +133,7 @@ public class NetworkService {
                     send();
                     Thread.sleep(Constants.DISCOVERY_INTERVAL);
                 }
-                LOGGER.debug("Send end");
+                LOGGER.debug("send end");
             } catch (Exception e) {
                 LOGGER.error("Error on send() " + Arrays.toString(e.getStackTrace()));
             }
@@ -132,7 +145,7 @@ public class NetworkService {
                 while (!end) {
                     receive();
                 }
-                LOGGER.debug("Receive end");
+                LOGGER.debug("receive end");
             } catch (Exception e) {
                 LOGGER.error("Error on receive() " + Arrays.toString(e.getStackTrace()));
             }
@@ -141,11 +154,11 @@ public class NetworkService {
         Runnable receiveTcpThread = (() -> {
             try {
                 while (!end) {
-                    receiveTCP();
+                    receiveMessage();
                 }
-                LOGGER.debug("ReceiveTCP end");
+                LOGGER.debug("receiveMessage end");
             } catch (Exception e) {
-                LOGGER.error("Error on receiveTCP() " + Arrays.toString(e.getStackTrace()));
+                LOGGER.error("Error on receiveMessage() " + Arrays.toString(e.getStackTrace()));
             }
         });
 

@@ -1,7 +1,6 @@
 package ogr.user12043.talkOnLan;
 
 import ogr.user12043.talkOnLan.ui.MainUI;
-import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,7 +17,6 @@ public class Main {
 
     public static void main(String args[]) {
         try {
-            Properties.username = System.getProperty("user.name");
             System.setProperty("java.net.preferIPv4Stack", "true"); // Set prefer to ipv4 addresses in java
             Utils.initInterfaces();
             SwingUtilities.invokeLater(() -> {
