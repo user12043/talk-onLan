@@ -1,6 +1,5 @@
 package ogr.user12043.talkOnLan.ui;
 
-import ogr.user12043.talkOnLan.Main;
 import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.net.FileTransferService;
 
@@ -25,13 +24,18 @@ class BuddyPanel extends javax.swing.JPanel {
     /**
      * Creates new form Buddy
      */
-    public BuddyPanel(User user) {
+    BuddyPanel(User user) {
         initComponents();
         this.user = user;
         jLabel_name.setText(user.getUserName());
         jLabel_address.setText(" on " + user.getAddress().toString().replace("/", ""));
     }
 
+    /**
+     * Overrided setEnabled() method to apply enabled state to action buttons in this panel
+     *
+     * @param enabled enabled state
+     */
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
@@ -101,10 +105,20 @@ class BuddyPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Opens messaging dialog
+     *
+     * @param evt action event
+     */
     private void jButton_messageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_messageActionPerformed
-        Main.mainUI.getMessagePanelOfUser(user).setVisible(true);
+        MainUI.getUI().getMessagePanelOfUser(user).setVisible(true);
     }//GEN-LAST:event_jButton_messageActionPerformed
 
+    /**
+     * Opens file select dialog to send
+     *
+     * @param evt action event
+     */
     private void jButton_fileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_fileActionPerformed
         JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
         final int state = chooser.showOpenDialog(this);

@@ -14,8 +14,7 @@ import java.io.IOException;
  */
 class MessagePanel extends javax.swing.JDialog {
 
-    private final User user;
-    private final StringBuilder receivingMessage;
+    private final User user; // Remote user
     private int lineNumber;
     private boolean shiftPressed;
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -28,11 +27,13 @@ class MessagePanel extends javax.swing.JDialog {
 
     /**
      * Creates new form MessagePanel
+     *
+     * @param parent parent frame
+     * @param user   remote user
      */
     MessagePanel(Frame parent, User user) {
         super(parent, false);
         initComponents();
-        receivingMessage = new StringBuilder();
         lineNumber = 0;
         this.user = user;
         setTitle(user.getUserName() + " on " + user.getAddress());
@@ -42,14 +43,17 @@ class MessagePanel extends javax.swing.JDialog {
         return user;
     }
 
+    /**
+     * Sends message to buddy
+     */
     private void sendMessage() {
         String sendingMessage = jTextArea_content.getText();
-        if (sendingMessage.isEmpty()) {
+        if (sendingMessage.isEmpty()) { // Ignore if empty
             return;
         }
         try {
-            MessageService.sendMessage(user.getAddress(), sendingMessage);
-            addMessage(sendingMessage, true);
+            MessageService.sendMessage(user.getAddress(), sendingMessage); // Send message
+            addMessage(sendingMessage, true); // Add message box to panel
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Cannot send the message!", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
@@ -59,9 +63,14 @@ class MessagePanel extends javax.swing.JDialog {
         addMessage(message, false);
     }
 
+    /**
+     * Adds a {@link MessageBox} to panel for a message
+     *
+     * @param message message content
+     * @param own     owning state
+     */
     private void addMessage(String message, boolean own) {
         GridBagConstraints constraints = new GridBagConstraints();
-        // TODO size does not reducing on reduce panel size
         constraints.gridy = lineNumber;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1.0d;

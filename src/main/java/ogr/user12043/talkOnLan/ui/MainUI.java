@@ -21,6 +21,7 @@ import java.util.Set;
  */
 public class MainUI extends javax.swing.JFrame {
 
+    private static MainUI mainUI; // To create one instance of MainUI
     private final Set<MessagePanel> messagePanels;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
@@ -35,38 +36,65 @@ public class MainUI extends javax.swing.JFrame {
     /**
      * Creates new form MainUI
      */
-    public MainUI() {
+    private MainUI() {
         initComponents();
         messagePanels = new HashSet<>();
     }
 
-    public MessagePanel getMessagePanelOfUser(User user) {
+    /**
+     * Gives instance of class. This class can be accessed on this method only to avoid creating new instances in same time.
+     * Applies "Singleton Pattern"
+     *
+     * @return instance
+     * @see <a href="https://en.wikipedia.org/wiki/Singleton_pattern">More information about Singleton Pattern</a>
+     */
+    public static MainUI getUI() {
+        if (mainUI == null) {
+            mainUI = new MainUI();
+        }
+        return mainUI;
+    }
+
+    /**
+     * Gives message panel for a user. Returns existing if created before, creates new one if not.
+     *
+     * @param user owner of panel
+     * @return message panel of user
+     */
+    MessagePanel getMessagePanelOfUser(User user) {
+        // Search for existing panel
         for (MessagePanel panel : messagePanels) {
             if (panel.getUser().equals(user)) {
                 return panel;
             }
         }
+
+        // Create new one if not exists
         MessagePanel messagePanel = new MessagePanel(this, user);
         messagePanels.add(messagePanel);
         return messagePanel;
     }
 
+    /**
+     * Receives message from remote user
+     *
+     * @param user    remote user
+     * @param message received message content
+     */
     public void receiveMessage(User user, String message) {
-        final boolean panelExists = messagePanels.stream().anyMatch(messagePanel -> {
-            if (messagePanel.getUser().equals(user)) {
-                messagePanel.receiveMessage(message);
-                messagePanel.setVisible(true);
-                return true;
-            }
-            return false;
-        });
-        if (!panelExists) {
-            final MessagePanel messagePanel = getMessagePanelOfUser(user);
-            messagePanel.setVisible(true);
-            messagePanel.receiveMessage(message);
-        }
+        final MessagePanel messagePanel = getMessagePanelOfUser(user);
+        messagePanel.setVisible(true);
+        messagePanel.receiveMessage(message);
     }
 
+    /**
+     * Asks user to confirm receiving a file from another user
+     *
+     * @param senderAddress address of sender
+     * @param fileName      sending file's name
+     * @param fileSize      sending file's size
+     * @return user confirmation result
+     */
     public boolean confirmFileReceive(InetAddress senderAddress, String fileName, long fileSize) {
         final User user = new User();
         final boolean buddyExists = Utils.buddies.stream().anyMatch(u -> {
@@ -77,7 +105,9 @@ public class MainUI extends javax.swing.JFrame {
             }
             return false;
         });
-        if (buddyExists) {
+        if (buddyExists) { // Process request if sender has discovered
+
+            // Turn file size to readable string
             String fileSizeString = "";
             if (fileSize < 1024) {
                 fileSizeString = (fileSize + " Bytes");
@@ -87,9 +117,10 @@ public class MainUI extends javax.swing.JFrame {
                 fileSizeString = (fileSize / 1024 / 1024) + " MB";
             }
 
+            // Display dialog
             String message = user.getUserName() + " on " + user.getAddress() + " wants to send you this file:\n" + fileName + " (" + fileSizeString + ")\nAccept the file?";
             final int option = JOptionPane.showConfirmDialog(this, message, "Confirm file receive", JOptionPane.YES_NO_OPTION);
-            return option == 0;
+            return option == 0; // 0 = OK option
         }
         return false;
     }
@@ -196,6 +227,11 @@ public class MainUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Starts network services for discovery
+     *
+     * @param evt action event
+     */
     private void jButton_startDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_startDiscoveryActionPerformed
         SwingUtilities.invokeLater(() -> {
             JDialog dialog = new JDialog();
@@ -227,6 +263,11 @@ public class MainUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton_startDiscoveryActionPerformed
 
+    /**
+     * Terminates network services
+     *
+     * @param evt action event
+     */
     private void jButton_endDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_endDiscoveryActionPerformed
         NetworkService.end();
         jButton_hardDiscovery.setEnabled(false);
@@ -243,13 +284,18 @@ public class MainUI extends javax.swing.JFrame {
         });
     }//GEN-LAST:event_jButton_endDiscoveryActionPerformed
 
+    /**
+     * Adds a user with ip address if can not be discovered
+     *
+     * @param evt action event
+     */
     private void jButton_addManuallyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_addManuallyActionPerformed
         String input = JOptionPane.showInputDialog(this, "Enter ip address", "Direct IP", JOptionPane.QUESTION_MESSAGE);
-        if (input != null && !input.isEmpty()) {
+        if (input != null && !input.isEmpty()) { // Check for empty input
             InetAddress address;
             try {
                 address = InetAddress.getByName(input);
-            } catch (UnknownHostException e) {
+            } catch (UnknownHostException e) { // Display error message if input is not valid for ip address
                 JOptionPane.showMessageDialog(this, "Invalid input!", "ERROR", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -261,6 +307,11 @@ public class MainUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton_addManuallyActionPerformed
 
+    /**
+     * Detects and shows the current users ip addresses on each connected network hardware
+     *
+     * @param evt action event
+     */
     private void jButton_hostAddressesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hostAddressesActionPerformed
         StringBuilder builder = new StringBuilder();
         for (InterfaceAddress hostAddress : Utils.hostAddresses) {
@@ -272,6 +323,11 @@ public class MainUI extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, builder.toString(), "Local IP addresses", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jButton_hostAddressesActionPerformed
 
+    /**
+     * calls {@link NetworkService#hardDiscovery()}
+     *
+     * @param evt action event
+     */
     private void jButton_hardDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hardDiscoveryActionPerformed
         try {
             NetworkService.hardDiscovery();

@@ -1,6 +1,6 @@
 package ogr.user12043.talkOnLan.net;
 
-import ogr.user12043.talkOnLan.Main;
+import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +13,8 @@ import java.net.Socket;
 /**
  * Created by ME99735 on 10.08.2018 - 09:03
  * part of project: talk-onLan
+ * <p>
+ * Does file transferring
  */
 public class FileTransferService {
     private static final Logger LOGGER = LogManager.getLogger(FileTransferService.class);
@@ -24,7 +26,7 @@ public class FileTransferService {
         DataInputStream fileInputStream = null;
         try {
             socket = new Socket(address, Constants.RECEIVE_PORT);
-//        socket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+            socket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
             outputStream = new DataOutputStream(socket.getOutputStream());
             inputStream = new DataInputStream(socket.getInputStream());
             fileInputStream = new DataInputStream(new FileInputStream(file));
@@ -64,9 +66,9 @@ public class FileTransferService {
         try {
             outputStream = new DataOutputStream(incomingSocket.getOutputStream());
             inputStream = new DataInputStream(incomingSocket.getInputStream());
-            if (Main.mainUI.confirmFileReceive(incomingSocket.getInetAddress(), fileName, fileSize)) {
-                File outputFile = new File(Properties.fileReceiveFolder + "/" + fileName);
-                outputFile.getParentFile().mkdirs();
+            if (MainUI.getUI().confirmFileReceive(incomingSocket.getInetAddress(), fileName, fileSize)) {
+                File outputFile = new File(Properties.fileReceiveFolder + fileName);
+                outputFile.getParentFile().mkdirs(); // Create parent folder of file if does not exists
                 fileOutputStream = new DataOutputStream(new FileOutputStream(outputFile, false));
 
                 // send allow response

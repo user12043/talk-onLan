@@ -26,6 +26,11 @@ public class BuddiesPanel extends javax.swing.JPanel {
         buddyPanels = new HashSet<>();
     }
 
+    /**
+     * Add new panel for new user
+     *
+     * @param user new user to add
+     */
     public void addBuddy(User user) {
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.NORTH;
@@ -43,9 +48,15 @@ public class BuddiesPanel extends javax.swing.JPanel {
         revalidate();
     }
 
+    /**
+     * Overrided setEnabled() method to apply enabled state to included buddy panels
+     *
+     * @param enabled enabled state
+     */
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
+        // setEnabled child components also
         for (Component component : getComponents()) {
             component.setEnabled(enabled);
         }

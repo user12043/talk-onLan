@@ -6,6 +6,8 @@ import java.util.Objects;
 /**
  * Created by user12043 on 24.07.2018 - 11:55
  * part of project: talk-onLan
+ * <p>
+ * The model class of User
  */
 public class User {
     private String userName;

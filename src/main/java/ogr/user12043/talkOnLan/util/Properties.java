@@ -6,5 +6,5 @@ package ogr.user12043.talkOnLan.util;
  */
 public class Properties {
     public static final String username = System.getProperty("user.name");
-    public static final String fileReceiveFolder = "receivedFiles";
+    public static final String fileReceiveFolder = "receivedFiles/";
 }

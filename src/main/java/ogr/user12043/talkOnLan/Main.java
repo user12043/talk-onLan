@@ -13,16 +13,12 @@ import javax.swing.*;
  */
 public class Main {
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
-    public static MainUI mainUI;
 
     public static void main(String args[]) {
         try {
             System.setProperty("java.net.preferIPv4Stack", "true"); // Set prefer to ipv4 addresses in java
             Utils.initInterfaces();
-            SwingUtilities.invokeLater(() -> {
-                mainUI = new MainUI();
-                mainUI.setVisible(true);
-            });
+            SwingUtilities.invokeLater(() -> MainUI.getUI().setVisible(true));
         } catch (Exception e) {
             LOGGER.error("Unexpected error happened!: ", e);
         }

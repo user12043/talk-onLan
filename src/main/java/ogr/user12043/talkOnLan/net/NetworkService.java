@@ -15,15 +15,22 @@ import java.util.concurrent.Executors;
 /**
  * Created by user12043 on 26.07.2018 - 11:53
  * part of project: talk-onLan
+ * <p>
+ * The main class for network operations
  */
 public class NetworkService {
     private static final Logger LOGGER = LogManager.getLogger(NetworkService.class);
     private static final ExecutorService service = Executors.newFixedThreadPool(3);
-    static DatagramSocket sendSocket;
-    private static DatagramSocket receiveSocket;
-    private static ServerSocket messageReceiveSocket;
+    static DatagramSocket sendSocket; // UDP socket for send discovery
+    private static DatagramSocket receiveSocket; // UDP socket for receive discovery
+    private static ServerSocket tcpReceiveSocket; // TCP socket for receiving messages and files
     private static boolean end; // Control field for threads. (To safely terminate)
 
+    /**
+     * UDP receiving (for discovery)
+     *
+     * @throws IOException IOException on connections
+     */
     private static void receive() throws IOException {
         // Receive data
         byte[] buffer = new byte[Constants.BUFFER_LENGTH];
@@ -54,10 +61,16 @@ public class NetworkService {
         }
     }
 
-    private static void receiveMessage() throws IOException {
+    /**
+     * TCP receiving for messaging and file transfer
+     *
+     * @throws IOException IOException on connections
+     */
+    private static void receiveTcp() throws IOException {
+        // Accept a connection
         final Socket incomingSocket;
         try {
-            incomingSocket = messageReceiveSocket.accept();
+            incomingSocket = tcpReceiveSocket.accept();
         } catch (SocketTimeoutException e) {
             return;
         }
@@ -79,12 +92,13 @@ public class NetworkService {
             DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
         }
 
+        // Process data
         DataInputStream inputStream = new DataInputStream(incomingSocket.getInputStream());
         String message = inputStream.readUTF();
-        if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) {
+        if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) { // Get messages
             message = message.replace((Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR), "");
             MessageService.receiveMessage(incomingSocket.getInetAddress(), incomingSocket.getPort(), message);
-        } else if (message.startsWith(Constants.COMMAND_FILE_TRANSFER_REQUEST + Constants.COMMAND_SEPARATOR)) {
+        } else if (message.startsWith(Constants.COMMAND_FILE_TRANSFER_REQUEST + Constants.COMMAND_SEPARATOR)) { // Get file
             final String[] arguments = message.split("\\" + Constants.COMMAND_SEPARATOR);
             try {
                 if (arguments.length > 3) {
@@ -100,12 +114,18 @@ public class NetworkService {
         }
     }
 
+    /**
+     * UDP sending (for discovery)
+     *
+     * @throws IOException IOException on connections
+     */
     private static void send() throws IOException {
+        // First send to generic broadcast address
         DiscoveryService.sendDiscoveryRequest(InetAddress.getByName("255.255.255.255"));
 
         //<editor-fold desc="Broadcast the message over all the network interfaces" defaultstate=collapsed>
         for (NetworkInterface networkInterface : Utils.networkInterfaces) {
-            if (networkInterface.isUp()) {
+            if (networkInterface.isUp()) { // Check for connectivity
                 for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
                     InetAddress broadcastAddress = interfaceAddress.getBroadcast();
                     if (broadcastAddress == null) {
@@ -128,22 +148,29 @@ public class NetworkService {
     private static void initConnections() throws IOException {
         if (sendSocket == null) {
             sendSocket = new DatagramSocket(Constants.SEND_PORT);
-            sendSocket.setBroadcast(true);
+            sendSocket.setBroadcast(true); // This is important to broadcasting
         }
         if (receiveSocket == null) {
             receiveSocket = new DatagramSocket(Constants.RECEIVE_PORT, InetAddress.getByName("0.0.0.0"));
-            receiveSocket.setBroadcast(true);
+//            receiveSocket.setBroadcast(true); // Not necessary here
             receiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
         }
-        if (messageReceiveSocket == null) {
-            messageReceiveSocket = new ServerSocket(Constants.RECEIVE_PORT);
-            messageReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+        if (tcpReceiveSocket == null) {
+            tcpReceiveSocket = new ServerSocket(Constants.RECEIVE_PORT);
+            tcpReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
         }
     }
 
+    /**
+     * Create and start network threads
+     *
+     * @throws IOException IOException on connections
+     */
     public static void start() throws IOException {
         initConnections();
         end = false;
+
+        // Create threads
         Runnable sendThread = () -> {
             try {
                 // Do task until end = true
@@ -172,14 +199,15 @@ public class NetworkService {
         Runnable receiveTcpThread = (() -> {
             try {
                 while (!end) {
-                    receiveMessage();
+                    receiveTcp();
                 }
-                LOGGER.debug("receiveMessage end");
+                LOGGER.debug("receiveTcp end");
             } catch (Exception e) {
-                LOGGER.error("Error on receiveMessage() " + Arrays.toString(e.getStackTrace()));
+                LOGGER.error("Error on receiveTcp() " + Arrays.toString(e.getStackTrace()));
             }
         });
 
+        // Execute threads
         service.execute(sendThread);
         service.execute(receiveThread);
         service.execute(receiveTcpThread);
@@ -189,6 +217,11 @@ public class NetworkService {
         end = true;
     }
 
+    /**
+     * If broadcasting is not working in the network, normal discovery will not work. This method sends discovery request to each ips specific
+     *
+     * @throws IOException IOException on connections
+     */
     public static void hardDiscovery() throws IOException {
         for (InterfaceAddress hostAddress : Utils.hostAddresses) {
             final InetAddress address = hostAddress.getAddress();

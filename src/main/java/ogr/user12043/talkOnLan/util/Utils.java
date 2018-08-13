@@ -16,20 +16,23 @@ import java.util.*;
  * part of project: talk-onLan
  */
 public class Utils {
-    public static final Set<InetAddress> buddyAddresses = new HashSet<>();
-    public static final Set<User> buddies = new HashSet<>();
-    public static final List<NetworkInterface> networkInterfaces = new ArrayList<>();
-    public static final Set<InterfaceAddress> hostAddresses = new HashSet<>();
+    public static final Set<InetAddress> buddyAddresses = new HashSet<>(); // discovered addresses
+    public static final Set<User> buddies = new HashSet<>(); // users for discovered addresses
+    public static final List<NetworkInterface> networkInterfaces = new ArrayList<>(); // network hardware list of device
+    public static final Set<InterfaceAddress> hostAddresses = new HashSet<>(); // self ip addresses on each network hardware
     private static final Logger LOGGER = LogManager.getLogger(Constants.class);
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy"); // Date display format date on ui
 
+    /**
+     * Detects network hardware and sets into {@link Utils#networkInterfaces}
+     */
     public static void initInterfaces() {
         try {
             final Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
             while (enumeration.hasMoreElements()) {
                 NetworkInterface networkInterface = enumeration.nextElement();
-                if (networkInterface.isLoopback() || !networkInterface.isUp()) {
-                    continue; // skip loop back or disconnected interface
+                if (networkInterface.isLoopback()) {
+                    continue; // skip loop back
                 }
                 networkInterfaces.add(networkInterface);
                 hostAddresses.addAll(networkInterface.getInterfaceAddresses());
@@ -39,6 +42,12 @@ public class Utils {
         }
     }
 
+    /**
+     * Formats date for display to user
+     *
+     * @param date date to format
+     * @return formatted date string
+     */
     public static String formatDate(Date date) {
         return dateFormat.format(date);
     }

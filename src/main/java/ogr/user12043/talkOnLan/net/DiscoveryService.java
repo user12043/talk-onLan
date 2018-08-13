@@ -1,7 +1,7 @@
 package ogr.user12043.talkOnLan.net;
 
-import ogr.user12043.talkOnLan.Main;
 import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
@@ -15,6 +15,8 @@ import java.net.InetAddress;
 /**
  * Created by user12043 on 26.07.2018 - 11:57
  * part of project: talk-onLan
+ * <p>
+ * Does discovery between two devices running the program
  */
 public class DiscoveryService {
     private static final Logger LOGGER = LogManager.getLogger(DiscoveryService.class);
@@ -27,9 +29,6 @@ public class DiscoveryService {
     }
 
     static void sendDiscoveryResponse(DatagramPacket receivedRequestPacket) throws IOException {
-        /*if (Utils.buddyAddresses.contains(receivedRequestPacket.getAddress())) {
-            return;
-        }*/
         LOGGER.debug("Discovery request received from " + receivedRequestPacket.getAddress() + ":" + receivedRequestPacket.getPort());
         byte[] discoveryResponse = (Constants.DISCOVERY_COMMAND_RESPONSE + Constants.COMMAND_SEPARATOR + Properties.username).getBytes();
         DatagramPacket discoveryResponsePacket = new DatagramPacket(discoveryResponse, discoveryResponse.length, receivedRequestPacket.getAddress(), Constants.RECEIVE_PORT);
@@ -43,17 +42,19 @@ public class DiscoveryService {
 
     static void receiveDiscoveryResponse(DatagramPacket receivedResponsePacket, String receivedData) {
         LOGGER.debug("Discovery response received from " + receivedResponsePacket.getAddress() + ":" + receivedResponsePacket.getPort());
+        // Ignore already discovered
         if (Utils.buddyAddresses.contains(receivedResponsePacket.getAddress())) {
             return;
         }
         Utils.buddyAddresses.add(receivedResponsePacket.getAddress());
         User user = new User();
         user.setAddress(receivedResponsePacket.getAddress());
+        // Get username with parsing response
         int index = receivedData.indexOf(Constants.COMMAND_SEPARATOR);
         if (index != -1) {
             user.setUserName(receivedData.substring(index + 1));
         }
         Utils.buddies.add(user);
-        Main.mainUI.buddiesPanel.addBuddy(user);
+        MainUI.getUI().buddiesPanel.addBuddy(user);
     }
 }
