@@ -233,15 +233,6 @@ public class MainUI extends javax.swing.JFrame {
      * @param evt action event
      */
     private void jButton_startDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_startDiscoveryActionPerformed
-        SwingUtilities.invokeLater(() -> {
-            JDialog dialog = new JDialog();
-            JProgressBar bar = new JProgressBar();
-            bar.setIndeterminate(true);
-            dialog.add(bar);
-            dialog.pack();
-            dialog.setVisible(true);
-            dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        });
         jButton_startDiscovery.setEnabled(false);
         try {
             NetworkService.start();
