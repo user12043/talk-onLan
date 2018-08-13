@@ -21,7 +21,8 @@ public class MessageService {
     private static final Logger LOGGER = LogManager.getLogger(MessageService.class);
 
     public static void sendMessage(InetAddress address, String message) throws IOException {
-        Socket socket = new Socket(address, Constants.RECEIVE_PORT);
+        Socket socket = new Socket(address, Constants.RECEIVE_PORT, InetAddress.getLocalHost(), Constants.SEND_PORT);
+        socket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
         DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
         message = (Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR + message);
         outputStream.writeUTF(message);

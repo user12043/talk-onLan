@@ -32,6 +32,12 @@ class BuddyPanel extends javax.swing.JPanel {
         jLabel_address.setText(" on " + user.getAddress().toString().replace("/", ""));
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        jButton_file.setEnabled(enabled);
+        jButton_message.setEnabled(enabled);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -46,8 +52,6 @@ class BuddyPanel extends javax.swing.JPanel {
         jLabel_address = new javax.swing.JLabel();
         jButton_message = new javax.swing.JButton();
         jButton_file = new javax.swing.JButton();
-
-        setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 2));
 
         jLabel_name.setFont(jLabel_name.getFont().deriveFont(jLabel_name.getFont().getSize() + 6f));
         jLabel_name.setText("name");

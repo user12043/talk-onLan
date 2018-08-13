@@ -3,6 +3,7 @@ package ogr.user12043.talkOnLan.ui;
 import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.net.DiscoveryService;
 import ogr.user12043.talkOnLan.net.NetworkService;
+import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Utils;
 
 import javax.swing.*;
@@ -153,6 +154,8 @@ public class MainUI extends javax.swing.JFrame {
         });
 
         jScrollPane_buddiesPanel.setAutoscrolls(true);
+
+        buddiesPanel.setEnabled(false);
         jScrollPane_buddiesPanel.setViewportView(buddiesPanel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -194,13 +197,30 @@ public class MainUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton_startDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_startDiscoveryActionPerformed
+        SwingUtilities.invokeLater(() -> {
+            JDialog dialog = new JDialog();
+            JProgressBar bar = new JProgressBar();
+            bar.setIndeterminate(true);
+            dialog.add(bar);
+            dialog.pack();
+            dialog.setVisible(true);
+            dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        });
+        jButton_startDiscovery.setEnabled(false);
         try {
             NetworkService.start();
-            jButton_startDiscovery.setEnabled(false);
-            jButton_hardDiscovery.setEnabled(true);
-            jButton_addManually.setEnabled(true);
-            jButton_hostAddresses.setEnabled(true);
-            jButton_endDiscovery.setEnabled(true);
+            SwingUtilities.invokeLater(() -> {
+                jButton_hardDiscovery.setEnabled(true);
+                jButton_addManually.setEnabled(true);
+                jButton_hostAddresses.setEnabled(true);
+                try {
+                    Thread.yield();
+                    Thread.sleep(Constants.RECEIVE_TIMEOUT);
+                } catch (InterruptedException ignored) {
+                }
+                jButton_endDiscovery.setEnabled(true);
+                buddiesPanel.setEnabled(true);
+            });
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Unable to start discovery. Check network connectivity", "ERROR", JOptionPane.ERROR_MESSAGE);
             jButton_endDiscovery.doClick();
@@ -209,11 +229,18 @@ public class MainUI extends javax.swing.JFrame {
 
     private void jButton_endDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_endDiscoveryActionPerformed
         NetworkService.end();
-        jButton_startDiscovery.setEnabled(true);
         jButton_hardDiscovery.setEnabled(false);
         jButton_addManually.setEnabled(false);
         jButton_hostAddresses.setEnabled(false);
         jButton_endDiscovery.setEnabled(false);
+        SwingUtilities.invokeLater(() -> {
+            try {
+                Thread.sleep(Constants.RECEIVE_TIMEOUT);
+            } catch (InterruptedException ignored) {
+            }
+            jButton_startDiscovery.setEnabled(true);
+            buddiesPanel.setEnabled(false);
+        });
     }//GEN-LAST:event_jButton_endDiscoveryActionPerformed
 
     private void jButton_addManuallyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_addManuallyActionPerformed

@@ -6,7 +6,6 @@ import ogr.user12043.talkOnLan.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -42,8 +41,6 @@ public class FileTransferService {
                     while (fileInputStream.read(buffer) != -1) {
                         outputStream.write(buffer);
                     }
-                    ProgressMonitorInputStream stream = new ProgressMonitorInputStream(null, "t", fileInputStream);
-                    ProgressMonitor progressMonitor = new ProgressMonitor(null, "fds", "fs", 0, 100);
                     break;
                 case Constants.COMMAND_FILE_TRANSFER_RESPONSE_REJECT:
                     throw new SecurityException();

@@ -43,6 +43,14 @@ public class BuddiesPanel extends javax.swing.JPanel {
         revalidate();
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        for (Component component : getComponents()) {
+            component.setEnabled(enabled);
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

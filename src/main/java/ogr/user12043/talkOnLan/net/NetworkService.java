@@ -38,7 +38,9 @@ public class NetworkService {
         for (InterfaceAddress hostAddress : Utils.hostAddresses) {
             final InetAddress receivePacketAddress = receivePacket.getAddress();
             final InetAddress localhost = hostAddress.getAddress();
-            if (receivePacketAddress == null || receivePacketAddress.getHostAddress().equals(localhost.getHostAddress())) {
+            if (receivePacketAddress == null
+                    || receivePacketAddress.getHostAddress().equals(localhost.getHostAddress())
+                    || receivePacketAddress.equals(InetAddress.getByName("127.0.0.1"))) {
                 return;
             }
         }
@@ -49,9 +51,7 @@ public class NetworkService {
             DiscoveryService.sendDiscoveryResponse(receivePacket);
         } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_RESPONSE)) {
             DiscoveryService.receiveDiscoveryResponse(receivePacket, receivedData);
-        }/* else if (receivedData.startsWith(Constants.COMMAND_MESSAGE)) {
-            MessageService.receiveMessage(receivePacket, receivedData);
-        }*/
+        }
     }
 
     private static void receiveMessage() throws IOException {
@@ -60,6 +60,17 @@ public class NetworkService {
             incomingSocket = messageReceiveSocket.accept();
         } catch (SocketTimeoutException e) {
             return;
+        }
+
+        // Return if source is localhost
+        for (InterfaceAddress hostAddress : Utils.hostAddresses) {
+            final InetAddress receiveAddress = incomingSocket.getInetAddress();
+            final InetAddress localhost = hostAddress.getAddress();
+            if (receiveAddress == null
+                    || receiveAddress.getHostAddress().equals(localhost.getHostAddress())
+                    || receiveAddress.equals(InetAddress.getByName("127.0.0.1"))) {
+                return;
+            }
         }
 
         // Discover user if not discovered yet
