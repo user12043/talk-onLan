@@ -8,6 +8,7 @@ import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -55,6 +56,6 @@ public class DiscoveryService {
             user.setUserName(receivedData.substring(index + 1));
         }
         Utils.buddies.add(user);
-        MainUI.getUI().buddiesPanel.addBuddy(user);
+        SwingUtilities.invokeLater(() -> MainUI.getUI().buddiesPanel.addBuddy(user));
     }
 }

@@ -7,6 +7,7 @@ import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -35,7 +36,9 @@ public class MessageService {
         final boolean founded = Utils.buddyAddresses.contains(senderAddress);
         if (founded) {
             final Optional<User> first = Utils.buddies.stream().filter(u -> u.getAddress().equals(senderAddress)).findFirst();
-            first.ifPresent(user -> MainUI.getUI().receiveMessage(user, receivedData));
+            first.ifPresent(user -> {
+                SwingUtilities.invokeLater(() -> MainUI.getUI().receiveMessage(user, receivedData));
+            });
         }
     }
 }

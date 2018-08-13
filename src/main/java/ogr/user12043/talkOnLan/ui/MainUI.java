@@ -23,6 +23,7 @@ public class MainUI extends javax.swing.JFrame {
 
     private static MainUI mainUI; // To create one instance of MainUI
     private final Set<MessagePanel> messagePanels;
+    private final JDialog loadingDialog;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
     private javax.swing.JButton jButton_addManually;
@@ -38,7 +39,9 @@ public class MainUI extends javax.swing.JFrame {
      */
     private MainUI() {
         initComponents();
+        setLocationRelativeTo(null);
         messagePanels = new HashSet<>();
+        loadingDialog = createLoadingDialog();
     }
 
     /**
@@ -53,6 +56,23 @@ public class MainUI extends javax.swing.JFrame {
             mainUI = new MainUI();
         }
         return mainUI;
+    }
+
+    /**
+     * Creates a dialog for display loading.
+     *
+     * @return crated dialog
+     */
+    private JDialog createLoadingDialog() {
+        JDialog dialog = new JDialog(this, true);
+        JProgressBar bar = new JProgressBar();
+        bar.setIndeterminate(true);
+        dialog.add(bar);
+        dialog.setUndecorated(true); // hides title bar, must be called before "pack()"
+        dialog.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+        dialog.pack();
+        dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));// should be called after "pack()"
+        return dialog;
     }
 
     /**
@@ -125,6 +145,18 @@ public class MainUI extends javax.swing.JFrame {
         return false;
     }
 
+    private void toggleLoading() {
+        // Set dialog location
+        loadingDialog.setLocation((getLocation().x + 200), (getLocation().y + 150));
+        SwingUtilities.invokeLater(() -> {
+            if (loadingDialog.isShowing()) {
+                loadingDialog.dispose();
+            } else {
+                loadingDialog.setVisible(true);
+            }
+        });
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -144,6 +176,7 @@ public class MainUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(0, 250));
+        setResizable(false);
 
         jButton_startDiscovery.setText("Start Discovery");
         jButton_startDiscovery.addActionListener(new java.awt.event.ActionListener() {
@@ -195,7 +228,8 @@ public class MainUI extends javax.swing.JFrame {
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane_buddiesPanel)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jButton_startDiscovery)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -205,9 +239,9 @@ public class MainUI extends javax.swing.JFrame {
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(jButton_hostAddresses)
                                                 .addGap(12, 12, 12)
-                                                .addComponent(jButton_endDiscovery))
-                                        .addComponent(jScrollPane_buddiesPanel))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addComponent(jButton_endDiscovery)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -234,20 +268,21 @@ public class MainUI extends javax.swing.JFrame {
      */
     private void jButton_startDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_startDiscoveryActionPerformed
         jButton_startDiscovery.setEnabled(false);
+        toggleLoading();
         try {
             NetworkService.start();
-            SwingUtilities.invokeLater(() -> {
-                jButton_hardDiscovery.setEnabled(true);
-                jButton_addManually.setEnabled(true);
-                jButton_hostAddresses.setEnabled(true);
+            new Thread(() -> {
                 try {
-                    Thread.yield();
                     Thread.sleep(Constants.RECEIVE_TIMEOUT);
                 } catch (InterruptedException ignored) {
                 }
+                jButton_hardDiscovery.setEnabled(true);
+                jButton_addManually.setEnabled(true);
+                jButton_hostAddresses.setEnabled(true);
                 jButton_endDiscovery.setEnabled(true);
                 buddiesPanel.setEnabled(true);
-            });
+                toggleLoading();
+            }).start();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Unable to start discovery. Check network connectivity", "ERROR", JOptionPane.ERROR_MESSAGE);
             jButton_endDiscovery.doClick();
@@ -260,19 +295,21 @@ public class MainUI extends javax.swing.JFrame {
      * @param evt action event
      */
     private void jButton_endDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_endDiscoveryActionPerformed
+        toggleLoading();
         NetworkService.end();
         jButton_hardDiscovery.setEnabled(false);
         jButton_addManually.setEnabled(false);
         jButton_hostAddresses.setEnabled(false);
         jButton_endDiscovery.setEnabled(false);
-        SwingUtilities.invokeLater(() -> {
+        new Thread(() -> {
             try {
                 Thread.sleep(Constants.RECEIVE_TIMEOUT);
             } catch (InterruptedException ignored) {
             }
             jButton_startDiscovery.setEnabled(true);
             buddiesPanel.setEnabled(false);
-        });
+            toggleLoading();
+        }).start();
     }//GEN-LAST:event_jButton_endDiscoveryActionPerformed
 
     /**
