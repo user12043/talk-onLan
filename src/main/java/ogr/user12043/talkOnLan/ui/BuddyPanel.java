@@ -126,12 +126,14 @@ class BuddyPanel extends javax.swing.JPanel {
             return;
         }
         File file = chooser.getSelectedFile();
-        try {
-            FileTransferService.sendFile(user.getAddress(), file);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, ("Unable to send file:\n" + e), "ERROR", JOptionPane.ERROR_MESSAGE);
-        } catch (SecurityException e) {
-            JOptionPane.showMessageDialog(this, ("File did not send. Target user rejected send request"), "WARNING", JOptionPane.WARNING_MESSAGE);
-        }
+        new Thread(() -> {
+            try {
+                FileTransferService.sendFile(user.getAddress(), file);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, ("Unable to send file:\n" + e), "ERROR", JOptionPane.ERROR_MESSAGE);
+            } catch (SecurityException e) {
+                JOptionPane.showMessageDialog(this, ("File did not send. Target user rejected send request"), "WARNING", JOptionPane.WARNING_MESSAGE);
+            }
+        }).start();
     }//GEN-LAST:event_jButton_fileActionPerformed
 }

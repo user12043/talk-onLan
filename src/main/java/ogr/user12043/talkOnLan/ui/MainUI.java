@@ -165,7 +165,6 @@ public class MainUI extends javax.swing.JFrame {
         // Set dialog location to center
         int width = (getLocation().x + (getSize().width / 2) - (loadingDialog.getSize().width / 2));
         loadingDialog.setLocation(width, (getLocation().y + 65));
-        System.out.println(loadingDialog.getSize());
         SwingUtilities.invokeLater(() -> {
             if (loadingDialog.isShowing()) {
                 loadingDialog.dispose(); // Hide loading dialog
