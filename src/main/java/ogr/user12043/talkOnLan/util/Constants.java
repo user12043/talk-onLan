@@ -15,7 +15,9 @@ public class Constants {
     public static final char COMMAND_SEPARATOR = '|';
     public static final int RECEIVE_PORT = 8888;
     public static final int SEND_PORT = 8889;
+    public static final int FILE_RECEIVE_PORT = 8890;
     public static final int RECEIVE_TIMEOUT = 5000;
     public static final int DISCOVERY_INTERVAL = 3000;
-    public static final int BUFFER_LENGTH = 64;
+    public static final int DISCOVERY_BUFFER_LENGTH = 64;
+    public static final int FILE_BUFFER_LENGTH = 64;
 }

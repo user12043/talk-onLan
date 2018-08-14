@@ -128,7 +128,7 @@ class BuddyPanel extends javax.swing.JPanel {
         File file = chooser.getSelectedFile();
         new Thread(() -> {
             try {
-                FileTransferService.sendFile(user.getAddress(), file);
+                FileTransferService.sendFile(user, file);
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(this, ("Unable to send file:\n" + e), "ERROR", JOptionPane.ERROR_MESSAGE);
             } catch (SecurityException e) {

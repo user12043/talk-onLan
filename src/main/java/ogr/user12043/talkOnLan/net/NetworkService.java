@@ -20,10 +20,11 @@ import java.util.concurrent.Executors;
  */
 public class NetworkService {
     private static final Logger LOGGER = LogManager.getLogger(NetworkService.class);
-    private static final ExecutorService service = Executors.newFixedThreadPool(3);
+    private static final ExecutorService service = Executors.newFixedThreadPool(4);
     static DatagramSocket sendSocket; // UDP socket for send discovery
     private static DatagramSocket receiveSocket; // UDP socket for receive discovery
-    private static ServerSocket tcpReceiveSocket; // TCP socket for receiving messages and files
+    private static ServerSocket messageReceiveSocket; // TCP socket for receiving messages
+    private static ServerSocket fileReceiveSocket; // TCP socket for receiving files
     private static boolean end; // Control field for threads. (To safely terminate)
 
     /**
@@ -33,7 +34,7 @@ public class NetworkService {
      */
     private static void receive() throws IOException {
         // Receive data
-        byte[] buffer = new byte[Constants.BUFFER_LENGTH];
+        byte[] buffer = new byte[Constants.DISCOVERY_BUFFER_LENGTH];
         DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
         try {
             receiveSocket.receive(receivePacket);
@@ -42,14 +43,8 @@ public class NetworkService {
         }
 
         // Return if source is localhost
-        for (InterfaceAddress hostAddress : Utils.hostAddresses) {
-            final InetAddress receivePacketAddress = receivePacket.getAddress();
-            final InetAddress localhost = hostAddress.getAddress();
-            if (receivePacketAddress == null
-                    || receivePacketAddress.getHostAddress().equals(localhost.getHostAddress())
-                    || receivePacketAddress.equals(InetAddress.getByName("127.0.0.1"))) {
-                return;
-            }
+        if (filterLocalhost(receivePacket.getAddress())) {
+            return;
         }
 
         String receivedData = new String(receivePacket.getData()).trim();
@@ -61,29 +56,18 @@ public class NetworkService {
         }
     }
 
-    /**
-     * TCP receiving for messaging and file transfer
-     *
-     * @throws IOException IOException on connections
-     */
-    private static void receiveTcp() throws IOException {
+    private static Socket receiveTcp(ServerSocket listenSocket) throws IOException {
         // Accept a connection
         final Socket incomingSocket;
         try {
-            incomingSocket = tcpReceiveSocket.accept();
+            incomingSocket = listenSocket.accept();
         } catch (SocketTimeoutException e) {
-            return;
+            return null;
         }
 
         // Return if source is localhost
-        for (InterfaceAddress hostAddress : Utils.hostAddresses) {
-            final InetAddress receiveAddress = incomingSocket.getInetAddress();
-            final InetAddress localhost = hostAddress.getAddress();
-            if (receiveAddress == null
-                    || receiveAddress.getHostAddress().equals(localhost.getHostAddress())
-                    || receiveAddress.equals(InetAddress.getByName("127.0.0.1"))) {
-                return;
-            }
+        if (filterLocalhost(incomingSocket.getInetAddress())) {
+            return null;
         }
 
         // Discover user if not discovered yet
@@ -92,13 +76,80 @@ public class NetworkService {
             DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
         }
 
+        return incomingSocket;
+    }
+
+    /**
+     * TCP receiving for messaging
+     *
+     * @throws IOException IOException on connections
+     */
+    private static void receiveMessage() throws IOException {
+        /*// Accept a connection
+        final Socket incomingSocket;
+        try {
+            incomingSocket = messageReceiveSocket.accept();
+        } catch (SocketTimeoutException e) {
+            return;
+        }
+
+        // Return if source is localhost
+        if (filterLocalhost(incomingSocket.getInetAddress())) {
+            return;
+        }
+
+        // Discover user if not discovered yet
+        final boolean exists = Utils.buddyAddresses.stream().anyMatch(address -> (address == incomingSocket.getInetAddress()));
+        if (!exists) {
+            DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
+        }*/
+        Socket incomingSocket = receiveTcp(messageReceiveSocket);
+        if (incomingSocket == null) {
+            return;
+        }
+
         // Process data
         DataInputStream inputStream = new DataInputStream(incomingSocket.getInputStream());
         String message = inputStream.readUTF();
         if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) { // Get messages
             message = message.replace((Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR), "");
             MessageService.receiveMessage(incomingSocket.getInetAddress(), incomingSocket.getPort(), message);
-        } else if (message.startsWith(Constants.COMMAND_FILE_TRANSFER_REQUEST + Constants.COMMAND_SEPARATOR)) { // Get file
+        }
+    }
+
+    /**
+     * TCP receiving for file transfer
+     *
+     * @throws IOException IOException on connections
+     */
+    private static void receiveFile() throws IOException {
+        /*// Accept a connection
+        final Socket incomingSocket;
+        try {
+            incomingSocket = fileReceiveSocket.accept();
+        } catch (SocketTimeoutException e) {
+            return;
+        }
+
+        // Return if source is localhost
+        if (filterLocalhost(incomingSocket.getInetAddress())) {
+            return;
+        }
+
+        // Discover user if not discovered yet
+        final boolean exists = Utils.buddyAddresses.stream().anyMatch(address -> (address == incomingSocket.getInetAddress()));
+        if (!exists) {
+            DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
+        }*/
+
+        Socket incomingSocket = receiveTcp(fileReceiveSocket);
+        if (incomingSocket == null) {
+            return;
+        }
+        // Process data
+        DataInputStream inputStream = new DataInputStream(incomingSocket.getInputStream());
+        String message = inputStream.readUTF();
+        if (message.startsWith(Constants.COMMAND_FILE_TRANSFER_REQUEST + Constants.COMMAND_SEPARATOR)) { // Get file
             final String[] arguments = message.split("\\" + Constants.COMMAND_SEPARATOR);
             try {
                 if (arguments.length > 3) {
@@ -145,6 +196,18 @@ public class NetworkService {
         //</editor-fold>
     }
 
+    private static boolean filterLocalhost(InetAddress address) throws UnknownHostException {
+        for (InterfaceAddress hostAddress : Utils.hostAddresses) {
+            final InetAddress localhost = hostAddress.getAddress();
+            if (address == null
+                    || address.getHostAddress().equals(localhost.getHostAddress())
+                    || address.equals(InetAddress.getByName("127.0.0.1"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void initConnections() throws IOException {
         if (sendSocket == null) {
             sendSocket = new DatagramSocket(Constants.SEND_PORT);
@@ -155,9 +218,13 @@ public class NetworkService {
 //            receiveSocket.setBroadcast(true); // Not necessary here
             receiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
         }
-        if (tcpReceiveSocket == null) {
-            tcpReceiveSocket = new ServerSocket(Constants.RECEIVE_PORT);
-            tcpReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+        if (messageReceiveSocket == null) {
+            messageReceiveSocket = new ServerSocket(Constants.RECEIVE_PORT);
+            messageReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+        }
+        if (fileReceiveSocket == null) {
+            fileReceiveSocket = new ServerSocket(Constants.FILE_RECEIVE_PORT);
+            fileReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
         }
     }
 
@@ -192,25 +259,37 @@ public class NetworkService {
                 }
                 LOGGER.debug("receive end");
             } catch (Exception e) {
-                LOGGER.error("Error on receive() " + Arrays.toString(e.getStackTrace()));
+                LOGGER.error("Error on receive() ", e);
             }
         });
 
-        Runnable receiveTcpThread = (() -> {
+        Runnable receiveMessageThread = (() -> {
             try {
                 while (!end) {
-                    receiveTcp();
+                    receiveMessage();
                 }
-                LOGGER.debug("receiveTcp end");
+                LOGGER.debug("receiveMessage end");
             } catch (Exception e) {
-                LOGGER.error("Error on receiveTcp() " + Arrays.toString(e.getStackTrace()));
+                LOGGER.error("Error on receiveMessage() ", e);
+            }
+        });
+
+        Runnable receiveFileThread = (() -> {
+            try {
+                while (!end) {
+                    receiveFile();
+                }
+                LOGGER.debug("receiveFile end");
+            } catch (Exception e) {
+                LOGGER.error("Error on receiveFile() ", e);
             }
         });
 
         // Execute threads
         service.execute(sendThread);
         service.execute(receiveThread);
-        service.execute(receiveTcpThread);
+        service.execute(receiveMessageThread);
+        service.execute(receiveFileThread);
     }
 
     public static void end() {

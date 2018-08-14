@@ -24,7 +24,7 @@ public class MessageService {
     private static final Logger LOGGER = LogManager.getLogger(MessageService.class);
 
     public static void sendMessage(InetAddress address, String message) throws IOException {
-        Socket socket = new Socket(address, Constants.RECEIVE_PORT, InetAddress.getLocalHost(), Constants.SEND_PORT);
+        Socket socket = new Socket(address, Constants.RECEIVE_PORT);
         DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
         message = (Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR + message);
         outputStream.writeUTF(message);
@@ -36,9 +36,7 @@ public class MessageService {
         final boolean founded = Utils.buddyAddresses.contains(senderAddress);
         if (founded) {
             final Optional<User> first = Utils.buddies.stream().filter(u -> u.getAddress().equals(senderAddress)).findFirst();
-            first.ifPresent(user -> {
-                SwingUtilities.invokeLater(() -> MainUI.getUI().receiveMessage(user, receivedData));
-            });
+            first.ifPresent(user -> SwingUtilities.invokeLater(() -> MainUI.getUI().receiveMessage(user, receivedData)));
         }
     }
 }

@@ -27,14 +27,11 @@ public class MainUI extends javax.swing.JFrame {
     private final JDialog loadingDialog;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
-    private javax.swing.JDialog fileTransferDialog;
     private javax.swing.JButton jButton_addManually;
     private javax.swing.JButton jButton_endDiscovery;
     private javax.swing.JButton jButton_hardDiscovery;
     private javax.swing.JButton jButton_hostAddresses;
     private javax.swing.JButton jButton_startDiscovery;
-    private javax.swing.JLabel jLabel_info;
-    private javax.swing.JProgressBar jProgressBar_transferProgress;
     private javax.swing.JScrollPane jScrollPane_buddiesPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -129,39 +126,26 @@ public class MainUI extends javax.swing.JFrame {
     /**
      * Asks user to confirm receiving a file from another user
      *
-     * @param senderAddress address of sender
-     * @param fileName      sending file's name
-     * @param fileSize      sending file's size
+     * @param user     sender user
+     * @param fileName sending file's name
+     * @param fileSize sending file's size
      * @return user confirmation result
      */
-    public boolean confirmFileReceive(InetAddress senderAddress, String fileName, long fileSize) {
-        final User user = new User();
-        final boolean buddyExists = Utils.buddies.stream().anyMatch(u -> {
-            if (u.getAddress().equals(senderAddress)) {
-                user.setUserName(u.getUserName());
-                user.setAddress(u.getAddress());
-                return true;
-            }
-            return false;
-        });
-        if (buddyExists) { // Process request if sender has discovered
-
-            // Turn file size to readable string
-            String fileSizeString = "";
-            if (fileSize < 1024) {
-                fileSizeString = (fileSize + " Bytes");
-            } else if (fileSize < 1024 * 1024) {
-                fileSizeString = (fileSize / 1024) + " KB";
-            } else if (fileSize < 1024 * 1024 * 1024) {
-                fileSizeString = (fileSize / 1024 / 1024) + " MB";
-            }
-
-            // Display dialog
-            String message = user.getUserName() + " on " + user.getAddress() + " wants to send you this file:\n" + fileName + " (" + fileSizeString + ")\nAccept the file?";
-            final int option = JOptionPane.showConfirmDialog(this, message, "Confirm file receive", JOptionPane.YES_NO_OPTION);
-            return option == 0; // 0 = OK option
+    public boolean confirmFileReceive(User user, String fileName, long fileSize) {
+        // Turn file size to readable string
+        String fileSizeString = "";
+        if (fileSize < 1024) {
+            fileSizeString = (fileSize + " Bytes");
+        } else if (fileSize < 1024 * 1024) {
+            fileSizeString = (fileSize / 1024) + " KB";
+        } else if (fileSize < 1024 * 1024 * 1024) {
+            fileSizeString = (fileSize / 1024 / 1024) + " MB";
         }
-        return false;
+
+        // Display dialog
+        String message = user.getUserName() + " on " + user.getAddress() + " wants to send you this file:\n" + fileName + " (" + fileSizeString + ")\nAccept the file?";
+        final int option = JOptionPane.showConfirmDialog(this, message, "Confirm file receive", JOptionPane.YES_NO_OPTION);
+        return option == 0; // 0 = OK option
     }
 
     private void toggleLoading() {
@@ -188,9 +172,6 @@ public class MainUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        fileTransferDialog = new javax.swing.JDialog();
-        jLabel_info = new javax.swing.JLabel();
-        jProgressBar_transferProgress = new javax.swing.JProgressBar();
         jButton_startDiscovery = new javax.swing.JButton();
         jButton_endDiscovery = new javax.swing.JButton();
         jButton_addManually = new javax.swing.JButton();
@@ -199,34 +180,8 @@ public class MainUI extends javax.swing.JFrame {
         jScrollPane_buddiesPanel = new javax.swing.JScrollPane();
         buddiesPanel = new ogr.user12043.talkOnLan.ui.BuddiesPanel();
 
-        jLabel_info.setText("jLabel_info");
-
-        javax.swing.GroupLayout fileTransferDialogLayout = new javax.swing.GroupLayout(fileTransferDialog.getContentPane());
-        fileTransferDialog.getContentPane().setLayout(fileTransferDialogLayout);
-        fileTransferDialogLayout.setHorizontalGroup(
-                fileTransferDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(fileTransferDialogLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(fileTransferDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jProgressBar_transferProgress, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                                        .addGroup(fileTransferDialogLayout.createSequentialGroup()
-                                                .addComponent(jLabel_info)
-                                                .addGap(0, 0, Short.MAX_VALUE)))
-                                .addContainerGap())
-        );
-        fileTransferDialogLayout.setVerticalGroup(
-                fileTransferDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(fileTransferDialogLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel_info)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jProgressBar_transferProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(0, 250));
-        setResizable(false);
+        setMinimumSize(new java.awt.Dimension(675, 250));
 
         jButton_startDiscovery.setText("Start Discovery");
         jButton_startDiscovery.addActionListener(new java.awt.event.ActionListener() {
@@ -267,9 +222,11 @@ public class MainUI extends javax.swing.JFrame {
             }
         });
 
+        jScrollPane_buddiesPanel.setBorder(null);
         jScrollPane_buddiesPanel.setAutoscrolls(true);
 
         buddiesPanel.setEnabled(false);
+        buddiesPanel.setLayout(new java.awt.GridBagLayout());
         jScrollPane_buddiesPanel.setViewportView(buddiesPanel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
