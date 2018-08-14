@@ -8,7 +8,6 @@ public class Constants {
     public static final String DISCOVERY_COMMAND_REQUEST = "talk-onLan_APPLICATION_DISCOVERY_REQUEST";
     public static final String DISCOVERY_COMMAND_RESPONSE = "talk-onLan_APPLICATION_DISCOVERY_RESPONSE";
     public static final String COMMAND_MESSAGE = "talk-onLan_APPLICATION_MESSAGE";
-    //    public static final String COMMAND_MESSAGE_END = "talk-onLan_MESSAGE_END";
     public static final String COMMAND_FILE_TRANSFER_REQUEST = "talk-onLan_FILE_TRANSFER_REQUEST";
     public static final String COMMAND_FILE_TRANSFER_RESPONSE_ACCEPT = "talk-onLan_FILE_TRANSFER_RESPONSE_ACCEPT";
     public static final String COMMAND_FILE_TRANSFER_RESPONSE_REJECT = "talk-onLan_FILE_TRANSFER_RESPONSE_REJECT";
@@ -19,5 +18,5 @@ public class Constants {
     public static final int RECEIVE_TIMEOUT = 5000;
     public static final int DISCOVERY_INTERVAL = 3000;
     public static final int DISCOVERY_BUFFER_LENGTH = 64;
-    public static final int FILE_BUFFER_LENGTH = 64;
+    public static final int FILE_BUFFER_LENGTH = 16384;
 }

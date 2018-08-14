@@ -56,6 +56,13 @@ public class NetworkService {
         }
     }
 
+    /**
+     * Receives a connection and does some process after process received data
+     *
+     * @param listenSocket listening socket
+     * @return incoming socket
+     * @throws IOException IOException on connections
+     */
     private static Socket receiveTcp(ServerSocket listenSocket) throws IOException {
         // Accept a connection
         final Socket incomingSocket;
@@ -64,16 +71,22 @@ public class NetworkService {
         } catch (SocketTimeoutException e) {
             return null;
         }
-
+        incomingSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
         // Return if source is localhost
         if (filterLocalhost(incomingSocket.getInetAddress())) {
             return null;
         }
 
         // Discover user if not discovered yet
-        final boolean exists = Utils.buddyAddresses.stream().anyMatch(address -> (address == incomingSocket.getInetAddress()));
+        final boolean exists = Utils.buddyAddresses.stream().anyMatch(address -> (address.equals(incomingSocket.getInetAddress())));
         if (!exists) {
             DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
+            // Wait for discovery
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                LOGGER.error("Error when discovering remote user: ", e);
+            }
         }
 
         return incomingSocket;
@@ -85,24 +98,6 @@ public class NetworkService {
      * @throws IOException IOException on connections
      */
     private static void receiveMessage() throws IOException {
-        /*// Accept a connection
-        final Socket incomingSocket;
-        try {
-            incomingSocket = messageReceiveSocket.accept();
-        } catch (SocketTimeoutException e) {
-            return;
-        }
-
-        // Return if source is localhost
-        if (filterLocalhost(incomingSocket.getInetAddress())) {
-            return;
-        }
-
-        // Discover user if not discovered yet
-        final boolean exists = Utils.buddyAddresses.stream().anyMatch(address -> (address == incomingSocket.getInetAddress()));
-        if (!exists) {
-            DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
-        }*/
         Socket incomingSocket = receiveTcp(messageReceiveSocket);
         if (incomingSocket == null) {
             return;
@@ -123,25 +118,6 @@ public class NetworkService {
      * @throws IOException IOException on connections
      */
     private static void receiveFile() throws IOException {
-        /*// Accept a connection
-        final Socket incomingSocket;
-        try {
-            incomingSocket = fileReceiveSocket.accept();
-        } catch (SocketTimeoutException e) {
-            return;
-        }
-
-        // Return if source is localhost
-        if (filterLocalhost(incomingSocket.getInetAddress())) {
-            return;
-        }
-
-        // Discover user if not discovered yet
-        final boolean exists = Utils.buddyAddresses.stream().anyMatch(address -> (address == incomingSocket.getInetAddress()));
-        if (!exists) {
-            DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
-        }*/
-
         Socket incomingSocket = receiveTcp(fileReceiveSocket);
         if (incomingSocket == null) {
             return;

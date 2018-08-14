@@ -9,8 +9,10 @@ import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * Created by ME99735 on 10.08.2018 - 09:03
@@ -30,13 +32,12 @@ public class FileTransferService {
         DataInputStream fileInputStream = null;
         try {
             socket = new Socket(user.getAddress(), Constants.FILE_RECEIVE_PORT);
-            socket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
             outputStream = new DataOutputStream(socket.getOutputStream());
             inputStream = new DataInputStream(socket.getInputStream());
             fileInputStream = new DataInputStream(new FileInputStream(file));
             // Send send request
             outputStream.writeUTF(Constants.COMMAND_FILE_TRANSFER_REQUEST + Constants.COMMAND_SEPARATOR + file.length() + Constants.COMMAND_SEPARATOR + file.getName());
-            LOGGER.info("file send request sent to " + user.getAddress());
+            LOGGER.info("file send request sent to " + user.getAddress() + "for file \"" + file.getName() + "\"");
 
             // Receive ok response
             String response = inputStream.readUTF();
@@ -44,18 +45,33 @@ public class FileTransferService {
                 case Constants.COMMAND_FILE_TRANSFER_RESPONSE_ACCEPT:
                     LOGGER.info("sending file \"" + file.getName() + "\" to " + user.getAddress());
 
-                    dialog.startSend();
+                    dialog.startTransfer();
                     byte[] buffer = new byte[Constants.FILE_BUFFER_LENGTH];
                     int readBytes;
                     long ration = file.length() / 100;
                     long amountProcessed = 0;
-                    while ((readBytes = fileInputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, readBytes);
-                        amountProcessed += readBytes;
-                        dialog.setProgress((int) (amountProcessed / ration));
+                    try {
+                        while ((readBytes = fileInputStream.read(buffer)) != -1) {
+                            if (dialog.cancelled()) {
+                                socket.shutdownOutput();
+                                socket.close();
+                                fileInputStream.close();
+                                return;
+                            }
+                            outputStream.write(buffer, 0, readBytes);
+                            amountProcessed += readBytes;
+                            dialog.setProgress((int) (amountProcessed / ration));
+                        }
+                    } catch (SocketException e) {
+                        if (e.getMessage().equals("Software caused connection abort: socket write error")) {
+                            JOptionPane.showMessageDialog(dialog, ("File did not send! Transfer interrupted by receiver"), "ERROR", JOptionPane.ERROR_MESSAGE);
+                            dialog.dispose();
+                        } else {
+                            throw e;
+                        }
                     }
 
-                    LOGGER.info("\"" + file.getName() + "\"file sent to " + user.getAddress());
+                    LOGGER.info("\"" + file.getName() + "\" file sent to " + user.getAddress());
                     break;
                 case Constants.COMMAND_FILE_TRANSFER_RESPONSE_REJECT:
                     dialog.dispose();
@@ -96,29 +112,52 @@ public class FileTransferService {
             inputStream = new DataInputStream(incomingSocket.getInputStream());
             if (MainUI.getUI().confirmFileReceive(user, fileName, fileSize)) {
                 File outputFile = new File(Properties.fileReceiveFolder + fileName);
+                if (outputFile.exists()) { // Ask user for overwriting
+                    final int option = JOptionPane.showConfirmDialog(MainUI.getUI(), "The receiving file is already exists. Do you want to continue and overwrite the file?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    if (option != 0) {
+                        // send deny response
+                        outputStream.writeUTF(Constants.COMMAND_FILE_TRANSFER_RESPONSE_REJECT);
+                        LOGGER.info("file \"" + fileName + "\" deny response sent to " + incomingSocket.getInetAddress());
+                        incomingSocket.close();
+                    }
+                }
                 outputFile.getParentFile().mkdirs(); // Create parent folder of file if does not exists
                 fileOutputStream = new DataOutputStream(new FileOutputStream(outputFile, false));
 
                 // send allow response
                 outputStream.writeUTF(Constants.COMMAND_FILE_TRANSFER_RESPONSE_ACCEPT);
-                LOGGER.info("file send allow response sent to " + incomingSocket.getInetAddress());
+                LOGGER.info("file \"" + fileName + "\" allow response sent to " + incomingSocket.getInetAddress());
 
-                FileTransferDialog dialog = null;
-                dialog = new FileTransferDialog(MainUI.getUI(), user, false, fileName);
+                FileTransferDialog dialog = new FileTransferDialog(MainUI.getUI(), user, false, fileName);
+                dialog.startTransfer();
                 byte[] buffer = new byte[Constants.FILE_BUFFER_LENGTH];
                 int readBytes;
                 long ration = fileSize / 100;
                 long amountProcessed = 0;
                 while ((readBytes = inputStream.read(buffer)) != -1) {
+                    if (dialog.cancelled()) {
+                        fileOutputStream.close();
+                        outputFile.delete();
+                        incomingSocket.close();
+                        return;
+                    }
                     fileOutputStream.write(buffer, 0, readBytes);
                     amountProcessed += readBytes;
                     dialog.setProgress((int) (amountProcessed / ration));
                 }
-                LOGGER.info("file received from " + incomingSocket.getInetAddress());
+                // Detect send interrupts
+                if (amountProcessed != fileSize) {
+                    JOptionPane.showMessageDialog(dialog, "Transfer interrupted! The sender cancelled transfer!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    dialog.dispose();
+                    fileOutputStream.close();
+                    outputFile.delete();
+                } else {
+                    LOGGER.info("file \"" + fileName + "\" received from " + incomingSocket.getInetAddress());
+                }
             } else {
                 // send deny response
                 outputStream.writeUTF(Constants.COMMAND_FILE_TRANSFER_RESPONSE_REJECT);
-                LOGGER.info("file send deny response sent to " + incomingSocket.getInetAddress());
+                LOGGER.info("file \"" + fileName + "\" deny response sent to " + incomingSocket.getInetAddress());
             }
         } finally {
             if (fileOutputStream != null) {

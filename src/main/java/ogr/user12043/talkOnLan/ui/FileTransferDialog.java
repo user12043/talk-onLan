@@ -2,6 +2,8 @@ package ogr.user12043.talkOnLan.ui;
 
 import ogr.user12043.talkOnLan.User;
 
+import java.awt.event.WindowEvent;
+
 /**
  * Created by user12043 on 14.08.2018 - 10:47
  * part of project: talk-onLan
@@ -11,6 +13,7 @@ public class FileTransferDialog extends javax.swing.JDialog {
     private boolean sending;
     private User user;
     private String fileName;
+    private boolean cancel;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_cancel;
     private javax.swing.JLabel jLabel_fileName;
@@ -26,21 +29,18 @@ public class FileTransferDialog extends javax.swing.JDialog {
         this.sending = sending;
         this.user = user;
         this.fileName = fileName;
+        cancel = false;
         setModal(false);
         setTitle(fileName);
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         initComponents();
-        if (!sending) {
-            jProgressBar_transferProgress.setIndeterminate(false);
-        }
         setLocationRelativeTo(MainUI.getUI());
         setVisible(true);
     }
 
-    public void startSend() {
+    public void startTransfer() {
         jProgressBar_transferProgress.setIndeterminate(false);
         jProgressBar_transferProgress.setValue(0);
-        jLabel_info.setText("Sending to " + user.getUserName() + " on " + user.getAddress());
+        jLabel_info.setText(((sending) ? "Sending to " : "Receiving from ") + user.getUserName() + " on " + user.getAddress());
     }
 
     public void setProgress(int progress) {
@@ -49,6 +49,24 @@ public class FileTransferDialog extends javax.swing.JDialog {
         if (jProgressBar_transferProgress.getValue() == 100) {
             requestFocus();
             setTitle(fileName);
+            jLabel_info.setText("Transfer Completed");
+            jButton_cancel.setText("Close");
+        }
+    }
+
+    public boolean cancelled() {
+        return cancel;
+    }
+
+    /**
+     * Make dialog non-closable to only dispose the dialog on clicking cancel button
+     *
+     * @param e window event
+     */
+    @Override
+    protected void processWindowEvent(WindowEvent e) {
+        if (e.getID() != WindowEvent.WINDOW_CLOSING) {
+            super.processWindowEvent(e);
         }
     }
 
@@ -77,6 +95,11 @@ public class FileTransferDialog extends javax.swing.JDialog {
         jLabel_fileName.setText(fileName);
 
         jButton_cancel.setText("Cancel");
+        jButton_cancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_cancelActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -111,4 +134,9 @@ public class FileTransferDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton_cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_cancelActionPerformed
+        cancel = true;
+        dispose();
+    }//GEN-LAST:event_jButton_cancelActionPerformed
 }

@@ -54,6 +54,8 @@ class MessagePanel extends javax.swing.JDialog {
         try {
             MessageService.sendMessage(user.getAddress(), sendingMessage); // Send message
             addMessage(sendingMessage, true); // Add message box to panel
+            jTextArea_content.setText("");
+            jTextArea_content.grabFocus();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Cannot send the message!", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
