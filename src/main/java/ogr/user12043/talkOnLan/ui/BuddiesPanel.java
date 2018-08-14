@@ -2,7 +2,6 @@ package ogr.user12043.talkOnLan.ui;
 
 import ogr.user12043.talkOnLan.User;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +15,6 @@ public class BuddiesPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
     private final Set<BuddyPanel> buddyPanels;
-    private int yIndex = 0;
 
     /**
      * Creates new form BuddiesPanel
@@ -32,19 +30,9 @@ public class BuddiesPanel extends javax.swing.JPanel {
      * @param user new user to add
      */
     public void addBuddy(User user) {
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.NORTH;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = yIndex;
-        c.weightx = 1.0d;
-        c.weighty = 1.0d;
         BuddyPanel buddyPanel = new BuddyPanel(user);
-        add(buddyPanel, c);
+        add(buddyPanel);
         buddyPanels.add(buddyPanel);
-        c.gridy = yIndex + 1;
-        add(new JSeparator(), c);
-        yIndex += 2;
         revalidate();
     }
 
@@ -71,6 +59,6 @@ public class BuddiesPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setLayout(new java.awt.GridBagLayout());
+        setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS));
     }// </editor-fold>//GEN-END:initComponents
 }

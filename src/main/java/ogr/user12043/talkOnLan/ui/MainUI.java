@@ -27,11 +27,14 @@ public class MainUI extends javax.swing.JFrame {
     private final JDialog loadingDialog;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
+    private javax.swing.JDialog fileTransferDialog;
     private javax.swing.JButton jButton_addManually;
     private javax.swing.JButton jButton_endDiscovery;
     private javax.swing.JButton jButton_hardDiscovery;
     private javax.swing.JButton jButton_hostAddresses;
     private javax.swing.JButton jButton_startDiscovery;
+    private javax.swing.JLabel jLabel_info;
+    private javax.swing.JProgressBar jProgressBar_transferProgress;
     private javax.swing.JScrollPane jScrollPane_buddiesPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -43,7 +46,7 @@ public class MainUI extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         messagePanels = new HashSet<>();
         loadingDialog = createLoadingDialog();
-        setGlassPaneDark();
+        initializeGlassPane();
     }
 
     /**
@@ -80,7 +83,7 @@ public class MainUI extends javax.swing.JFrame {
     /**
      * Set frame's glass pane darken to darken the window on loading dialog shows
      */
-    private void setGlassPaneDark() {
+    private void initializeGlassPane() {
         getRootPane().setGlassPane(new JComponent() {
             @Override
             public void paintComponent(Graphics g) {
@@ -185,6 +188,9 @@ public class MainUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        fileTransferDialog = new javax.swing.JDialog();
+        jLabel_info = new javax.swing.JLabel();
+        jProgressBar_transferProgress = new javax.swing.JProgressBar();
         jButton_startDiscovery = new javax.swing.JButton();
         jButton_endDiscovery = new javax.swing.JButton();
         jButton_addManually = new javax.swing.JButton();
@@ -192,6 +198,31 @@ public class MainUI extends javax.swing.JFrame {
         jButton_hardDiscovery = new javax.swing.JButton();
         jScrollPane_buddiesPanel = new javax.swing.JScrollPane();
         buddiesPanel = new ogr.user12043.talkOnLan.ui.BuddiesPanel();
+
+        jLabel_info.setText("jLabel_info");
+
+        javax.swing.GroupLayout fileTransferDialogLayout = new javax.swing.GroupLayout(fileTransferDialog.getContentPane());
+        fileTransferDialog.getContentPane().setLayout(fileTransferDialogLayout);
+        fileTransferDialogLayout.setHorizontalGroup(
+                fileTransferDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(fileTransferDialogLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(fileTransferDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jProgressBar_transferProgress, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                                        .addGroup(fileTransferDialogLayout.createSequentialGroup()
+                                                .addComponent(jLabel_info)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap())
+        );
+        fileTransferDialogLayout.setVerticalGroup(
+                fileTransferDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(fileTransferDialogLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel_info)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jProgressBar_transferProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(0, 250));
