@@ -40,8 +40,9 @@ public class FileTransferService {
                 case Constants.COMMAND_FILE_TRANSFER_RESPONSE_ACCEPT:
                     LOGGER.info("sending file to " + address);
                     byte[] buffer = new byte[Constants.BUFFER_LENGTH];
-                    while (fileInputStream.read(buffer) != -1) {
-                        outputStream.write(buffer);
+                    int readBytes;
+                    while ((readBytes = fileInputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, readBytes);
                     }
                     break;
                 case Constants.COMMAND_FILE_TRANSFER_RESPONSE_REJECT:
@@ -76,8 +77,9 @@ public class FileTransferService {
                 LOGGER.info("file send allow response sent to " + incomingSocket.getInetAddress());
 
                 byte[] buffer = new byte[Constants.BUFFER_LENGTH];
-                while (inputStream.read(buffer) != -1) {
-                    fileOutputStream.write(buffer);
+                int readBytes;
+                while ((readBytes = inputStream.read(buffer)) != -1) {
+                    fileOutputStream.write(buffer, 0, readBytes);
                 }
                 LOGGER.info("file received from " + incomingSocket.getInetAddress());
             } else {

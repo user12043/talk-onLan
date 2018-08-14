@@ -157,7 +157,7 @@ public class NetworkService {
         }
         if (tcpReceiveSocket == null) {
             tcpReceiveSocket = new ServerSocket(Constants.RECEIVE_PORT);
-            tcpReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+//            tcpReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
         }
     }
 
