@@ -7,6 +7,7 @@ import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Utils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -42,6 +43,7 @@ public class MainUI extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         messagePanels = new HashSet<>();
         loadingDialog = createLoadingDialog();
+        setGlassPaneDark();
     }
 
     /**
@@ -73,6 +75,20 @@ public class MainUI extends javax.swing.JFrame {
         dialog.pack();
         dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));// should be called after "pack()"
         return dialog;
+    }
+
+    /**
+     * Set frame's glass pane darken to darken the window on loading dialog shows
+     */
+    private void setGlassPaneDark() {
+        getRootPane().setGlassPane(new JComponent() {
+            @Override
+            public void paintComponent(Graphics g) {
+                g.setColor(new Color(0, 0, 0, 100));
+                g.fillRect(0, 0, getWidth(), getHeight());
+                super.paintComponent(g);
+            }
+        });
     }
 
     /**
@@ -146,13 +162,17 @@ public class MainUI extends javax.swing.JFrame {
     }
 
     private void toggleLoading() {
-        // Set dialog location
-        loadingDialog.setLocation((getLocation().x + 200), (getLocation().y + 150));
+        // Set dialog location to center
+        int width = (getLocation().x + (getSize().width / 2) - (loadingDialog.getSize().width / 2));
+        loadingDialog.setLocation(width, (getLocation().y + 65));
+        System.out.println(loadingDialog.getSize());
         SwingUtilities.invokeLater(() -> {
             if (loadingDialog.isShowing()) {
-                loadingDialog.dispose();
+                loadingDialog.dispose(); // Hide loading dialog
+                getRootPane().getGlassPane().setVisible(false); // hide dark glass pane
             } else {
-                loadingDialog.setVisible(true);
+                getRootPane().getGlassPane().setVisible(true); // show dark glass pane
+                loadingDialog.setVisible(true); // Show loading dialog
             }
         });
     }
