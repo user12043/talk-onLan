@@ -144,9 +144,10 @@ class MessagePanel extends javax.swing.JDialog {
             }
         });
 
+        jScrollPane_dialogue.setBorder(null);
         jScrollPane_dialogue.setAutoscrolls(true);
 
-        jPanel_dialogue.setPreferredSize(jScrollPane_dialogue.getPreferredSize());
+        jPanel_dialogue.setAutoscrolls(true);
         jPanel_dialogue.setLayout(new java.awt.GridBagLayout());
         jScrollPane_dialogue.setViewportView(jPanel_dialogue);
 
