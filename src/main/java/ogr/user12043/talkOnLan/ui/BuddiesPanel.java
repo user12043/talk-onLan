@@ -30,8 +30,13 @@ public class BuddiesPanel extends javax.swing.JPanel {
      * @param user new user to add
      */
     public void addBuddy(User user) {
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridy = buddyPanels.size();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0d;
         BuddyPanel buddyPanel = new BuddyPanel(user);
-        add(buddyPanel);
+        buddyPanel.setBackground((buddyPanels.size() % 2 == 0) ? Color.WHITE : Color.LIGHT_GRAY);
+        add(buddyPanel, constraints);
         buddyPanels.add(buddyPanel);
         revalidate();
     }
@@ -60,6 +65,6 @@ public class BuddiesPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Buddies"));
-        setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS));
+        setLayout(new java.awt.GridBagLayout());
     }// </editor-fold>//GEN-END:initComponents
 }

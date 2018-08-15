@@ -226,7 +226,6 @@ public class MainUI extends javax.swing.JFrame {
         jScrollPane_buddiesPanel.setAutoscrolls(true);
 
         buddiesPanel.setEnabled(false);
-        buddiesPanel.setLayout(new java.awt.GridBagLayout());
         jScrollPane_buddiesPanel.setViewportView(buddiesPanel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -308,6 +307,7 @@ public class MainUI extends javax.swing.JFrame {
         jButton_addManually.setEnabled(false);
         jButton_hostAddresses.setEnabled(false);
         jButton_endDiscovery.setEnabled(false);
+        messagePanels.forEach(Window::dispose);
         new Thread(() -> {
             try {
                 Thread.sleep(Constants.RECEIVE_TIMEOUT);

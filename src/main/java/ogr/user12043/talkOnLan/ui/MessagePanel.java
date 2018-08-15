@@ -19,10 +19,10 @@ class MessagePanel extends javax.swing.JDialog {
     private boolean shiftPressed;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_send;
-    private javax.swing.JPanel jPanel_dialog;
+    private javax.swing.JPanel jPanel_dialogue;
     private javax.swing.JProgressBar jProgressBar_sending;
     private javax.swing.JScrollPane jScrollPane_content;
-    private javax.swing.JScrollPane jScrollPane_dialog;
+    private javax.swing.JScrollPane jScrollPane_dialogue;
     private javax.swing.JTextArea jTextArea_content;
     // End of variables declaration//GEN-END:variables
 
@@ -39,6 +39,7 @@ class MessagePanel extends javax.swing.JDialog {
         this.user = user;
         setTitle(user.getUserName() + " on " + user.getAddress());
         jProgressBar_sending.setVisible(false);
+        jTextArea_content.requestFocusInWindow();
     }
 
     User getUser() {
@@ -48,8 +49,9 @@ class MessagePanel extends javax.swing.JDialog {
     /**
      * Sends message to buddy
      */
-    private void sendMessage(String sendingMessage) {
+    private void sendMessage(final String sendingMessage) {
         if (sendingMessage.isEmpty()) { // Ignore if empty
+            setInputEnabled(true);
             return;
         }
         try {
@@ -57,7 +59,7 @@ class MessagePanel extends javax.swing.JDialog {
             SwingUtilities.invokeLater(() -> {
                 addMessage(sendingMessage, true); // Add message box to panel
                 jTextArea_content.setText("");
-                jTextArea_content.grabFocus();
+                jTextArea_content.requestFocusInWindow();
                 setInputEnabled(true);
             });
         } catch (IOException e) {
@@ -86,7 +88,7 @@ class MessagePanel extends javax.swing.JDialog {
         constraints.weightx = 1.0d;
         constraints.insets = new Insets(0, 0, 20, 0);
         MessageBox messageBox = new MessageBox(user, message, own);
-        jPanel_dialog.add(messageBox, constraints);
+        jPanel_dialogue.add(messageBox, constraints);
         lineNumber++;
         revalidate();
     }
@@ -109,18 +111,26 @@ class MessagePanel extends javax.swing.JDialog {
         jScrollPane_content = new javax.swing.JScrollPane();
         jTextArea_content = new javax.swing.JTextArea();
         jButton_send = new javax.swing.JButton();
-        jScrollPane_dialog = new javax.swing.JScrollPane();
-        jPanel_dialog = new javax.swing.JPanel();
+        jScrollPane_dialogue = new javax.swing.JScrollPane();
+        jPanel_dialogue = new javax.swing.JPanel();
         jProgressBar_sending = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(300, 450));
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                formComponentResized(evt);
+            }
+        });
 
-        jTextArea_content.setColumns(20);
+        jTextArea_content.setLineWrap(true);
         jTextArea_content.setRows(5);
+        jTextArea_content.setWrapStyleWord(true);
         jTextArea_content.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 jTextArea_contentKeyPressed(evt);
             }
+
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 jTextArea_contentKeyReleased(evt);
             }
@@ -134,11 +144,11 @@ class MessagePanel extends javax.swing.JDialog {
             }
         });
 
-        jScrollPane_dialog.setAutoscrolls(true);
+        jScrollPane_dialogue.setAutoscrolls(true);
 
-        jPanel_dialog.setAutoscrolls(true);
-        jPanel_dialog.setLayout(new java.awt.GridBagLayout());
-        jScrollPane_dialog.setViewportView(jPanel_dialog);
+        jPanel_dialogue.setPreferredSize(jScrollPane_dialogue.getPreferredSize());
+        jPanel_dialogue.setLayout(new java.awt.GridBagLayout());
+        jScrollPane_dialogue.setViewportView(jPanel_dialogue);
 
         jProgressBar_sending.setIndeterminate(true);
 
@@ -146,26 +156,27 @@ class MessagePanel extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jScrollPane_content, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
-                                        .addComponent(jScrollPane_dialog, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane_dialogue)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jButton_send)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                .addGap(185, 185, 185)
+                                                .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addComponent(jScrollPane_content))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jScrollPane_dialog, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
+                                .addComponent(jScrollPane_dialogue, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jScrollPane_content, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(jButton_send)
                                         .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addContainerGap())
@@ -175,7 +186,7 @@ class MessagePanel extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_sendActionPerformed
-        final String sendingMessage = jTextArea_content.getText();
+        final String sendingMessage = jTextArea_content.getText().trim();
         setInputEnabled(false);
         new Thread(() -> sendMessage(sendingMessage)).start();
     }//GEN-LAST:event_jButton_sendActionPerformed
@@ -202,4 +213,12 @@ class MessagePanel extends javax.swing.JDialog {
             shiftPressed = false;
         }
     }//GEN-LAST:event_jTextArea_contentKeyReleased
+
+    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
+        /*System.out.println("===================================================================================");
+        System.out.println("window: " + getSize() + " | " + getPreferredSize());
+        System.out.println("scroll pane: " + jScrollPane_dialogue.getSize() + " | " + jScrollPane_dialogue.getPreferredSize());
+        System.out.println("panel: " + jPanel_dialogue.getSize() + " | " + jPanel_dialogue.getPreferredSize());
+        System.out.println("===================================================================================");*/
+    }//GEN-LAST:event_formComponentResized
 }
