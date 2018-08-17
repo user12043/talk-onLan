@@ -11,7 +11,9 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 
 /**
  * Created by user12043 on 26.07.2018 - 11:57
@@ -57,5 +59,24 @@ public class DiscoveryService {
         }
         Utils.buddies.add(user);
         SwingUtilities.invokeLater(() -> MainUI.getUI().buddiesPanel.addBuddy(user));
+    }
+
+    /**
+     * If broadcasting is not working in the network, normal discovery will not work. This method sends discovery request to each ips specific
+     *
+     * @throws IOException IOException on connections
+     */
+    public static void hardDiscovery() throws IOException {
+        for (InterfaceAddress hostAddress : Utils.hostAddresses) {
+            final InetAddress address = hostAddress.getAddress();
+            if (address instanceof Inet4Address) {
+                final String hostAddressString = address.toString().replace(address.getHostName(), "").replace("/", "");
+                for (int i = 0; i < 255; i++) {
+                    final String targetAddressString = hostAddressString.substring(0, hostAddressString.lastIndexOf('.') + 1) + i;
+                    InetAddress targetAddress = Inet4Address.getByName(targetAddressString);
+                    sendDiscoveryRequest(targetAddress);
+                }
+            }
+        }
     }
 }

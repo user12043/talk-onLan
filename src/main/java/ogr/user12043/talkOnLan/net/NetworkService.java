@@ -272,23 +272,4 @@ public class NetworkService {
         end = true;
     }
 
-    /**
-     * If broadcasting is not working in the network, normal discovery will not work. This method sends discovery request to each ips specific
-     *
-     * @throws IOException IOException on connections
-     */
-    public static void hardDiscovery() throws IOException {
-        for (InterfaceAddress hostAddress : Utils.hostAddresses) {
-            final InetAddress address = hostAddress.getAddress();
-            if (address instanceof Inet4Address) {
-                final String hostAddressString = address.toString().replace(address.getHostName(), "").replace("/", "");
-                for (int i = 0; i < 255; i++) {
-                    final String targetAddressString = hostAddressString.substring(0, hostAddressString.lastIndexOf('.') + 1) + i;
-                    System.out.println(targetAddressString);
-                    InetAddress targetAddress = Inet4Address.getByName(targetAddressString);
-                    DiscoveryService.sendDiscoveryRequest(targetAddress);
-                }
-            }
-        }
-    }
 }

@@ -359,13 +359,13 @@ public class MainUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton_hostAddressesActionPerformed
 
     /**
-     * calls {@link NetworkService#hardDiscovery()}
+     * calls {@link DiscoveryService#hardDiscovery()}
      *
      * @param evt action event
      */
     private void jButton_hardDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hardDiscoveryActionPerformed
         try {
-            NetworkService.hardDiscovery();
+            DiscoveryService.hardDiscovery();
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error on discovery!", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
