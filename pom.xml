@@ -52,25 +52,25 @@
 
     <!--=========================================THEMES=========================================-->
     <!--This dependency installed to local repository with this command:
-    mvn install:install-file -Dfile=material-ui-swing.jar -DgroupId=madlf.vincenzopalazzo -DartifactId=material-ui-swing -Dversion=v0.9.3.1 -Dpackaging=jar -Dmaven.repo.local=${project.basedir}/${lib-folder}
+    mvn install:install-file -Dfile=material-ui-swing.jar -DgroupId=madlf.vincenzopalazzo -DartifactId=material-ui-swing -Dversion=v0.9.3.4 -Dpackaging=jar -Dmaven.repo.local=${project.basedir}/${lib-folder}
 
     source: https://github.com/atarw/material-ui-swing
     -->
     <dependency>
       <groupId>madlf.vincenzopalazzo</groupId>
       <artifactId>material-ui-swing</artifactId>
-      <version>v0.9.3.1</version>
+      <version>v0.9.3.4</version>
     </dependency>
 
     <!--This dependency installed to local repository with this command:
-    mvn install:install-file -Dfile=material-ui-swing.jar -DgroupId=madlf.atarw -DartifactId=material-ui-swing -Dversion=v0.9.3 -Dpackaging=jar -Dmaven.repo.local=${project.basedir}/${lib-folder}
+    mvn install:install-file -Dfile=material-ui-swing.jar -DgroupId=madlf.atarw -DartifactId=material-ui-swing -Dversion=v0.9.3.3 -Dpackaging=jar -Dmaven.repo.local=${project.basedir}/${lib-folder}
 
     source: https://github.com/atarw/material-ui-swing
     -->
     <!--<dependency>
       <groupId>madlf.atarw</groupId>
       <artifactId>material-ui-swing</artifactId>
-      <version>v0.9.3</version>
+      <version>v0.9.3.3</version>
     </dependency>-->
   </dependencies>
 
