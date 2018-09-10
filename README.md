@@ -1,2 +1,2 @@
 # talk-onLan
-Simple chatting and file transfer app on local network.
+Simple chatting and file transfer app works on local network.
