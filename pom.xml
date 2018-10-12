@@ -26,6 +26,13 @@
     <repository>
       <id>in-project-repository</id>
       <name>In project Repository</name>
+      <releases>
+        <enabled>true</enabled>
+        <checksumPolicy>ignore</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
       <url>file://${project.basedir}/${lib-folder}</url>
     </repository>
   </repositories>
@@ -73,6 +80,20 @@
       <version>v0.9.3.3</version>
     </dependency>-->
   </dependencies>
+
+  <!--Note about in project repository: If there is a mirror in "settings.xml" file, then the mirror must be excluded for the in project repository with:
+
+<mirror>*,!in-project-repository</mirror>
+
+or
+
+<mirror>
+  ...
+  <mirrorOf>*,!in-project-repository</mirrorOf>
+  ...
+</mirror>
+
+  -->
 
   <build>
     <plugins>
