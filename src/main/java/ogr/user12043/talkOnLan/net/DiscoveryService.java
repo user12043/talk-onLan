@@ -24,11 +24,18 @@ import java.net.InterfaceAddress;
 public class DiscoveryService {
     private static final Logger LOGGER = LogManager.getLogger(DiscoveryService.class);
 
-    public static void sendDiscoveryRequest(InetAddress address) throws IOException {
-        byte[] request = Constants.DISCOVERY_COMMAND_REQUEST.getBytes();
-        DatagramPacket sendPacket = new DatagramPacket(request, request.length, address, Constants.RECEIVE_PORT);
+    private static void sendRequest(InetAddress address, byte[] message) throws IOException {
+        DatagramPacket sendPacket = new DatagramPacket(message, message.length, address, Constants.RECEIVE_PORT);
         NetworkService.sendSocket.send(sendPacket);
         LOGGER.debug("Discovery package sent to " + sendPacket.getAddress() + ":" + sendPacket.getPort());
+    }
+
+    public static void sendDiscoveryRequest(InetAddress address) throws IOException {
+        sendRequest(address, Constants.DISCOVERY_COMMAND_REQUEST.getBytes());
+    }
+
+    public static void sendRoomDiscoveryRequest(InetAddress address) throws IOException {
+        sendRequest(address, Constants.DISCOVERY_COMMAND_REQUEST_ROOM.getBytes());
     }
 
     static void sendDiscoveryResponse(DatagramPacket receivedRequestPacket) throws IOException {
