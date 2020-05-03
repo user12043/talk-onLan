@@ -1,6 +1,7 @@
 package ogr.user12043.talkOnLan;
 
 import ogr.user12043.talkOnLan.ui.MainUI;
+import ogr.user12043.talkOnLan.util.Themes;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,8 +23,7 @@ public class Main {
             System.setProperty("awt.useSystemAAFontSettings", "on");
 
             // set last theme found
-            String[] lookAndFeels = Utils.getLookAndFeels();
-            Utils.changeTheme(lookAndFeels[lookAndFeels.length - 1]);
+            Utils.changeTheme(Themes.DEFAULT_THEME);
 
             Utils.initInterfaces();
             SwingUtilities.invokeLater(() -> MainUI.getUI().setVisible(true)); // display main ui

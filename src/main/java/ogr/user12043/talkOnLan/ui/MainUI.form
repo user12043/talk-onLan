@@ -184,8 +184,8 @@
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="new DefaultComboBoxModel&lt;String&gt;&#xa;(Utils.getLookAndFeels())" type="code"/>
         </Property>
-        <Property name="selectedIndex" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="jComboBox_themes.getItemCount() - 1" type="code"/>
+        <Property name="selectedItem" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="Themes.DEFAULT_THEME" type="code"/>
         </Property>
       </Properties>
       <Events>
@@ -220,7 +220,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Roomss"/>
+            <TitledBorder title="Rooms"/>
           </Border>
         </Property>
         <Property name="autoscrolls" type="boolean" value="true"/>

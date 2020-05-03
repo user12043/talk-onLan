@@ -21,22 +21,8 @@
     <lib-folder>lib</lib-folder>
     <log4j-version>2.11.0</log4j-version>
     <flatlaf.version>0.33</flatlaf.version>
+    <material-ui.version>1.0.6</material-ui.version>
   </properties>
-
-  <repositories>
-    <repository>
-      <id>in-project-repository</id>
-      <name>In project Repository</name>
-      <releases>
-        <enabled>true</enabled>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <url>file://${project.basedir}/${lib-folder}</url>
-    </repository>
-  </repositories>
 
   <dependencies>
     <!--<dependency>
@@ -63,6 +49,12 @@
       <groupId>com.formdev</groupId>
       <artifactId>flatlaf</artifactId>
       <version>${flatlaf.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.github.vincenzopalazzo</groupId>
+      <artifactId>material-ui-swing</artifactId>
+      <version>${material-ui.version}</version>
     </dependency>
   </dependencies>
 

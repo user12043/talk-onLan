@@ -4,6 +4,7 @@ import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.net.DiscoveryService;
 import ogr.user12043.talkOnLan.net.NetworkService;
 import ogr.user12043.talkOnLan.util.Constants;
+import ogr.user12043.talkOnLan.util.Themes;
 import ogr.user12043.talkOnLan.util.Utils;
 
 import javax.swing.*;
@@ -33,13 +34,13 @@ public class MainUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton_hostAddresses;
     public ogr.user12043.talkOnLan.ui.BuddiesPanel roomsPanel;
     private javax.swing.JButton jButton_startDiscovery;
-    private javax.swing.JButton jButton_joinRoom;
     private javax.swing.JButton jButton_startRoom;
     private javax.swing.JComboBox<String> jComboBox_themes;
     private javax.swing.JLabel jLabel_header;
-    private javax.swing.JScrollPane jScrollPane_buddiesPanel;
     private javax.swing.JLabel jLabel_theme;
+    private javax.swing.JButton jButton_joinRoom;
     private javax.swing.JScrollPane jScrollPane_roomsPanel;
+    private javax.swing.JScrollPane jScrollPane_buddiesPanel;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -246,7 +247,7 @@ public class MainUI extends javax.swing.JFrame {
 
         jComboBox_themes.setModel(new DefaultComboBoxModel<String>
                 (Utils.getLookAndFeels()));
-        jComboBox_themes.setSelectedIndex(jComboBox_themes.getItemCount() - 1);
+        jComboBox_themes.setSelectedItem(Themes.DEFAULT_THEME);
         jComboBox_themes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox_themesActionPerformed(evt);
@@ -269,7 +270,7 @@ public class MainUI extends javax.swing.JFrame {
             }
         });
 
-        jScrollPane_roomsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Roomss"));
+        jScrollPane_roomsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Rooms"));
         jScrollPane_roomsPanel.setAutoscrolls(true);
         jScrollPane_roomsPanel.setViewportView(roomsPanel);
 

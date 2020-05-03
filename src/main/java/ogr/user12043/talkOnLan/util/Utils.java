@@ -1,9 +1,5 @@
 package ogr.user12043.talkOnLan.util;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
-import com.formdev.flatlaf.FlatLightLaf;
 import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.ui.MainUI;
 import org.apache.logging.log4j.LogManager;
@@ -67,11 +63,8 @@ public class Utils {
      * @return Names of themes
      */
     public static String[] getLookAndFeels() {
-        List<String> installed = Arrays.stream(UIManager.getInstalledLookAndFeels()).map(UIManager.LookAndFeelInfo::getName).collect(Collectors.toList());
-        installed.add("Flat Intellij");
-        installed.add("Flat Darcula");
-        installed.add("Flat Light");
-        installed.add("Flat Dark");
+        List<String> installed = Arrays.stream(Themes.INSTALLED_LOOK_AND_FEELS).map(UIManager.LookAndFeelInfo::getName).collect(Collectors.toList());
+        installed.addAll(Themes.THEMES.keySet().stream().sorted().collect(Collectors.toList()));
         return installed.toArray(new String[0]);
     }
 
@@ -82,23 +75,14 @@ public class Utils {
      */
     public static void changeTheme(String themeName) {
         try {
-            switch (themeName) {
-                case "Flat Intellij":
-                    UIManager.setLookAndFeel(new FlatIntelliJLaf());
-                    break;
-                case "Flat Darcula":
-                    UIManager.setLookAndFeel(new FlatDarculaLaf());
-                    break;
-                case "Flat Light":
-                    UIManager.setLookAndFeel(new FlatLightLaf());
-                    break;
-                case "Flat Dark":
-                    UIManager.setLookAndFeel(new FlatDarkLaf());
-                    break;
-            }
-            for (UIManager.LookAndFeelInfo lookAndFeelInfo : UIManager.getInstalledLookAndFeels()) {
-                if (lookAndFeelInfo.getName().equals(themeName)) {
-                    UIManager.setLookAndFeel(lookAndFeelInfo.getClassName());
+            LookAndFeel lookAndFeel = Themes.THEMES.get(themeName);
+            if (lookAndFeel != null) {
+                UIManager.setLookAndFeel(lookAndFeel);
+            } else {
+                for (UIManager.LookAndFeelInfo lookAndFeelInfo : UIManager.getInstalledLookAndFeels()) {
+                    if (lookAndFeelInfo.getName().equals(themeName)) {
+                        UIManager.setLookAndFeel(lookAndFeelInfo.getClassName());
+                    }
                 }
             }
             SwingUtilities.updateComponentTreeUI(MainUI.getUI());
