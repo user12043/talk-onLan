@@ -9,8 +9,10 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.*;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by user12043 on 26.07.2018 - 11:53
@@ -20,12 +22,18 @@ import java.util.concurrent.Executors;
  */
 public class NetworkService {
     private static final Logger LOGGER = LogManager.getLogger(NetworkService.class);
-    private static final ExecutorService service = Executors.newFixedThreadPool(4);
+    private static final ScheduledExecutorService service = Executors.newScheduledThreadPool(Constants.NETWORK_THREADS);
     static DatagramSocket sendSocket; // UDP socket for send discovery
     private static DatagramSocket receiveSocket; // UDP socket for receive discovery
     private static ServerSocket messageReceiveSocket; // TCP socket for receiving messages
     private static ServerSocket fileReceiveSocket; // TCP socket for receiving files
     private static boolean end; // Control field for threads. (To safely terminate)
+
+    // network tasks
+    private static ScheduledFuture<?> discoverySendTask;
+    private static ScheduledFuture<?> discoveryReceiveTask;
+    private static ScheduledFuture<?> messageReceiveTask;
+    private static ScheduledFuture<?> fileReceiveTask;
 
     /**
      * UDP receiving (for discovery)
@@ -217,10 +225,10 @@ public class NetworkService {
         Runnable sendThread = () -> {
             try {
                 // Do task until end = true
-                while (!end) {
-                    send();
-                    Thread.sleep(Constants.DISCOVERY_INTERVAL);
-                }
+//                while (!end) {
+                send();
+//                    Thread.sleep(Constants.DISCOVERY_INTERVAL);
+//                }
                 LOGGER.debug("send end");
             } catch (Exception e) {
                 LOGGER.error("Error on send() " + Arrays.toString(e.getStackTrace()));
@@ -230,9 +238,9 @@ public class NetworkService {
         Runnable receiveThread = (() -> {
             try {
                 // Do task until end = true
-                while (!end) {
-                    receive();
-                }
+//                while (!end) {
+                receive();
+//                }
                 LOGGER.debug("receive end");
             } catch (Exception e) {
                 LOGGER.error("Error on receive() ", e);
@@ -241,9 +249,9 @@ public class NetworkService {
 
         Runnable receiveMessageThread = (() -> {
             try {
-                while (!end) {
-                    receiveMessage();
-                }
+//                while (!end) {
+                receiveMessage();
+//                }
                 LOGGER.debug("receiveMessage end");
             } catch (Exception e) {
                 LOGGER.error("Error on receiveMessage() ", e);
@@ -252,9 +260,9 @@ public class NetworkService {
 
         Runnable receiveFileThread = (() -> {
             try {
-                while (!end) {
-                    receiveFile();
-                }
+//                while (!end) {
+                receiveFile();
+//                }
                 LOGGER.debug("receiveFile end");
             } catch (Exception e) {
                 LOGGER.error("Error on receiveFile() ", e);
@@ -262,14 +270,23 @@ public class NetworkService {
         });
 
         // Execute threads
-        service.execute(sendThread);
-        service.execute(receiveThread);
-        service.execute(receiveMessageThread);
-        service.execute(receiveFileThread);
+        discoverySendTask = service.scheduleWithFixedDelay(sendThread, 0L, Constants.DISCOVERY_INTERVAL, TimeUnit.MILLISECONDS);
+        discoveryReceiveTask = service.scheduleWithFixedDelay(receiveThread, 0L, 300L, TimeUnit.MILLISECONDS);
+        messageReceiveTask = service.scheduleWithFixedDelay(receiveMessageThread, 0L, 100L, TimeUnit.MILLISECONDS);
+        fileReceiveTask = service.scheduleWithFixedDelay(receiveFileThread, 0L, 300L, TimeUnit.MILLISECONDS);
     }
 
     public static void end() {
-        end = true;
+        endTask(discoverySendTask);
+        endTask(discoveryReceiveTask);
+        endTask(messageReceiveTask);
+        endTask(fileReceiveTask);
+    }
+
+    private static void endTask(ScheduledFuture<?> task) {
+        if (!task.isDone() || !task.isCancelled()) {
+            task.cancel(false);
+        }
     }
 
 }
