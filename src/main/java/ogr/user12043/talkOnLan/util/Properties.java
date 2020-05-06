@@ -5,6 +5,8 @@ package ogr.user12043.talkOnLan.util;
  * part of project: talk-onLan
  */
 public class Properties {
+    // TODO Properties here will be read from a configuration file
     public static final String username = System.getProperty("user.name");
     public static final String fileReceiveFolder = "receivedFiles/";
+    public static boolean roomMode = false;
 }

@@ -12,13 +12,15 @@ import java.util.Objects;
 public class User {
     private String userName;
     private InetAddress address;
+    private boolean isRoom;
 
     public User() {
     }
 
-    public User(String userName, InetAddress address) {
+    public User(String userName, InetAddress address, boolean isRoom) {
         this.userName = userName;
         this.address = address;
+        this.isRoom = isRoom;
     }
 
     public String getUserName() {
@@ -37,13 +39,22 @@ public class User {
         this.address = address;
     }
 
+    public boolean isRoom() {
+        return isRoom;
+    }
+
+    public void setRoom(boolean room) {
+        isRoom = room;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
         User user = (User) o;
         return Objects.equals(getUserName(), user.getUserName()) &&
-                Objects.equals(getAddress(), user.getAddress());
+                Objects.equals(getAddress(), user.getAddress()) &&
+                Objects.equals(isRoom(), user.isRoom());
     }
 
     @Override

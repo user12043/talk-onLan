@@ -49,7 +49,7 @@
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
           <FontInfo relative="true">
-            <Font component="jLabel_name" property="font" relativeSize="true" size="6"/>
+            <Font component="jLabel_name" property="font" relativeSize="true" size="1"/>
           </FontInfo>
         </Property>
         <Property name="text" type="java.lang.String" value="name"/>
@@ -59,7 +59,7 @@
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
           <FontInfo relative="true">
-            <Font component="jLabel_address" property="font" relativeSize="true" size="6"/>
+            <Font component="jLabel_address" property="font" relativeSize="true" size="1"/>
           </FontInfo>
         </Property>
         <Property name="text" type="java.lang.String" value="address"/>

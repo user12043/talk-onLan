@@ -34,38 +34,46 @@ public class DiscoveryService {
         sendRequest(address, Constants.DISCOVERY_COMMAND_REQUEST.getBytes());
     }
 
-    public static void sendRoomDiscoveryRequest(InetAddress address) throws IOException {
+    public static void sendDiscoveryRequestRoom(InetAddress address) throws IOException {
         sendRequest(address, Constants.DISCOVERY_COMMAND_REQUEST_ROOM.getBytes());
     }
 
-    static void sendDiscoveryResponse(DatagramPacket receivedRequestPacket) throws IOException {
-        LOGGER.debug("Discovery request received from " + receivedRequestPacket.getAddress() + ":" + receivedRequestPacket.getPort());
-        byte[] discoveryResponse = (Constants.DISCOVERY_COMMAND_RESPONSE + Constants.COMMAND_SEPARATOR + Properties.username).getBytes();
-        DatagramPacket discoveryResponsePacket = new DatagramPacket(discoveryResponse, discoveryResponse.length, receivedRequestPacket.getAddress(), Constants.RECEIVE_PORT);
+    static void sendDiscoveryResponse(InetAddress receiveAddress, boolean isRoom) throws IOException {
+        LOGGER.debug("Discovery request received from " + receiveAddress);
+        byte[] discoveryResponse = (!isRoom ? Constants.DISCOVERY_COMMAND_RESPONSE : Constants.DISCOVERY_COMMAND_RESPONSE_ROOM + Constants.COMMAND_SEPARATOR + Properties.username).getBytes();
+        DatagramPacket discoveryResponsePacket = new DatagramPacket(discoveryResponse, discoveryResponse.length, receiveAddress, Constants.RECEIVE_PORT);
         NetworkService.sendSocket.send(discoveryResponsePacket);
         LOGGER.debug("Discovery response sent to: " + discoveryResponsePacket.getAddress() + ":" + discoveryResponsePacket.getPort());
         // Send a new discovery request to source address if request received from unknown address
-        if (!Utils.buddyAddresses.contains(receivedRequestPacket.getAddress())) {
-            sendDiscoveryRequest(receivedRequestPacket.getAddress());
+        if (!isRoom && !Utils.isDiscovered(receiveAddress)) {
+            sendDiscoveryRequest(receiveAddress);
+        } else if (isRoom && !Utils.isDiscoveredRoom(receiveAddress)) {
+            sendDiscoveryRequestRoom(receiveAddress);
         }
     }
 
-    static void receiveDiscoveryResponse(DatagramPacket receivedResponsePacket, String receivedData) {
-        LOGGER.debug("Discovery response received from " + receivedResponsePacket.getAddress() + ":" + receivedResponsePacket.getPort());
+    static void receiveDiscoveryResponse(InetAddress receiveAddress, String receivedData, boolean isRoom) {
+        LOGGER.debug("Discovery response received from " + receiveAddress);
         // Ignore already discovered
-        if (Utils.buddyAddresses.contains(receivedResponsePacket.getAddress())) {
+        if ((!isRoom && Utils.isDiscovered(receiveAddress)) || (isRoom && Utils.isDiscoveredRoom(receiveAddress))) {
             return;
         }
-        Utils.buddyAddresses.add(receivedResponsePacket.getAddress());
+
         User user = new User();
-        user.setAddress(receivedResponsePacket.getAddress());
+        user.setAddress(receiveAddress);
+        user.setRoom(isRoom);
         // Get username with parsing response
         int index = receivedData.indexOf(Constants.COMMAND_SEPARATOR);
         if (index != -1) {
             user.setUserName(receivedData.substring(index + 1));
         }
-        Utils.buddies.add(user);
-        SwingUtilities.invokeLater(() -> MainUI.getUI().buddiesPanel.addBuddy(user));
+        if (!isRoom) {
+            Utils.buddies.add(user);
+            SwingUtilities.invokeLater(() -> MainUI.getUI().buddiesPanel.addBuddy(user));
+        } else {
+            Utils.rooms.add(user);
+            SwingUtilities.invokeLater(() -> MainUI.getUI().roomsPanel.addBuddy(user));
+        }
     }
 
     /**

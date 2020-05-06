@@ -29,6 +29,10 @@ class BuddyPanel extends javax.swing.JPanel {
         this.user = user;
         jLabel_name.setText(user.getUserName());
         jLabel_address.setText(" on " + user.getAddress().toString().replace("/", ""));
+        if (user.isRoom()) {
+            jButton_message.setEnabled(false);
+            jButton_message.setVisible(false);
+        }
     }
 
     /**
@@ -57,10 +61,10 @@ class BuddyPanel extends javax.swing.JPanel {
         jButton_message = new javax.swing.JButton();
         jButton_file = new javax.swing.JButton();
 
-        jLabel_name.setFont(jLabel_name.getFont().deriveFont(jLabel_name.getFont().getSize() + 6f));
+        jLabel_name.setFont(jLabel_name.getFont().deriveFont(jLabel_name.getFont().getSize() + 1f));
         jLabel_name.setText("name");
 
-        jLabel_address.setFont(jLabel_address.getFont().deriveFont(jLabel_address.getFont().getSize() + 6f));
+        jLabel_address.setFont(jLabel_address.getFont().deriveFont(jLabel_address.getFont().getSize() + 1f));
         jLabel_address.setText("address");
 
         jButton_message.setText("Message");

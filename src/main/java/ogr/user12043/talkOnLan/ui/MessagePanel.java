@@ -37,7 +37,7 @@ class MessagePanel extends javax.swing.JDialog {
         initComponents();
         lineNumber = 0;
         this.user = user;
-        setTitle(user.getUserName() + " on " + user.getAddress());
+        setTitle(!user.isRoom() ? "" : "Room of " + user.getUserName() + " on " + user.getAddress());
         jProgressBar_sending.setVisible(false);
         jTextArea_content.requestFocusInWindow();
     }
@@ -55,7 +55,7 @@ class MessagePanel extends javax.swing.JDialog {
             return;
         }
         try {
-            MessageService.sendMessage(user.getAddress(), sendingMessage); // Send message
+            MessageService.sendMessage(user.getAddress(), sendingMessage, false); // Send message
             SwingUtilities.invokeLater(() -> {
                 addMessage(sendingMessage, true); // Add message box to panel
                 jTextArea_content.setText("");

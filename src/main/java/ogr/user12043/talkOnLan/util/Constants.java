@@ -10,6 +10,7 @@ public class Constants {
     public static final String DISCOVERY_COMMAND_RESPONSE = "talk-onLan_APPLICATION_DISCOVERY_RESPONSE";
     public static final String DISCOVERY_COMMAND_RESPONSE_ROOM = "talk-onLan_APPLICATION_DISCOVERY_RESPONSE_ROOM";
     public static final String COMMAND_MESSAGE = "talk-onLan_APPLICATION_MESSAGE";
+    public static final String COMMAND_MESSAGE_ROOM = "talk-onLan_APPLICATION_MESSAGE_ROOM";
     public static final String COMMAND_FILE_TRANSFER_REQUEST = "talk-onLan_FILE_TRANSFER_REQUEST";
     public static final String COMMAND_FILE_TRANSFER_RESPONSE_ACCEPT = "talk-onLan_FILE_TRANSFER_RESPONSE_ACCEPT";
     public static final String COMMAND_FILE_TRANSFER_RESPONSE_REJECT = "talk-onLan_FILE_TRANSFER_RESPONSE_REJECT";

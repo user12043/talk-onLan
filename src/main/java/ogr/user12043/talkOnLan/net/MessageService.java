@@ -12,7 +12,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Optional;
 
 /**
  * Created by user12043 on 31.07.2018 - 09:36
@@ -23,20 +22,19 @@ import java.util.Optional;
 public class MessageService {
     private static final Logger LOGGER = LogManager.getLogger(MessageService.class);
 
-    public static void sendMessage(InetAddress address, String message) throws IOException {
+    public static void sendMessage(InetAddress address, String message, boolean isRoom) throws IOException {
         Socket socket = new Socket(address, Constants.RECEIVE_PORT);
         DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-        message = (Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR + message);
+        message = (!isRoom ? Constants.COMMAND_MESSAGE : Constants.COMMAND_MESSAGE_ROOM + Constants.COMMAND_SEPARATOR + message);
         outputStream.writeUTF(message);
         socket.close();
     }
 
-    static void receiveMessage(InetAddress senderAddress, int senderPort, String receivedData) {
-        LOGGER.debug("Message received from " + senderAddress + ":" + senderPort);
-        final boolean founded = Utils.buddyAddresses.contains(senderAddress);
-        if (founded) {
-            final Optional<User> first = Utils.buddies.stream().filter(u -> u.getAddress().equals(senderAddress)).findFirst();
-            first.ifPresent(user -> SwingUtilities.invokeLater(() -> MainUI.getUI().receiveMessage(user, receivedData)));
+    static void receiveMessage(InetAddress senderAddress, String receivedData, boolean isRoom) {
+        LOGGER.debug((isRoom ? "Room message" : "Message") + "received from " + senderAddress);
+        User user = !isRoom ? Utils.findBuddy(senderAddress) : Utils.findRoom(senderAddress);
+        if (user != null) {
+            SwingUtilities.invokeLater(() -> MainUI.getUI().receiveMessage(user, receivedData));
         }
     }
 }

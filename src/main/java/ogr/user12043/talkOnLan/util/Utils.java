@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
  * part of project: talk-onLan
  */
 public class Utils {
-    public static final Set<InetAddress> buddyAddresses = new HashSet<>(); // discovered addresses
-    public static final Set<InetAddress> connectedServers = new HashSet<>(); // discovered servers
     public static final Set<User> buddies = new HashSet<>(); // users for discovered addresses
     public static final Set<User> rooms = new HashSet<>(); // users for discovered servers
     public static final List<NetworkInterface> networkInterfaces = new ArrayList<>(); // network hardware list of device
@@ -64,7 +62,7 @@ public class Utils {
      */
     public static String[] getLookAndFeels() {
         List<String> installed = Arrays.stream(Themes.INSTALLED_LOOK_AND_FEELS).map(UIManager.LookAndFeelInfo::getName).collect(Collectors.toList());
-        installed.addAll(Themes.THEMES.keySet().stream().sorted().collect(Collectors.toList()));
+        installed.addAll(Arrays.asList(Themes.THEMES));
         return installed.toArray(new String[0]);
     }
 
@@ -75,7 +73,7 @@ public class Utils {
      */
     public static void changeTheme(String themeName) {
         try {
-            LookAndFeel lookAndFeel = Themes.THEMES.get(themeName);
+            LookAndFeel lookAndFeel = Themes.get(themeName);
             if (lookAndFeel != null) {
                 UIManager.setLookAndFeel(lookAndFeel);
             } else {
@@ -88,5 +86,23 @@ public class Utils {
             SwingUtilities.updateComponentTreeUI(MainUI.getUI());
         } catch (Exception ignored) {
         }
+    }
+
+    public static boolean isDiscovered(InetAddress inetAddress) {
+        return buddies.stream().anyMatch(user -> user.getAddress().equals(inetAddress));
+    }
+
+    public static boolean isDiscoveredRoom(InetAddress inetAddress) {
+        return rooms.stream().anyMatch(user -> user.getAddress().equals(inetAddress));
+    }
+
+    public static User findBuddy(InetAddress inetAddress) {
+        Optional<User> first = buddies.stream().filter(user -> user.getAddress().equals(inetAddress)).findFirst();
+        return first.orElse(null);
+    }
+
+    public static User findRoom(InetAddress inetAddress) {
+        Optional<User> first = rooms.stream().filter(user -> user.getAddress().equals(inetAddress)).findFirst();
+        return first.orElse(null);
     }
 }

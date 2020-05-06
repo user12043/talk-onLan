@@ -1,6 +1,7 @@
 package ogr.user12043.talkOnLan.net;
 
 import ogr.user12043.talkOnLan.util.Constants;
+import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,10 +58,14 @@ public class NetworkService {
 
         String receivedData = new String(receivePacket.getData()).trim();
         // Process data
-        if (Constants.DISCOVERY_COMMAND_REQUEST.equals(receivedData)) {
-            DiscoveryService.sendDiscoveryResponse(receivePacket);
+        if (receivedData.equals(Constants.DISCOVERY_COMMAND_REQUEST_ROOM) && Properties.roomMode) {
+            DiscoveryService.sendDiscoveryResponse(receivePacket.getAddress(), true);
+        } else if (receivedData.equals(Constants.DISCOVERY_COMMAND_REQUEST)) {
+            DiscoveryService.sendDiscoveryResponse(receivePacket.getAddress(), false);
+        } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_RESPONSE_ROOM) && Properties.roomMode) {
+            DiscoveryService.receiveDiscoveryResponse(receivePacket.getAddress(), receivedData, true);
         } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_RESPONSE)) {
-            DiscoveryService.receiveDiscoveryResponse(receivePacket, receivedData);
+            DiscoveryService.receiveDiscoveryResponse(receivePacket.getAddress(), receivedData, false);
         }
     }
 
@@ -86,7 +91,7 @@ public class NetworkService {
         }
 
         // Discover user if not discovered yet
-        final boolean exists = Utils.buddyAddresses.stream().anyMatch(address -> (address.equals(incomingSocket.getInetAddress())));
+        final boolean exists = Utils.isDiscovered(incomingSocket.getInetAddress());
         if (!exists) {
             DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
             // Wait for discovery
@@ -114,9 +119,13 @@ public class NetworkService {
         // Process data
         DataInputStream inputStream = new DataInputStream(incomingSocket.getInputStream());
         String message = inputStream.readUTF();
-        if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) { // Get messages
+        // Get messages
+        if (message.startsWith(Constants.COMMAND_MESSAGE_ROOM + Constants.COMMAND_SEPARATOR)) {
+            message = message.replace((Constants.COMMAND_MESSAGE_ROOM + Constants.COMMAND_SEPARATOR), "");
+            MessageService.receiveMessage(incomingSocket.getInetAddress(), message, true);
+        } else if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) {
             message = message.replace((Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR), "");
-            MessageService.receiveMessage(incomingSocket.getInetAddress(), incomingSocket.getPort(), message);
+            MessageService.receiveMessage(incomingSocket.getInetAddress(), message, false);
         }
     }
 
@@ -224,11 +233,7 @@ public class NetworkService {
         // Create threads
         Runnable sendThread = () -> {
             try {
-                // Do task until end = true
-//                while (!end) {
                 send();
-//                    Thread.sleep(Constants.DISCOVERY_INTERVAL);
-//                }
                 LOGGER.debug("send end");
             } catch (Exception e) {
                 LOGGER.error("Error on send() " + Arrays.toString(e.getStackTrace()));
@@ -237,10 +242,7 @@ public class NetworkService {
 
         Runnable receiveThread = (() -> {
             try {
-                // Do task until end = true
-//                while (!end) {
                 receive();
-//                }
                 LOGGER.debug("receive end");
             } catch (Exception e) {
                 LOGGER.error("Error on receive() ", e);
@@ -249,9 +251,7 @@ public class NetworkService {
 
         Runnable receiveMessageThread = (() -> {
             try {
-//                while (!end) {
                 receiveMessage();
-//                }
                 LOGGER.debug("receiveMessage end");
             } catch (Exception e) {
                 LOGGER.error("Error on receiveMessage() ", e);
@@ -260,9 +260,7 @@ public class NetworkService {
 
         Runnable receiveFileThread = (() -> {
             try {
-//                while (!end) {
                 receiveFile();
-//                }
                 LOGGER.debug("receiveFile end");
             } catch (Exception e) {
                 LOGGER.error("Error on receiveFile() ", e);
