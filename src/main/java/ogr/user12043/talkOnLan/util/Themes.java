@@ -1,13 +1,5 @@
 package ogr.user12043.talkOnLan.util;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-import mdlaf.MaterialLookAndFeel;
-import mdlaf.themes.MaterialLiteTheme;
-import mdlaf.themes.MaterialOceanicTheme;
-
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicLookAndFeel;
 
@@ -35,7 +27,7 @@ public class Themes {
     };
 
     public static BasicLookAndFeel get(String name) {
-        switch (name) {
+        /*switch (name) {
             case FLAT_INTELLIJ_LAF:
                 return new FlatIntelliJLaf();
             case FLAT_DARCULA_LAF:
@@ -48,7 +40,7 @@ public class Themes {
                 return new MaterialLookAndFeel(new MaterialLiteTheme());
             case MATERIAL_OCEANIC:
                 return new MaterialLookAndFeel(new MaterialOceanicTheme());
-        }
+        }*/
         return null;
     }
 }

@@ -45,7 +45,7 @@
     </dependency>
 
     <!--=========================================THEMES=========================================-->
-    <dependency>
+    <!--<dependency>
       <groupId>com.formdev</groupId>
       <artifactId>flatlaf</artifactId>
       <version>${flatlaf.version}</version>
@@ -55,7 +55,7 @@
       <groupId>io.github.vincenzopalazzo</groupId>
       <artifactId>material-ui-swing</artifactId>
       <version>${material-ui.version}</version>
-    </dependency>
+    </dependency>-->
   </dependencies>
 
   <!--Note about in project repository: If there is a mirror in "settings.xml" file, then the mirror must be excluded for the in project repository with:

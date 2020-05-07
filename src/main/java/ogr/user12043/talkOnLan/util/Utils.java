@@ -12,7 +12,6 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by user12043 on 24.07.2018 - 11:56
@@ -61,9 +60,9 @@ public class Utils {
      * @return Names of themes
      */
     public static String[] getLookAndFeels() {
-        List<String> installed = Arrays.stream(Themes.INSTALLED_LOOK_AND_FEELS).map(UIManager.LookAndFeelInfo::getName).collect(Collectors.toList());
-        installed.addAll(Arrays.asList(Themes.THEMES));
-        return installed.toArray(new String[0]);
+//        List<String> installed = Arrays.stream(Themes.INSTALLED_LOOK_AND_FEELS).map(UIManager.LookAndFeelInfo::getName).collect(Collectors.toList());
+//        installed.addAll(Arrays.asList(Themes.THEMES));
+        return Arrays.stream(Themes.INSTALLED_LOOK_AND_FEELS).map(UIManager.LookAndFeelInfo::getName).toArray(String[]::new);
     }
 
     /**
