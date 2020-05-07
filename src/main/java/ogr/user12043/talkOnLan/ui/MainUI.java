@@ -1,10 +1,9 @@
 package ogr.user12043.talkOnLan.ui;
 
+import ogr.user12043.talkOnLan.Message;
 import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.net.DiscoveryService;
-import ogr.user12043.talkOnLan.net.MessageService;
 import ogr.user12043.talkOnLan.net.NetworkService;
-import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Themes;
 import ogr.user12043.talkOnLan.util.Utils;
@@ -16,6 +15,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +27,9 @@ public class MainUI extends javax.swing.JFrame {
 
     private static MainUI mainUI; // To create one instance of MainUI
     private final Set<MessagePanel> messagePanels;
+    private final MessagePanel roomMessagePanel;
     private final JDialog loadingDialog;
+    private final int discoveryStartEndWait = 1000;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
     public ogr.user12043.talkOnLan.ui.BuddiesPanel roomsPanel;
@@ -36,8 +38,8 @@ public class MainUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton_hardDiscovery;
     private javax.swing.JButton jButton_hostAddresses;
     private javax.swing.JButton jButton_hostRoom;
-    private javax.swing.JButton jButton_joinRoom;
     private javax.swing.JButton jButton_startDiscovery;
+    private javax.swing.JButton jButton_stopRoom;
     private javax.swing.JComboBox<String> jComboBox_themes;
     private javax.swing.JLabel jLabel_header;
     private javax.swing.JLabel jLabel_theme;
@@ -55,6 +57,7 @@ public class MainUI extends javax.swing.JFrame {
         loadingDialog = createLoadingDialog();
         initializeGlassPane();
         setResizable(false);
+        roomMessagePanel = new MessagePanel(this, null);
     }
 
     /**
@@ -125,11 +128,15 @@ public class MainUI extends javax.swing.JFrame {
     /**
      * Receives message from remote user
      *
-     * @param user    remote user
-     * @param message received message content
+     * @param message received message
      */
-    public void receiveMessage(User user, String message) {
-        final MessagePanel messagePanel = getMessagePanelOfUser(user);
+    public void receiveMessage(Message message) {
+        MessagePanel messagePanel;
+        if (!message.isRoomMessage()) {
+            messagePanel = getMessagePanelOfUser(message.getSender());
+        } else {
+            messagePanel = roomMessagePanel;
+        }
         messagePanel.setVisible(true);
         messagePanel.receiveMessage(message);
     }
@@ -192,9 +199,9 @@ public class MainUI extends javax.swing.JFrame {
         jComboBox_themes = new javax.swing.JComboBox<>();
         jLabel_theme = new javax.swing.JLabel();
         jButton_hostRoom = new javax.swing.JButton();
-        jButton_joinRoom = new javax.swing.JButton();
         jScrollPane_roomsPanel = new javax.swing.JScrollPane();
         roomsPanel = new ogr.user12043.talkOnLan.ui.BuddiesPanel();
+        jButton_stopRoom = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("talk-onLan");
@@ -267,20 +274,17 @@ public class MainUI extends javax.swing.JFrame {
             }
         });
 
-        jButton_joinRoom.setText("Join a room");
-        jButton_joinRoom.setEnabled(false);
-        jButton_joinRoom.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton_joinRoomActionPerformed(evt);
-            }
-        });
-
         jScrollPane_roomsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Rooms"));
         jScrollPane_roomsPanel.setAutoscrolls(true);
-        jScrollPane_roomsPanel.setEnabled(false);
         jScrollPane_roomsPanel.setViewportView(roomsPanel);
 
-        jScrollPane_roomsPanel.setVisible(false);
+        jButton_stopRoom.setText("Stop room");
+        jButton_stopRoom.setEnabled(false);
+        jButton_stopRoom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_stopRoomActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -295,27 +299,32 @@ public class MainUI extends javax.swing.JFrame {
                                 .addComponent(jComboBox_themes, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addContainerGap())
                         .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jScrollPane_buddiesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane_roomsPanel)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(12, 12, 12)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jButton_startDiscovery, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton_hostRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jButton_hardDiscovery, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton_joinRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButton_addManually)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(jScrollPane_buddiesPanel))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(12, 12, 12)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(jButton_startDiscovery, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(jButton_hostRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(jButton_hardDiscovery)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addComponent(jButton_addManually))
+                                                        .addComponent(jButton_stopRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton_hostAddresses)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButton_endDiscovery)
-                                .addGap(12, 12, 12))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jButton_hostAddresses)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(jButton_endDiscovery)
+                                                .addGap(12, 12, 12))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jScrollPane_roomsPanel)
+                                                .addContainerGap())))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -335,11 +344,11 @@ public class MainUI extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jButton_hostRoom)
-                                        .addComponent(jButton_joinRoom))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jButton_stopRoom))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane_buddiesPanel)
-                                        .addComponent(jScrollPane_roomsPanel))
+                                        .addComponent(jScrollPane_roomsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane_buddiesPanel))
                                 .addContainerGap())
         );
 
@@ -358,7 +367,7 @@ public class MainUI extends javax.swing.JFrame {
             NetworkService.start();
             new Thread(() -> {
                 try {
-                    Thread.sleep(Constants.RECEIVE_TIMEOUT);
+                    Thread.sleep(discoveryStartEndWait);
                 } catch (InterruptedException ignored) {
                 }
                 jButton_hardDiscovery.setEnabled(true);
@@ -366,13 +375,13 @@ public class MainUI extends javax.swing.JFrame {
                 jButton_hostAddresses.setEnabled(true);
                 jButton_endDiscovery.setEnabled(true);
                 jButton_hostRoom.setEnabled(true);
-                jButton_joinRoom.setEnabled(true);
                 buddiesPanel.setEnabled(true);
                 toggleLoading();
             }).start();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Unable to start discovery. Check network connectivity", "ERROR", JOptionPane.ERROR_MESSAGE);
             jButton_endDiscovery.doClick();
+            toggleLoading();
         }
     }//GEN-LAST:event_jButton_startDiscoveryActionPerformed
 
@@ -389,11 +398,10 @@ public class MainUI extends javax.swing.JFrame {
         jButton_hostAddresses.setEnabled(false);
         jButton_endDiscovery.setEnabled(false);
         jButton_hostRoom.setEnabled(false);
-        jButton_joinRoom.setEnabled(false);
         messagePanels.forEach(Window::dispose);
         new Thread(() -> {
             try {
-                Thread.sleep(Constants.RECEIVE_TIMEOUT);
+                Thread.sleep(discoveryStartEndWait);
             } catch (InterruptedException ignored) {
             }
             jButton_startDiscovery.setEnabled(true);
@@ -459,13 +467,6 @@ public class MainUI extends javax.swing.JFrame {
         pack();
     }//GEN-LAST:event_jComboBox_themesActionPerformed
 
-    private void jButton_joinRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_joinRoomActionPerformed
-        jScrollPane_roomsPanel.setEnabled(true);
-        jScrollPane_roomsPanel.setVisible(true);
-        jScrollPane_roomsPanel.setSize(jScrollPane_roomsPanel.getPreferredSize());
-        pack();
-    }//GEN-LAST:event_jButton_joinRoomActionPerformed
-
     private void jButton_hostRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hostRoomActionPerformed
         try {
             Properties.roomMode = true;
@@ -474,9 +475,16 @@ public class MainUI extends javax.swing.JFrame {
             room.setAddress(InetAddress.getLocalHost());
             room.setRoom(true);
             Utils.rooms.add(room);
-            MessageService.sendMessage(InetAddress.getLocalHost(), "You just made yourself a room!", true);
+            receiveMessage(new Message(room, "You just started a room!", new Date(), true));
+            jButton_hostRoom.setEnabled(false);
+            jButton_stopRoom.setEnabled(true);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error occurred while making room!", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButton_hostRoomActionPerformed
+
+    private void jButton_stopRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_stopRoomActionPerformed
+        Properties.roomMode = false;
+        jButton_hostRoom.setEnabled(true);
+    }//GEN-LAST:event_jButton_stopRoomActionPerformed
 }

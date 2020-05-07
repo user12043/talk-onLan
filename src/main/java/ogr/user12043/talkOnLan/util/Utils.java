@@ -1,5 +1,6 @@
 package ogr.user12043.talkOnLan.util;
 
+import ogr.user12043.talkOnLan.Message;
 import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.ui.MainUI;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +13,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by user12043 on 24.07.2018 - 11:56
@@ -22,6 +24,7 @@ public class Utils {
     public static final Set<User> rooms = new HashSet<>(); // users for discovered servers
     public static final List<NetworkInterface> networkInterfaces = new ArrayList<>(); // network hardware list of device
     public static final Set<InterfaceAddress> hostAddresses = new HashSet<>(); // self ip addresses on each network hardware
+    public static final Set<User> roomClients = new HashSet<>(); // users connected the room while hosting room
     private static final Logger LOGGER = LogManager.getLogger(Constants.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy"); // Date display format date on ui
 
@@ -103,5 +106,25 @@ public class Utils {
     public static User findRoom(InetAddress inetAddress) {
         Optional<User> first = rooms.stream().filter(user -> user.getAddress().equals(inetAddress)).findFirst();
         return first.orElse(null);
+    }
+
+    public static User findRoomByUsername(String username) {
+        Optional<User> first = rooms.stream().filter(user -> user.getUserName().equals(username)).findFirst();
+        return first.orElse(null);
+    }
+
+    public static String generateMessage(Message message) {
+        return String.format("%s%c%s%c%d",
+                !message.isRoomMessage() ? Constants.COMMAND_MESSAGE : Constants.COMMAND_MESSAGE_ROOM,
+                Constants.COMMAND_SEPARATOR, message.getContent(),
+                Constants.COMMAND_SEPARATOR, message.getSentDate().getTime());
+    }
+
+    public static Message parseMessage(String content) {
+        String[] split = Pattern.compile(String.valueOf(Constants.COMMAND_SEPARATOR), Pattern.LITERAL).split(content);
+        Message message = new Message();
+        message.setContent(split[0]);
+        message.setSentDate(new Date(Long.parseLong(split[1])));
+        return message;
     }
 }

@@ -62,7 +62,7 @@ public class NetworkService {
             DiscoveryService.sendDiscoveryResponse(receivePacket.getAddress(), true);
         } else if (receivedData.equals(Constants.DISCOVERY_COMMAND_REQUEST)) {
             DiscoveryService.sendDiscoveryResponse(receivePacket.getAddress(), false);
-        } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_RESPONSE_ROOM) && Properties.roomMode) {
+        } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_RESPONSE_ROOM)) {
             DiscoveryService.receiveDiscoveryResponse(receivePacket.getAddress(), receivedData, true);
         } else if (receivedData.startsWith(Constants.DISCOVERY_COMMAND_RESPONSE)) {
             DiscoveryService.receiveDiscoveryResponse(receivePacket.getAddress(), receivedData, false);
@@ -165,7 +165,9 @@ public class NetworkService {
      */
     private static void send() throws IOException {
         // First send to generic broadcast address
-        DiscoveryService.sendDiscoveryRequest(InetAddress.getByName("255.255.255.255"));
+        InetAddress broadcastAll = InetAddress.getByName("255.255.255.255");
+        DiscoveryService.sendDiscoveryRequest(broadcastAll);
+        DiscoveryService.sendDiscoveryRequestRoom(broadcastAll);
 
         //<editor-fold desc="Broadcast the message over all the network interfaces" defaultstate=collapsed>
         for (NetworkInterface networkInterface : Utils.networkInterfaces) {
@@ -177,6 +179,7 @@ public class NetworkService {
                     }
                     // Send the broadcast package!
                     DiscoveryService.sendDiscoveryRequest(broadcastAddress);
+                    DiscoveryService.sendDiscoveryRequestRoom(broadcastAddress);
                 }
 
                 // If interface is got up after program start, its host address will be added.
@@ -234,7 +237,6 @@ public class NetworkService {
         Runnable sendThread = () -> {
             try {
                 send();
-                LOGGER.debug("send end");
             } catch (Exception e) {
                 LOGGER.error("Error on send() " + Arrays.toString(e.getStackTrace()));
             }
@@ -243,7 +245,6 @@ public class NetworkService {
         Runnable receiveThread = (() -> {
             try {
                 receive();
-                LOGGER.debug("receive end");
             } catch (Exception e) {
                 LOGGER.error("Error on receive() ", e);
             }
@@ -252,7 +253,6 @@ public class NetworkService {
         Runnable receiveMessageThread = (() -> {
             try {
                 receiveMessage();
-                LOGGER.debug("receiveMessage end");
             } catch (Exception e) {
                 LOGGER.error("Error on receiveMessage() ", e);
             }
@@ -261,7 +261,6 @@ public class NetworkService {
         Runnable receiveFileThread = (() -> {
             try {
                 receiveFile();
-                LOGGER.debug("receiveFile end");
             } catch (Exception e) {
                 LOGGER.error("Error on receiveFile() ", e);
             }

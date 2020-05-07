@@ -17,10 +17,8 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
-              <Component id="jLabel_name" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jLabel_address" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jLabel_info" pref="122" max="32767" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
               <Component id="jButton_message" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -34,8 +32,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel_name" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel_address" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel_info" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButton_message" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButton_file" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
@@ -45,24 +42,14 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="jLabel_name">
+    <Component class="javax.swing.JLabel" name="jLabel_info">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
           <FontInfo relative="true">
-            <Font component="jLabel_name" property="font" relativeSize="true" size="1"/>
+            <Font component="jLabel_info" property="font" relativeSize="true" size="1"/>
           </FontInfo>
         </Property>
-        <Property name="text" type="java.lang.String" value="name"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="jLabel_address">
-      <Properties>
-        <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
-          <FontInfo relative="true">
-            <Font component="jLabel_address" property="font" relativeSize="true" size="1"/>
-          </FontInfo>
-        </Property>
-        <Property name="text" type="java.lang.String" value="address"/>
+        <Property name="text" type="java.lang.String" value="info"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="jButton_message">

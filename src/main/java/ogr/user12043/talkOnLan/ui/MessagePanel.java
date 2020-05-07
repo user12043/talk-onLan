@@ -1,12 +1,17 @@
 package ogr.user12043.talkOnLan.ui;
 
+import ogr.user12043.talkOnLan.Message;
 import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.net.MessageService;
+import ogr.user12043.talkOnLan.util.Properties;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by user12043 on 31.07.2018 - 16:22
@@ -15,6 +20,7 @@ import java.io.IOException;
 class MessagePanel extends javax.swing.JDialog {
 
     private final User user; // Remote user
+    private final Set<User> participants;
     private int lineNumber;
     private boolean shiftPressed;
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -30,14 +36,19 @@ class MessagePanel extends javax.swing.JDialog {
      * Creates new form MessagePanel
      *
      * @param parent parent frame
-     * @param user   remote user
+     * @param user   remote user (null for self room hosting)
      */
     MessagePanel(Frame parent, User user) {
         super(parent, false);
         initComponents();
         lineNumber = 0;
         this.user = user;
-        setTitle(!user.isRoom() ? "" : "Room of " + user.getUserName() + " on " + user.getAddress());
+        participants = new HashSet<>();
+        if (user != null) {
+            setTitle(user.getUserName() + " on " + user.getAddress());
+        } else {
+            setTitle("Room of " + Properties.username);
+        }
         jProgressBar_sending.setVisible(false);
         jTextArea_content.requestFocusInWindow();
     }
@@ -49,13 +60,16 @@ class MessagePanel extends javax.swing.JDialog {
     /**
      * Sends message to buddy
      */
-    private void sendMessage(final String sendingMessage) {
-        if (sendingMessage.isEmpty()) { // Ignore if empty
-            setInputEnabled(true);
-            return;
-        }
+    private void sendMessage(final String content) {
+        Message sendingMessage = new Message(user, content, new Date(), user == null || user.isRoom());
         try {
-            MessageService.sendMessage(user.getAddress(), sendingMessage, false); // Send message
+            if (user != null) {
+                MessageService.sendMessage(user, sendingMessage); // Send message
+            } else {
+                for (User participant : participants) {
+                    MessageService.sendMessage(participant, sendingMessage);
+                }
+            }
             SwingUtilities.invokeLater(() -> {
                 addMessage(sendingMessage, true); // Add message box to panel
                 jTextArea_content.setText("");
@@ -65,14 +79,15 @@ class MessagePanel extends javax.swing.JDialog {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Cannot send the message!", "ERROR", JOptionPane.ERROR_MESSAGE);
             SwingUtilities.invokeLater(() -> {
-                jTextArea_content.setText(sendingMessage);
+                jTextArea_content.setText(sendingMessage.getContent());
                 setInputEnabled(true);
             });
         }
     }
 
-    void receiveMessage(String message) {
+    void receiveMessage(Message message) {
         addMessage(message, false);
+        participants.add(message.getSender());
     }
 
     /**
@@ -81,13 +96,13 @@ class MessagePanel extends javax.swing.JDialog {
      * @param message message content
      * @param own     owning state
      */
-    private void addMessage(String message, boolean own) {
+    private void addMessage(Message message, boolean own) {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridy = lineNumber;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1.0d;
         constraints.insets = new Insets(0, 0, 20, 0);
-        MessageBox messageBox = new MessageBox(user, message, own);
+        MessageBox messageBox = new MessageBox(message, own);
         jPanel_dialogue.add(messageBox, constraints);
         lineNumber++;
         revalidate();
@@ -97,6 +112,10 @@ class MessagePanel extends javax.swing.JDialog {
         jButton_send.setEnabled(enabled);
         jTextArea_content.setEnabled(enabled);
         jProgressBar_sending.setVisible(!enabled);
+    }
+
+    public void addParticipant(User user) {
+        participants.add(user);
     }
 
     /**
@@ -188,6 +207,9 @@ class MessagePanel extends javax.swing.JDialog {
 
     private void jButton_sendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_sendActionPerformed
         final String sendingMessage = jTextArea_content.getText().trim();
+        if (sendingMessage.isEmpty()) { // Ignore if empty
+            return;
+        }
         setInputEnabled(false);
         new Thread(() -> sendMessage(sendingMessage)).start();
     }//GEN-LAST:event_jButton_sendActionPerformed

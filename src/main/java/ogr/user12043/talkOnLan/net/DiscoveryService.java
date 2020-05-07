@@ -27,23 +27,24 @@ public class DiscoveryService {
     private static void sendRequest(InetAddress address, byte[] message) throws IOException {
         DatagramPacket sendPacket = new DatagramPacket(message, message.length, address, Constants.RECEIVE_PORT);
         NetworkService.sendSocket.send(sendPacket);
-        LOGGER.debug("Discovery package sent to " + sendPacket.getAddress() + ":" + sendPacket.getPort());
     }
 
     public static void sendDiscoveryRequest(InetAddress address) throws IOException {
         sendRequest(address, Constants.DISCOVERY_COMMAND_REQUEST.getBytes());
+//        LOGGER.debug("Discovery request sent to " + address);
     }
 
     public static void sendDiscoveryRequestRoom(InetAddress address) throws IOException {
         sendRequest(address, Constants.DISCOVERY_COMMAND_REQUEST_ROOM.getBytes());
+//        LOGGER.debug("Room discovery request sent to " + address);
     }
 
     static void sendDiscoveryResponse(InetAddress receiveAddress, boolean isRoom) throws IOException {
-        LOGGER.debug("Discovery request received from " + receiveAddress);
-        byte[] discoveryResponse = (!isRoom ? Constants.DISCOVERY_COMMAND_RESPONSE : Constants.DISCOVERY_COMMAND_RESPONSE_ROOM + Constants.COMMAND_SEPARATOR + Properties.username).getBytes();
+        LOGGER.debug((!isRoom ? "Discovery" : "Room discovery") + " request received from " + receiveAddress);
+        byte[] discoveryResponse = ((!isRoom ? Constants.DISCOVERY_COMMAND_RESPONSE : Constants.DISCOVERY_COMMAND_RESPONSE_ROOM) + Constants.COMMAND_SEPARATOR + Properties.username).getBytes();
         DatagramPacket discoveryResponsePacket = new DatagramPacket(discoveryResponse, discoveryResponse.length, receiveAddress, Constants.RECEIVE_PORT);
         NetworkService.sendSocket.send(discoveryResponsePacket);
-        LOGGER.debug("Discovery response sent to: " + discoveryResponsePacket.getAddress() + ":" + discoveryResponsePacket.getPort());
+        LOGGER.debug((!isRoom ? "Discovery" : "Room discovery") + " response sent to: " + discoveryResponsePacket.getAddress());
         // Send a new discovery request to source address if request received from unknown address
         if (!isRoom && !Utils.isDiscovered(receiveAddress)) {
             sendDiscoveryRequest(receiveAddress);
@@ -53,11 +54,11 @@ public class DiscoveryService {
     }
 
     static void receiveDiscoveryResponse(InetAddress receiveAddress, String receivedData, boolean isRoom) {
-        LOGGER.debug("Discovery response received from " + receiveAddress);
         // Ignore already discovered
         if ((!isRoom && Utils.isDiscovered(receiveAddress)) || (isRoom && Utils.isDiscoveredRoom(receiveAddress))) {
             return;
         }
+        LOGGER.debug((!isRoom ? "Discovery" : "Room discovery") + " response received from " + receiveAddress);
 
         User user = new User();
         user.setAddress(receiveAddress);

@@ -1,7 +1,6 @@
 package ogr.user12043.talkOnLan;
 
 import ogr.user12043.talkOnLan.ui.MainUI;
-import ogr.user12043.talkOnLan.util.Themes;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,9 +20,6 @@ public class Main {
             // some property for smooth text
             System.setProperty("swing.aatext", "true");
             System.setProperty("awt.useSystemAAFontSettings", "on");
-
-            // set last theme found
-            Utils.changeTheme(Themes.DEFAULT_THEME);
 
             Utils.initInterfaces();
             SwingUtilities.invokeLater(() -> MainUI.getUI().setVisible(true)); // display main ui
