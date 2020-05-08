@@ -29,7 +29,7 @@ class MessageBox extends javax.swing.JPanel {
         initComponents();
         this.jLabel_left.setVisible(!own);
         if (own) {
-            jTextArea_content.setBackground(Color.CYAN);
+            jTextArea_content.setBackground(jTextArea_content.getBackground().brighter());
         }
     }
 
@@ -56,7 +56,7 @@ class MessageBox extends javax.swing.JPanel {
 
         setMaximumSize(new Dimension(300, Integer.MAX_VALUE));
 
-        jLabel_left.setText(!own ? message.getSender().getUserName() : Properties.username);
+        jLabel_left.setText((!own && message.getSender() != null) ? message.getSender().getUserName() : Properties.username);
 
         jTextArea_content.setEditable(false);
         jTextArea_content.setColumns(25);

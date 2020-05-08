@@ -57,6 +57,8 @@ class BuddyPanel extends javax.swing.JPanel {
         jButton_message = new javax.swing.JButton();
         jButton_file = new javax.swing.JButton();
 
+        setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+
         jLabel_info.setFont(jLabel_info.getFont().deriveFont(jLabel_info.getFont().getSize() + 1f));
         jLabel_info.setText("info");
 
@@ -80,7 +82,7 @@ class BuddyPanel extends javax.swing.JPanel {
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel_info, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                                .addComponent(jLabel_info, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton_message)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)

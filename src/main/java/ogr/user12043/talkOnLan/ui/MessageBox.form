@@ -54,7 +54,7 @@
     <Component class="javax.swing.JLabel" name="jLabel_left">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="!own ? message.getSender().getUserName() : Properties.username" type="code"/>
+          <Connection code="(!own &amp;&amp; message.getSender() != null) ? message.getSender().getUserName() : Properties.username" type="code"/>
         </Property>
       </Properties>
     </Component>

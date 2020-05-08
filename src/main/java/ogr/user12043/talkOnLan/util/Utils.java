@@ -72,22 +72,36 @@ public class Utils {
      * Changes look and feel and updates the {@link MainUI}
      *
      * @param themeName Theme name to set
+     * @return true if theme found and applied
      */
-    public static void changeTheme(String themeName) {
+    public static boolean changeTheme(String themeName) {
         try {
             LookAndFeel lookAndFeel = Themes.get(themeName);
             if (lookAndFeel != null) {
                 UIManager.setLookAndFeel(lookAndFeel);
+                SwingUtilities.updateComponentTreeUI(MainUI.getUI());
+                return true;
             } else {
                 for (UIManager.LookAndFeelInfo lookAndFeelInfo : UIManager.getInstalledLookAndFeels()) {
                     if (lookAndFeelInfo.getName().equals(themeName)) {
                         UIManager.setLookAndFeel(lookAndFeelInfo.getClassName());
+                        SwingUtilities.updateComponentTreeUI(MainUI.getUI());
+                        return true;
                     }
                 }
             }
-            SwingUtilities.updateComponentTreeUI(MainUI.getUI());
         } catch (Exception ignored) {
         }
+        return false;
+    }
+
+    public static String getCurrentTheme() {
+        for (UIManager.LookAndFeelInfo lookAndFeel : UIManager.getInstalledLookAndFeels()) {
+            if (lookAndFeel.getClassName().equals(UIManager.getLookAndFeel().getClass().getName())) {
+                return lookAndFeel.getName();
+            }
+        }
+        return "";
     }
 
     public static boolean isDiscovered(InetAddress inetAddress) {
@@ -114,10 +128,11 @@ public class Utils {
     }
 
     public static String generateMessage(Message message) {
-        return String.format("%s%c%s%c%d",
-                !message.isRoomMessage() ? Constants.COMMAND_MESSAGE : Constants.COMMAND_MESSAGE_ROOM,
+        return String.format("%s%c%s%c%d%c%d",
+                Constants.COMMAND_MESSAGE,
                 Constants.COMMAND_SEPARATOR, message.getContent(),
-                Constants.COMMAND_SEPARATOR, message.getSentDate().getTime());
+                Constants.COMMAND_SEPARATOR, message.getSentDate().getTime(),
+                Constants.COMMAND_SEPARATOR, message.getMessageType());
     }
 
     public static Message parseMessage(String content) {
@@ -125,6 +140,7 @@ public class Utils {
         Message message = new Message();
         message.setContent(split[0]);
         message.setSentDate(new Date(Long.parseLong(split[1])));
+        message.setMessageType(Integer.parseInt(split[2]));
         return message;
     }
 }

@@ -10,9 +10,9 @@ import java.awt.event.WindowEvent;
  */
 public class FileTransferDialog extends javax.swing.JDialog {
 
-    private boolean sending;
-    private User user;
-    private String fileName;
+    private final boolean sending;
+    private final User user;
+    private final String fileName;
     private boolean cancel;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_cancel;

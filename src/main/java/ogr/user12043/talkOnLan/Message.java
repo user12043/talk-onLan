@@ -10,16 +10,16 @@ public class Message {
     private User sender;
     private String content;
     private Date sentDate;
-    private boolean roomMessage;
+    private int messageType;
 
     public Message() {
     }
 
-    public Message(User sender, String content, Date sentDate, boolean roomMessage) {
+    public Message(User sender, String content, Date sentDate, int messageType) {
         this.sender = sender;
         this.content = content;
         this.sentDate = sentDate;
-        this.roomMessage = roomMessage;
+        this.messageType = messageType;
     }
 
     public User getSender() {
@@ -46,11 +46,11 @@ public class Message {
         this.sentDate = sentDate;
     }
 
-    public boolean isRoomMessage() {
-        return roomMessage;
+    public int getMessageType() {
+        return messageType;
     }
 
-    public void setRoomMessage(boolean roomMessage) {
-        this.roomMessage = roomMessage;
+    public void setMessageType(int messageType) {
+        this.messageType = messageType;
     }
 }

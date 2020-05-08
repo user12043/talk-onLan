@@ -120,12 +120,9 @@ public class NetworkService {
         DataInputStream inputStream = new DataInputStream(incomingSocket.getInputStream());
         String message = inputStream.readUTF();
         // Get messages
-        if (message.startsWith(Constants.COMMAND_MESSAGE_ROOM + Constants.COMMAND_SEPARATOR)) {
-            message = message.replace((Constants.COMMAND_MESSAGE_ROOM + Constants.COMMAND_SEPARATOR), "");
-            MessageService.receiveMessage(incomingSocket.getInetAddress(), message, true);
-        } else if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) {
+        if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) {
             message = message.replace((Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR), "");
-            MessageService.receiveMessage(incomingSocket.getInetAddress(), message, false);
+            MessageService.receiveMessage(incomingSocket.getInetAddress(), message);
         }
     }
 

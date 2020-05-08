@@ -10,7 +10,6 @@ public class Constants {
     public static final String DISCOVERY_COMMAND_RESPONSE = "talk-onLan_APPLICATION_DISCOVERY_RESPONSE";
     public static final String DISCOVERY_COMMAND_RESPONSE_ROOM = "talk-onLan_APPLICATION_DISCOVERY_RESPONSE_ROOM";
     public static final String COMMAND_MESSAGE = "talk-onLan_APPLICATION_MESSAGE";
-    public static final String COMMAND_MESSAGE_ROOM = "talk-onLan_APPLICATION_MESSAGE_ROOM";
     public static final String COMMAND_FILE_TRANSFER_REQUEST = "talk-onLan_FILE_TRANSFER_REQUEST";
     public static final String COMMAND_FILE_TRANSFER_RESPONSE_ACCEPT = "talk-onLan_FILE_TRANSFER_RESPONSE_ACCEPT";
     public static final String COMMAND_FILE_TRANSFER_RESPONSE_REJECT = "talk-onLan_FILE_TRANSFER_RESPONSE_REJECT";
@@ -23,4 +22,7 @@ public class Constants {
     public static final int DISCOVERY_BUFFER_LENGTH = 64;
     public static final int FILE_BUFFER_LENGTH = 16384;
     public static final int NETWORK_THREADS = 4;
+    public static final int MSG_TYPE_DIRECT = 0; // Direct messages
+    public static final int MSG_TYPE_ROOM = 1; // Messages sent to hosted room
+    public static final int MSG_TYPE_FWD = 2; // Messages from connected room
 }

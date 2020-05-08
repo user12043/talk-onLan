@@ -21,6 +21,10 @@ public class Main {
             System.setProperty("swing.aatext", "true");
             System.setProperty("awt.useSystemAAFontSettings", "on");
 
+            if (!Utils.changeTheme("GTK+")) {
+                Utils.changeTheme("Windows");
+            }
+
             Utils.initInterfaces();
             SwingUtilities.invokeLater(() -> MainUI.getUI().setVisible(true)); // display main ui
         } catch (Exception e) {

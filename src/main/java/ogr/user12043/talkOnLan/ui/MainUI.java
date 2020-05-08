@@ -4,8 +4,8 @@ import ogr.user12043.talkOnLan.Message;
 import ogr.user12043.talkOnLan.User;
 import ogr.user12043.talkOnLan.net.DiscoveryService;
 import ogr.user12043.talkOnLan.net.NetworkService;
+import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
-import ogr.user12043.talkOnLan.util.Themes;
 import ogr.user12043.talkOnLan.util.Utils;
 
 import javax.swing.*;
@@ -132,11 +132,14 @@ public class MainUI extends javax.swing.JFrame {
      */
     public void receiveMessage(Message message) {
         MessagePanel messagePanel;
-        if (!message.isRoomMessage()) {
+        if (message.getMessageType() == 0) {
             messagePanel = getMessagePanelOfUser(message.getSender());
-        } else {
+        } else if (message.getMessageType() == 1) {
             messagePanel = roomMessagePanel;
-        }
+        } else if (message.getMessageType() == 2) {
+            User room = Utils.findRoom(message.getSender().getAddress());
+            messagePanel = getMessagePanelOfUser(room);
+        } else return;
         messagePanel.setVisible(true);
         messagePanel.receiveMessage(message);
     }
@@ -257,7 +260,7 @@ public class MainUI extends javax.swing.JFrame {
 
         jComboBox_themes.setModel(new DefaultComboBoxModel<String>
                 (Utils.getLookAndFeels()));
-        jComboBox_themes.setSelectedItem(Themes.DEFAULT_THEME);
+        jComboBox_themes.setSelectedItem(Utils.getCurrentTheme());
         jComboBox_themes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox_themesActionPerformed(evt);
@@ -475,7 +478,8 @@ public class MainUI extends javax.swing.JFrame {
             room.setAddress(InetAddress.getLocalHost());
             room.setRoom(true);
             Utils.rooms.add(room);
-            receiveMessage(new Message(room, "You just started a room!", new Date(), true));
+            roomMessagePanel.receiveMessage(new Message(null, "You just started a room!", new Date(), Constants.MSG_TYPE_ROOM));
+            roomMessagePanel.setVisible(true);
             jButton_hostRoom.setEnabled(false);
             jButton_stopRoom.setEnabled(true);
         } catch (IOException e) {
