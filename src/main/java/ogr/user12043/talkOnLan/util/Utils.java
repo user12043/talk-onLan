@@ -117,6 +117,11 @@ public class Utils {
         return first.orElse(null);
     }
 
+    private static User findBuddyByUsername(String username) {
+        Optional<User> first = buddies.stream().filter(user -> user.getUserName().equals(username)).findFirst();
+        return first.orElse(null);
+    }
+
     public static User findRoom(InetAddress inetAddress) {
         Optional<User> first = rooms.stream().filter(user -> user.getAddress().equals(inetAddress)).findFirst();
         return first.orElse(null);
@@ -128,11 +133,12 @@ public class Utils {
     }
 
     public static String generateMessage(Message message) {
-        return String.format("%s%c%s%c%d%c%d",
+        return String.format("%s%c%s%c%d%c%d%c%s",
                 Constants.COMMAND_MESSAGE,
                 Constants.COMMAND_SEPARATOR, message.getContent(),
                 Constants.COMMAND_SEPARATOR, message.getSentDate().getTime(),
-                Constants.COMMAND_SEPARATOR, message.getMessageType());
+                Constants.COMMAND_SEPARATOR, message.getMessageType(),
+                Constants.COMMAND_SEPARATOR, message.getForwardedFrom().getUserName());
     }
 
     public static Message parseMessage(String content) {
@@ -141,6 +147,7 @@ public class Utils {
         message.setContent(split[0]);
         message.setSentDate(new Date(Long.parseLong(split[1])));
         message.setMessageType(Integer.parseInt(split[2]));
+        message.setForwardedFrom(findBuddyByUsername(split[3]));
         return message;
     }
 }

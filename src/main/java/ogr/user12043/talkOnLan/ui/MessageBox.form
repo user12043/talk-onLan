@@ -54,7 +54,7 @@
     <Component class="javax.swing.JLabel" name="jLabel_left">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="(!own &amp;&amp; message.getSender() != null) ? message.getSender().getUserName() : Properties.username" type="code"/>
+          <Connection code="getUser()" type="code"/>
         </Property>
       </Properties>
     </Component>
@@ -74,7 +74,9 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel_time">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JLabel(getDate(), getDateAlignment())"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JLabel(getDate(), own ? SwingConstants.RIGHT : SwingConstants.LEFT)"/>
+        <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
       </AuxValues>
     </Component>
   </SubComponents>

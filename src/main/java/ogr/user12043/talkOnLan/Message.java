@@ -11,8 +11,10 @@ public class Message {
     private String content;
     private Date sentDate;
     private int messageType;
+    private User forwardedFrom;
 
     public Message() {
+        this.forwardedFrom = new User();
     }
 
     public Message(User sender, String content, Date sentDate, int messageType) {
@@ -20,6 +22,7 @@ public class Message {
         this.content = content;
         this.sentDate = sentDate;
         this.messageType = messageType;
+        this.forwardedFrom = new User();
     }
 
     public User getSender() {
@@ -52,5 +55,13 @@ public class Message {
 
     public void setMessageType(int messageType) {
         this.messageType = messageType;
+    }
+
+    public User getForwardedFrom() {
+        return forwardedFrom;
+    }
+
+    public void setForwardedFrom(User forwardedFrom) {
+        this.forwardedFrom = forwardedFrom;
     }
 }
