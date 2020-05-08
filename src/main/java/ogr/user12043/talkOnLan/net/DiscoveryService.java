@@ -70,10 +70,10 @@ public class DiscoveryService {
         }
         if (!isRoom) {
             Utils.buddies.add(user);
-            SwingUtilities.invokeLater(() -> MainUI.getUI().buddiesPanel.addBuddy(user));
+            SwingUtilities.invokeLater(() -> MainUI.getUI().addBuddy(user));
         } else {
             Utils.rooms.add(user);
-            SwingUtilities.invokeLater(() -> MainUI.getUI().roomsPanel.addBuddy(user));
+            SwingUtilities.invokeLater(() -> MainUI.getUI().addRoom(user));
         }
     }
 

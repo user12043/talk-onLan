@@ -31,8 +31,7 @@ public class MainUI extends javax.swing.JFrame {
     private final JDialog loadingDialog;
     private final int discoveryStartEndWait = 1000;
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
-    public ogr.user12043.talkOnLan.ui.BuddiesPanel roomsPanel;
+    private ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
     private javax.swing.JButton jButton_addManually;
     private javax.swing.JButton jButton_endDiscovery;
     private javax.swing.JButton jButton_hardDiscovery;
@@ -41,10 +40,7 @@ public class MainUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton_startDiscovery;
     private javax.swing.JButton jButton_stopRoom;
     private javax.swing.JComboBox<String> jComboBox_themes;
-    private javax.swing.JLabel jLabel_header;
-    private javax.swing.JLabel jLabel_theme;
-    private javax.swing.JScrollPane jScrollPane_buddiesPanel;
-    private javax.swing.JScrollPane jScrollPane_roomsPanel;
+    private ogr.user12043.talkOnLan.ui.BuddiesPanel roomsPanel;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -56,7 +52,6 @@ public class MainUI extends javax.swing.JFrame {
         messagePanels = new HashSet<>();
         loadingDialog = createLoadingDialog();
         initializeGlassPane();
-        setResizable(false);
         roomMessagePanel = new MessagePanel(this, null);
     }
 
@@ -184,6 +179,16 @@ public class MainUI extends javax.swing.JFrame {
         });
     }
 
+    public void addBuddy(User user) {
+        buddiesPanel.addBuddy(user);
+        pack();
+    }
+
+    public void addRoom(User user) {
+        roomsPanel.addBuddy(user);
+        pack();
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -196,13 +201,13 @@ public class MainUI extends javax.swing.JFrame {
         jButton_addManually = new javax.swing.JButton();
         jButton_hostAddresses = new javax.swing.JButton();
         jButton_hardDiscovery = new javax.swing.JButton();
-        jScrollPane_buddiesPanel = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane_buddiesPanel = new javax.swing.JScrollPane();
         buddiesPanel = new ogr.user12043.talkOnLan.ui.BuddiesPanel();
-        jLabel_header = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel_header = new javax.swing.JLabel();
         jComboBox_themes = new javax.swing.JComboBox<>();
-        jLabel_theme = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel_theme = new javax.swing.JLabel();
         jButton_hostRoom = new javax.swing.JButton();
-        jScrollPane_roomsPanel = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane_roomsPanel = new javax.swing.JScrollPane();
         roomsPanel = new ogr.user12043.talkOnLan.ui.BuddiesPanel();
         jButton_stopRoom = new javax.swing.JButton();
 
@@ -253,6 +258,7 @@ public class MainUI extends javax.swing.JFrame {
         jScrollPane_buddiesPanel.setAutoscrolls(true);
 
         buddiesPanel.setEnabled(false);
+        buddiesPanel.setLayout(new java.awt.GridBagLayout());
         jScrollPane_buddiesPanel.setViewportView(buddiesPanel);
 
         jLabel_header.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
@@ -279,6 +285,8 @@ public class MainUI extends javax.swing.JFrame {
 
         jScrollPane_roomsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Rooms"));
         jScrollPane_roomsPanel.setAutoscrolls(true);
+
+        roomsPanel.setLayout(new java.awt.GridBagLayout());
         jScrollPane_roomsPanel.setViewportView(roomsPanel);
 
         jButton_stopRoom.setText("Stop room");
@@ -294,40 +302,40 @@ public class MainUI extends javax.swing.JFrame {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel_header)
-                                .addGap(18, 18, Short.MAX_VALUE)
-                                .addComponent(jLabel_theme)
-                                .addGap(12, 12, 12)
-                                .addComponent(jComboBox_themes, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addComponent(jScrollPane_buddiesPanel))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addGap(12, 12, 12)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                        .addComponent(jButton_startDiscovery, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(jButton_hostRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addContainerGap()
+                                                .addComponent(jLabel_header)
+                                                .addGap(18, 18, Short.MAX_VALUE)
+                                                .addComponent(jLabel_theme)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jComboBox_themes, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                                .addContainerGap()
+                                                                .addComponent(jScrollPane_buddiesPanel))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGap(12, 12, 12)
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                        .addComponent(jButton_startDiscovery, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                        .addComponent(jButton_hostRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(layout.createSequentialGroup()
+                                                                                .addComponent(jButton_hardDiscovery)
+                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                                .addComponent(jButton_addManually))
+                                                                        .addComponent(jButton_stopRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(layout.createSequentialGroup()
-                                                                .addComponent(jButton_hardDiscovery)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                .addComponent(jButton_addManually))
-                                                        .addComponent(jButton_stopRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jButton_hostAddresses)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(jButton_endDiscovery)
-                                                .addGap(12, 12, 12))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jScrollPane_roomsPanel)
-                                                .addContainerGap())))
+                                                                .addGap(0, 8, Short.MAX_VALUE)
+                                                                .addComponent(jButton_hostAddresses)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(jButton_endDiscovery, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(jScrollPane_roomsPanel))))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -350,7 +358,7 @@ public class MainUI extends javax.swing.JFrame {
                                         .addComponent(jButton_stopRoom))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane_roomsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane_roomsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
                                         .addComponent(jScrollPane_buddiesPanel))
                                 .addContainerGap())
         );

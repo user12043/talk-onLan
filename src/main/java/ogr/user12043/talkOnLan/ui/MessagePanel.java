@@ -29,7 +29,6 @@ class MessagePanel extends javax.swing.JDialog {
     private javax.swing.JButton jButton_send;
     private javax.swing.JPanel jPanel_dialogue;
     private javax.swing.JProgressBar jProgressBar_sending;
-    private javax.swing.JScrollPane jScrollPane_content;
     private javax.swing.JScrollPane jScrollPane_dialogue;
     private javax.swing.JTextArea jTextArea_content;
     // End of variables declaration//GEN-END:variables
@@ -151,7 +150,7 @@ class MessagePanel extends javax.swing.JDialog {
      */
     private void initComponents() {//GEN-BEGIN:initComponents
 
-        jScrollPane_content = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane_content = new javax.swing.JScrollPane();
         jTextArea_content = new javax.swing.JTextArea();
         jButton_send = new javax.swing.JButton();
         jScrollPane_dialogue = new javax.swing.JScrollPane();
@@ -189,6 +188,7 @@ class MessagePanel extends javax.swing.JDialog {
         });
 
         jScrollPane_dialogue.setBorder(null);
+        jScrollPane_dialogue.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane_dialogue.setAutoscrolls(true);
 
         jPanel_dialogue.setAutoscrolls(true);
@@ -204,13 +204,13 @@ class MessagePanel extends javax.swing.JDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane_dialogue)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jButton_send)
                                                 .addGap(185, 185, 185)
                                                 .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(0, 0, Short.MAX_VALUE))
-                                        .addComponent(jScrollPane_content))
+                                        .addComponent(jScrollPane_content)
+                                        .addComponent(jScrollPane_dialogue))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
