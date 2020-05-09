@@ -59,9 +59,11 @@ public class UserDao implements Dao<User, Integer> {
         try {
             db.openStatement();
             ResultSet resultSet = db.executeSelectQuery(query);
-            user = DBUtils.resultSetToUser(resultSet);
-            db.closeStatement();
-            return user;
+            if (resultSet.next()) {
+                user = DBUtils.resultSetToUser(resultSet);
+                db.closeStatement();
+                return user;
+            }
         } catch (SQLException e) {
             LOGGER.error(e);
         }
@@ -115,8 +117,11 @@ public class UserDao implements Dao<User, Integer> {
         try {
             db.openStatement();
             ResultSet resultSet = db.executeSelectQuery(query);
-            db.closeStatement();
-            return DBUtils.resultSetToUser(resultSet);
+            if (resultSet.next()) {
+                User result = DBUtils.resultSetToUser(resultSet);
+                db.closeStatement();
+                return result;
+            }
         } catch (SQLException e) {
             LOGGER.error(e);
         }

@@ -60,10 +60,12 @@ public class MessageDao implements Dao<Message, Integer> {
         try {
             db.openStatement();
             ResultSet resultSet = db.executeSelectQuery(query);
-            message = DBUtils.resultSetToMessage(resultSet);
-            fillUsers(message, resultSet);
-            db.closeStatement();
-            return message;
+            if (resultSet.next()) {
+                message = DBUtils.resultSetToMessage(resultSet);
+                fillUsers(message, resultSet);
+                db.closeStatement();
+                return message;
+            }
         } catch (SQLException e) {
             LOGGER.error(e);
         }
