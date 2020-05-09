@@ -150,4 +150,12 @@ public class Utils {
         message.setForwardedFrom(findBuddyByUsername(split[3]));
         return message;
     }
+
+    public static void addUser(User user) {
+        if (user.isRoom()) {
+            rooms.add(user);
+        } else {
+            buddies.add(user);
+        }
+    }
 }

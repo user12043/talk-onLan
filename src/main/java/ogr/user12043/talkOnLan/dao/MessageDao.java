@@ -2,8 +2,12 @@ package ogr.user12043.talkOnLan.dao;
 
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
+import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.DBUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -14,10 +18,19 @@ import java.util.Set;
  * part of project: talk-onLan
  */
 public class MessageDao implements Dao<Message, Integer> {
+    private static final Logger LOGGER = LogManager.getLogger();
     private final DBConnection db;
 
-    public MessageDao() throws SQLException {
-        db = DBConnection.get();
+    public MessageDao() {
+        DBConnection db = null;
+        try {
+            db = DBConnection.get();
+        } catch (Exception e) {
+            LOGGER.error("Could not connect to database!", e);
+            JOptionPane.showMessageDialog(MainUI.getUI(), "Could not connect to database!", "Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
+        this.db = db;
     }
 
     @Override
@@ -35,7 +48,7 @@ public class MessageDao implements Dao<Message, Integer> {
             db.closeStatement();
             return messages;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         return null;
     }
@@ -52,7 +65,7 @@ public class MessageDao implements Dao<Message, Integer> {
             db.closeStatement();
             return message;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         return null;
     }
@@ -62,9 +75,9 @@ public class MessageDao implements Dao<Message, Integer> {
         String query;
         if (message.getId() != null) {
             query = "UPDATE users SET content=':content:', sent_date=':sentDate:', \"type\"=:messageType:" +
-                    "sender_id=:senderId:, fwd_user_id=:fwdUserId:, sent=':sent:' WHERE id=" + message.getId();
+                    "sender_id=:senderId:, fwd_user_id=:fwdUserId:, sent=:sent: WHERE id=" + message.getId();
         } else {
-            query = "INSERT INTO users VALUES(DEFAULT, ':content:', ':sentDate:', :type:, :senderId:, :fwdUserId:, ':sent:')";
+            query = "INSERT INTO users VALUES(DEFAULT, ':content:', ':sentDate:', :type:, :senderId:, :fwdUserId:, :sent:)";
         }
 
         query = query.replace(":content:", message.getContent());
@@ -81,7 +94,7 @@ public class MessageDao implements Dao<Message, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
     }
 
@@ -98,7 +111,7 @@ public class MessageDao implements Dao<Message, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
     }
 

@@ -2,7 +2,10 @@ package ogr.user12043.talkOnLan.dao;
 
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.util.DBUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -13,10 +16,19 @@ import java.util.Set;
  * part of project: talk-onLan
  */
 public class UserDao implements Dao<User, Integer> {
+    private static final Logger LOGGER = LogManager.getLogger();
     private final DBConnection db;
 
-    public UserDao() throws SQLException {
-        db = DBConnection.get();
+    public UserDao() {
+        DBConnection db = null;
+        try {
+            db = DBConnection.get();
+        } catch (Exception e) {
+            LOGGER.error("Could not connect to database!", e);
+            JOptionPane.showMessageDialog(null, "Could not connect to database!\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
+        this.db = db;
     }
 
     @Override
@@ -34,7 +46,7 @@ public class UserDao implements Dao<User, Integer> {
                 db.closeStatement();
                 return users;
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.error(e);
             }
             return null;
         }
@@ -51,7 +63,7 @@ public class UserDao implements Dao<User, Integer> {
             db.closeStatement();
             return user;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
         return null;
     }
@@ -60,9 +72,9 @@ public class UserDao implements Dao<User, Integer> {
     public void save(User user) {
         String query;
         if (user.getId() != null) {
-            query = "UPDATE users SET username=':username:', address=':address:', is_room=':isRoom:' WHERE id=" + user.getId();
+            query = "UPDATE users SET username=':username:', address=':address:', is_room=:isRoom: WHERE id=" + user.getId();
         } else {
-            query = "INSERT INTO users VALUES(DEFAULT, ':username:', ':address:', ':isRoom:')";
+            query = "INSERT INTO users VALUES(DEFAULT, ':username:', ':address:', :isRoom:)";
         }
 
         query = query.replace(":username:", user.getUsername());
@@ -74,7 +86,7 @@ public class UserDao implements Dao<User, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
     }
 
@@ -91,7 +103,23 @@ public class UserDao implements Dao<User, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
+    }
+
+    public User findByFields(User user) {
+        String query = "SELECT * FROM users WHERE username=':username:' AND address=':address:' AND is_room=:isRoom:";
+        query = query.replace(":username:", user.getUsername());
+        query = query.replace(":address:", user.getAddress().getHostAddress());
+        query = query.replace(":isRoom:", String.valueOf(user.isRoom()));
+        try {
+            db.openStatement();
+            ResultSet resultSet = db.executeSelectQuery(query);
+            db.closeStatement();
+            return DBUtils.resultSetToUser(resultSet);
+        } catch (SQLException e) {
+            LOGGER.error(e);
+        }
+        return null;
     }
 }

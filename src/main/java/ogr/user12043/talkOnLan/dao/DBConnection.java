@@ -28,9 +28,8 @@ public class DBConnection {
         return statement.executeQuery(query);
     }
 
-    public boolean executeUpdateQuery(String query) throws SQLException {
+    public void executeUpdateQuery(String query) throws SQLException {
         statement.executeUpdate(query);
-        return true;
     }
 
     public void openStatement() throws SQLException {

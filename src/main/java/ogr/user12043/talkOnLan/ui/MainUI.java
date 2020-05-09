@@ -1,6 +1,7 @@
 package ogr.user12043.talkOnLan.ui;
 
 import ogr.user12043.talkOnLan.dao.DBConnection;
+import ogr.user12043.talkOnLan.dao.UserDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.DiscoveryService;
@@ -32,6 +33,7 @@ public class MainUI extends javax.swing.JFrame {
     private final MessagePanel roomMessagePanel;
     private final JDialog loadingDialog;
     private final int discoveryStartEndWait = 1000;
+    private final UserDao userDao;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
     private javax.swing.JButton jButton_addManually;
@@ -55,6 +57,7 @@ public class MainUI extends javax.swing.JFrame {
         loadingDialog = createLoadingDialog();
         initializeGlassPane();
         roomMessagePanel = new MessagePanel(this, null);
+        userDao = new UserDao();
     }
 
     /**
@@ -181,13 +184,17 @@ public class MainUI extends javax.swing.JFrame {
         });
     }
 
-    public void addBuddy(User user) {
-        buddiesPanel.addBuddy(user);
-        pack();
-    }
-
-    public void addRoom(User user) {
-        roomsPanel.addBuddy(user);
+    public void addUser(User user) {
+        if (user.isRoom()) {
+            roomsPanel.addBuddy(user);
+        } else {
+            buddiesPanel.addBuddy(user);
+        }
+        // check database and add if not exists
+        User existing = userDao.findByFields(user);
+        if (existing == null) {
+            userDao.save(user);
+        }
         pack();
     }
 

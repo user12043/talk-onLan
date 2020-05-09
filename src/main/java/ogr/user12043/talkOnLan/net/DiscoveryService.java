@@ -68,13 +68,8 @@ public class DiscoveryService {
         if (index != -1) {
             user.setUsername(receivedData.substring(index + 1));
         }
-        if (!isRoom) {
-            Utils.buddies.add(user);
-            SwingUtilities.invokeLater(() -> MainUI.getUI().addBuddy(user));
-        } else {
-            Utils.rooms.add(user);
-            SwingUtilities.invokeLater(() -> MainUI.getUI().addRoom(user));
-        }
+        Utils.addUser(user);
+        SwingUtilities.invokeLater(() -> MainUI.getUI().addUser(user));
     }
 
     /**
@@ -86,7 +81,7 @@ public class DiscoveryService {
         for (InterfaceAddress hostAddress : Utils.hostAddresses) {
             final InetAddress address = hostAddress.getAddress();
             if (address instanceof Inet4Address) {
-                final String hostAddressString = address.toString().replace(address.getHostName(), "").replace("/", "");
+                final String hostAddressString = address.getHostAddress();
                 for (int i = 0; i < 255; i++) {
                     final String targetAddressString = hostAddressString.substring(0, hostAddressString.lastIndexOf('.') + 1) + i;
                     InetAddress targetAddress = Inet4Address.getByName(targetAddressString);
