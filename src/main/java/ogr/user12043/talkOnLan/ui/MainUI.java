@@ -22,6 +22,7 @@ import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -203,7 +204,7 @@ public class MainUI extends javax.swing.JFrame {
         pack();
 
         // retrieve this user's messages and send unsent ones
-        Set<Message> messages = MessageDao.get().findUnsentByReceiver(user);
+        List<Message> messages = MessageDao.get().findUnsentByReceiver(user);
         for (Message message : messages) {
             MessageService.sendMessage(message);
         }
