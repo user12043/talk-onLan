@@ -1,7 +1,7 @@
 package ogr.user12043.talkOnLan.ui;
 
-import ogr.user12043.talkOnLan.Message;
-import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.model.Message;
+import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.MessageService;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
@@ -46,7 +46,7 @@ class MessagePanel extends javax.swing.JDialog {
         this.user = user;
         participants = new HashSet<>();
         if (user != null) {
-            setTitle(user.isRoom() ? "Room of " + user.getUserName() : user.getUserName() + " on " + user.getAddress());
+            setTitle(user.isRoom() ? "Room of " + user.getUsername() : user.getUsername() + " on " + user.getAddress());
         } else {
             setTitle("Room of " + Properties.username);
         }

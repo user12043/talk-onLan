@@ -1,6 +1,6 @@
 package ogr.user12043.talkOnLan.ui;
 
-import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.FileTransferService;
 
 import javax.swing.*;
@@ -26,7 +26,7 @@ class BuddyPanel extends javax.swing.JPanel {
     BuddyPanel(User user) {
         initComponents();
         this.user = user;
-        jLabel_info.setText(user.getUserName() + " on " + user.getAddress().toString().replace("/", ""));
+        jLabel_info.setText(user.getUsername() + " on " + user.getAddress().toString().replace("/", ""));
         if (user.isRoom()) {
             jButton_file.setEnabled(false);
             jButton_file.setVisible(false);

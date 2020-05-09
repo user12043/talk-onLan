@@ -1,7 +1,7 @@
 package ogr.user12043.talkOnLan.util;
 
-import ogr.user12043.talkOnLan.Message;
-import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.model.Message;
+import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.ui.MainUI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -118,7 +118,7 @@ public class Utils {
     }
 
     private static User findBuddyByUsername(String username) {
-        Optional<User> first = buddies.stream().filter(user -> user.getUserName().equals(username)).findFirst();
+        Optional<User> first = buddies.stream().filter(user -> user.getUsername().equals(username)).findFirst();
         return first.orElse(null);
     }
 
@@ -128,7 +128,7 @@ public class Utils {
     }
 
     public static User findRoomByUsername(String username) {
-        Optional<User> first = rooms.stream().filter(user -> user.getUserName().equals(username)).findFirst();
+        Optional<User> first = rooms.stream().filter(user -> user.getUsername().equals(username)).findFirst();
         return first.orElse(null);
     }
 
@@ -138,7 +138,7 @@ public class Utils {
                 Constants.COMMAND_SEPARATOR, message.getContent(),
                 Constants.COMMAND_SEPARATOR, message.getSentDate().getTime(),
                 Constants.COMMAND_SEPARATOR, message.getMessageType(),
-                Constants.COMMAND_SEPARATOR, message.getForwardedFrom().getUserName());
+                Constants.COMMAND_SEPARATOR, message.getForwardedFrom().getUsername());
     }
 
     public static Message parseMessage(String content) {

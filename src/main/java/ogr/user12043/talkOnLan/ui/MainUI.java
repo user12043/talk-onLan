@@ -1,7 +1,8 @@
 package ogr.user12043.talkOnLan.ui;
 
-import ogr.user12043.talkOnLan.Message;
-import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.dao.DBConnection;
+import ogr.user12043.talkOnLan.model.Message;
+import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.DiscoveryService;
 import ogr.user12043.talkOnLan.net.NetworkService;
 import ogr.user12043.talkOnLan.util.Constants;
@@ -15,6 +16,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -159,7 +161,7 @@ public class MainUI extends javax.swing.JFrame {
         }
 
         // Display dialog
-        String message = user.getUserName() + " on " + user.getAddress() + " wants to send you this file:\n" + fileName + " (" + fileSizeString + ")\nAccept the file?";
+        String message = user.getUsername() + " on " + user.getAddress() + " wants to send you this file:\n" + fileName + " (" + fileSizeString + ")\nAccept the file?";
         final int option = JOptionPane.showConfirmDialog(this, message, "Confirm file receive", JOptionPane.YES_NO_OPTION);
         return option == 0; // 0 = OK option
     }
@@ -214,6 +216,11 @@ public class MainUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("talk-onLan");
         setMinimumSize(new java.awt.Dimension(675, 250));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jButton_startDiscovery.setText("Start Discovery");
         jButton_startDiscovery.addActionListener(new java.awt.event.ActionListener() {
@@ -482,7 +489,7 @@ public class MainUI extends javax.swing.JFrame {
         try {
             Properties.roomMode = true;
             User room = new User();
-            room.setUserName(Properties.username);
+            room.setUsername(Properties.username);
             room.setAddress(InetAddress.getLocalHost());
             room.setRoom(true);
             Utils.rooms.add(room);
@@ -499,4 +506,12 @@ public class MainUI extends javax.swing.JFrame {
         Properties.roomMode = false;
         jButton_hostRoom.setEnabled(true);
     }//GEN-LAST:event_jButton_stopRoomActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        try {
+            DBConnection.get().close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_formWindowClosing
 }

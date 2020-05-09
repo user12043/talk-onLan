@@ -1,7 +1,7 @@
 package ogr.user12043.talkOnLan.net;
 
-import ogr.user12043.talkOnLan.Message;
-import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.model.Message;
+import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Utils;

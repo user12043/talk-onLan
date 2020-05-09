@@ -1,6 +1,6 @@
 package ogr.user12043.talkOnLan.ui;
 
-import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.model.User;
 
 import java.awt.*;
 import java.util.HashSet;

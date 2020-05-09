@@ -1,4 +1,4 @@
-package ogr.user12043.talkOnLan;
+package ogr.user12043.talkOnLan.model;
 
 import java.util.Date;
 
@@ -7,11 +7,13 @@ import java.util.Date;
  * part of project: talk-onLan
  */
 public class Message {
+    private Integer id;
     private User sender;
     private String content;
     private Date sentDate;
     private int messageType;
     private User forwardedFrom;
+    private boolean sent;
 
     public Message() {
         this.forwardedFrom = new User();
@@ -23,6 +25,14 @@ public class Message {
         this.sentDate = sentDate;
         this.messageType = messageType;
         this.forwardedFrom = new User();
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public User getSender() {
@@ -63,5 +73,13 @@ public class Message {
 
     public void setForwardedFrom(User forwardedFrom) {
         this.forwardedFrom = forwardedFrom;
+    }
+
+    public boolean isSent() {
+        return sent;
+    }
+
+    public void setSent(boolean sent) {
+        this.sent = sent;
     }
 }

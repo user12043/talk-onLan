@@ -9,4 +9,7 @@ public class Properties {
     public static final String username = System.getProperty("user.name");
     public static final String fileReceiveFolder = "receivedFiles/";
     public static boolean roomMode = false;
+    public static String databaseUrl = "jdbc:h2:./data";
+    public static String databaseUsername = "talk-onLan";
+    public static String databasePassword = "myAwesomePassword";
 }

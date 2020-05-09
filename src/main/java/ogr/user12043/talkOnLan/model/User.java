@@ -1,4 +1,4 @@
-package ogr.user12043.talkOnLan;
+package ogr.user12043.talkOnLan.model;
 
 import java.net.InetAddress;
 import java.util.Objects;
@@ -10,25 +10,34 @@ import java.util.Objects;
  * The model class of User
  */
 public class User {
-    private String userName;
+    private Integer id;
+    private String username;
     private InetAddress address;
     private boolean isRoom;
 
     public User() {
     }
 
-    public User(String userName, InetAddress address, boolean isRoom) {
-        this.userName = userName;
+    public User(String username, InetAddress address, boolean isRoom) {
+        this.username = username;
         this.address = address;
         this.isRoom = isRoom;
     }
 
-    public String getUserName() {
-        return userName;
+    public Integer getId() {
+        return id;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public InetAddress getAddress() {
@@ -52,13 +61,13 @@ public class User {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
         User user = (User) o;
-        return Objects.equals(getUserName(), user.getUserName()) &&
+        return Objects.equals(getUsername(), user.getUsername()) &&
                 Objects.equals(getAddress(), user.getAddress()) &&
                 Objects.equals(isRoom(), user.isRoom());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userName, address);
+        return Objects.hash(username, address);
     }
 }

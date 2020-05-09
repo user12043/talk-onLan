@@ -1,6 +1,6 @@
 package ogr.user12043.talkOnLan.ui;
 
-import ogr.user12043.talkOnLan.Message;
+import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
@@ -37,9 +37,9 @@ class MessageBox extends javax.swing.JPanel {
         if (message.getSender() == null) {
             return Properties.username;
         } else if (message.getMessageType() != Constants.MSG_TYPE_FWD || message.getForwardedFrom() == null) {
-            return message.getSender().getUserName();
+            return message.getSender().getUsername();
         } else {
-            return message.getForwardedFrom().getUserName();
+            return message.getForwardedFrom().getUsername();
         }
     }
 

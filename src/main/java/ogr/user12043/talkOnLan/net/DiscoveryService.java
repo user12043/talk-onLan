@@ -1,6 +1,6 @@
 package ogr.user12043.talkOnLan.net;
 
-import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
@@ -66,7 +66,7 @@ public class DiscoveryService {
         // Get username with parsing response
         int index = receivedData.indexOf(Constants.COMMAND_SEPARATOR);
         if (index != -1) {
-            user.setUserName(receivedData.substring(index + 1));
+            user.setUsername(receivedData.substring(index + 1));
         }
         if (!isRoom) {
             Utils.buddies.add(user);

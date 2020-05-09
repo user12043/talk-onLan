@@ -20,6 +20,7 @@
     <maven-dependency-plugin.version>3.1.0</maven-dependency-plugin.version>
     <lib-folder>lib</lib-folder>
     <log4j-version>2.11.0</log4j-version>
+    <h2.version>1.4.200</h2.version>
     <flatlaf.version>0.33</flatlaf.version>
     <material-ui.version>1.0.6</material-ui.version>
   </properties>
@@ -56,6 +57,13 @@
       <artifactId>material-ui-swing</artifactId>
       <version>${material-ui.version}</version>
     </dependency>-->
+
+    <!--=========================================DATABASE=========================================-->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${h2.version}</version>
+    </dependency>
   </dependencies>
 
   <!--Note about in project repository: If there is a mirror in "settings.xml" file, then the mirror must be excluded for the in project repository with:

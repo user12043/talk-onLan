@@ -1,5 +1,6 @@
 package ogr.user12043.talkOnLan;
 
+import ogr.user12043.talkOnLan.dao.DBConnection;
 import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +26,7 @@ public class Main {
                 Utils.changeTheme("Windows");
             }
 
+            DBConnection.get(); // init database connection
             Utils.initInterfaces();
             SwingUtilities.invokeLater(() -> MainUI.getUI().setVisible(true)); // display main ui
         } catch (Exception e) {

@@ -1,6 +1,6 @@
 package ogr.user12043.talkOnLan.ui;
 
-import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.model.User;
 
 import java.awt.event.WindowEvent;
 
@@ -40,7 +40,7 @@ public class FileTransferDialog extends javax.swing.JDialog {
     public void startTransfer() {
         jProgressBar_transferProgress.setIndeterminate(false);
         jProgressBar_transferProgress.setValue(0);
-        jLabel_info.setText(((sending) ? "Sending to " : "Receiving from ") + user.getUserName() + " on " + user.getAddress());
+        jLabel_info.setText(((sending) ? "Sending to " : "Receiving from ") + user.getUsername() + " on " + user.getAddress());
     }
 
     public void setProgress(int progress) {
@@ -90,7 +90,7 @@ public class FileTransferDialog extends javax.swing.JDialog {
         jProgressBar_transferProgress.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
         jProgressBar_transferProgress.setStringPainted(true);
 
-        jLabel_info.setText(((sending) ? "Waiting for confirmation " : "Receiving from ") + user.getUserName() + " on " + user.getAddress());
+        jLabel_info.setText(((sending) ? "Waiting for confirmation " : "Receiving from ") + user.getUsername() + " on " + user.getAddress());
 
         jLabel_fileName.setText(fileName);
 

@@ -1,6 +1,6 @@
 package ogr.user12043.talkOnLan.net;
 
-import ogr.user12043.talkOnLan.User;
+import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.ui.FileTransferDialog;
 import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Constants;
@@ -93,7 +93,7 @@ public class FileTransferService {
         final User user = new User();
         final boolean buddyExists = Utils.buddies.stream().anyMatch(u -> {
             if (u.getAddress().equals(incomingSocket.getInetAddress())) {
-                user.setUserName(u.getUserName());
+                user.setUsername(u.getUsername());
                 user.setAddress(u.getAddress());
                 return true;
             }
@@ -101,7 +101,7 @@ public class FileTransferService {
         });
         if (!buddyExists) {
             DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
-            user.setUserName("<Unknown user>");
+            user.setUsername("<Unknown user>");
             user.setAddress(incomingSocket.getInetAddress());
         }
         DataOutputStream outputStream;
