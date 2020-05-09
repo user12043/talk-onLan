@@ -62,8 +62,8 @@ public class MessageDao implements Dao<Message, Integer> {
     public void save(Message message) {
         String query;
         if (message.getId() != null) {
-            query = "UPDATE messages SET content=':content:', sent_date=':sentDate:', \"type\"=:messageType:" +
-                    "sender_id=:senderId:, receiver_id=:receiverId:, fwd_user_id=:fwdUserId:, sent=:sent: WHERE id=" + message.getId();
+            query = "UPDATE messages SET content=':content:', sent_date=':sentDate:', type=:messageType:" +
+                    ", sender_id=:senderId:, receiver_id=:receiverId:, fwd_user_id=:fwdUserId:, sent=:sent: WHERE id=" + message.getId();
         } else {
             query = "INSERT INTO messages VALUES(DEFAULT, ':content:', ':sentDate:', :messageType:, :senderId:, :receiverId:" +
                     ", :fwdUserId:, :sent:)";
