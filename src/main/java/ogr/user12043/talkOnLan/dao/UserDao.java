@@ -5,7 +5,6 @@ import ogr.user12043.talkOnLan.util.DBUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -17,18 +16,19 @@ import java.util.Set;
  */
 public class UserDao implements Dao<User, Integer> {
     private static final Logger LOGGER = LogManager.getLogger();
+    private static UserDao instance;
     private final DBConnection db;
 
-    public UserDao() {
-        DBConnection db = null;
-        try {
-            db = DBConnection.get();
-        } catch (Exception e) {
-            LOGGER.error("Could not connect to database!", e);
-            JOptionPane.showMessageDialog(null, "Could not connect to database!\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            System.exit(1);
+    private UserDao() {
+        db = DBConnection.get();
+    }
+
+    public static UserDao get() {
+        if (instance == null) {
+            instance = new UserDao();
         }
-        this.db = db;
+
+        return instance;
     }
 
     @Override

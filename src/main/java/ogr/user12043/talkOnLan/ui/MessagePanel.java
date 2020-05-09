@@ -1,18 +1,21 @@
 package ogr.user12043.talkOnLan.ui;
 
+import ogr.user12043.talkOnLan.dao.MessageDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.MessageService;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
+import ogr.user12043.talkOnLan.util.Utils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.net.InetAddress;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,7 +23,7 @@ import java.util.Set;
  * part of project: talk-onLan
  */
 class MessagePanel extends javax.swing.JDialog {
-
+    private static final Logger LOGGER = LogManager.getLogger();
     private final User user; // Remote user
     private final Set<User> participants;
     private int lineNumber;
@@ -52,6 +55,16 @@ class MessagePanel extends javax.swing.JDialog {
         }
         jProgressBar_sending.setVisible(false);
         jTextArea_content.requestFocusInWindow();
+        fetchMessages();
+    }
+
+    private void fetchMessages() {
+        if (user != null) {
+            List<Message> messages = MessageDao.get().findConversation(Utils.self(), user);
+            for (Message message : messages) {
+                addMessage(message, message.getSender().equals(Utils.self()));
+            }
+        }
     }
 
     User getUser() {
@@ -65,17 +78,23 @@ class MessagePanel extends javax.swing.JDialog {
         Message sendingMessage = new Message();
         sendingMessage.setContent(content);
         sendingMessage.setSentDate(new Date());
+        User sender = Utils.self();
         try {
             if (user != null) {
                 // Direct or connected room
                 sendingMessage.setMessageType(user.isRoom() ? Constants.MSG_TYPE_ROOM : Constants.MSG_TYPE_DIRECT);
-                MessageService.sendMessage(user, sendingMessage);
+                sendingMessage.setSender(sender);
+                sendingMessage.setReceiver(user);
+                MessageService.sendMessage(sendingMessage);
             } else {
                 // hosting a room
                 sendingMessage.setMessageType(Constants.MSG_TYPE_FWD);
-                sendingMessage.setSender(new User(Properties.username, InetAddress.getLocalHost(), true));
+                sender.setRoom(true);
+                sendingMessage.setSender(sender);
                 for (User participant : participants) {
-                    MessageService.sendMessage(participant, sendingMessage);
+                    Message forwardedMessage = sendingMessage.cloneMessage();
+                    forwardedMessage.setReceiver(participant);
+                    MessageService.sendMessage(forwardedMessage);
                 }
             }
             SwingUtilities.invokeLater(() -> {
@@ -84,8 +103,9 @@ class MessagePanel extends javax.swing.JDialog {
                 jTextArea_content.requestFocusInWindow();
                 setInputEnabled(true);
             });
-        } catch (IOException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Cannot send the message!", "ERROR", JOptionPane.ERROR_MESSAGE);
+            LOGGER.error("Cannot send the message!", e);
             SwingUtilities.invokeLater(() -> {
                 jTextArea_content.setText(sendingMessage.getContent());
                 setInputEnabled(true);
@@ -97,9 +117,6 @@ class MessagePanel extends javax.swing.JDialog {
         addMessage(message, false);
         if (message.getSender() != null) {
             participants.add(message.getSender());
-        }
-
-        try {
             if (message.getMessageType() == Constants.MSG_TYPE_ROOM) {
                 // forward message to all clients
                 message.setMessageType(Constants.MSG_TYPE_FWD);
@@ -107,11 +124,12 @@ class MessagePanel extends javax.swing.JDialog {
                 for (User participant : participants) {
                     // except sender
                     if (!participant.equals(message.getSender())) {
-                        MessageService.sendMessage(participant, message);
+                        Message clone = message.cloneMessage();
+                        clone.setReceiver(participant);
+                        MessageService.sendMessage(clone);
                     }
                 }
             }
-        } catch (IOException ignored) {
         }
     }
 
@@ -160,11 +178,6 @@ class MessagePanel extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationByPlatform(true);
         setMinimumSize(new java.awt.Dimension(300, 450));
-        addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
-                formComponentResized(evt);
-            }
-        });
 
         jTextArea_content.setLineWrap(true);
         jTextArea_content.setRows(5);
@@ -261,12 +274,4 @@ class MessagePanel extends javax.swing.JDialog {
             shiftPressed = false;
         }
     }//GEN-LAST:event_jTextArea_contentKeyReleased
-
-    private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        /*System.out.println("===================================================================================");
-        System.out.println("window: " + getSize() + " | " + getPreferredSize());
-        System.out.println("scroll pane: " + jScrollPane_dialogue.getSize() + " | " + jScrollPane_dialogue.getPreferredSize());
-        System.out.println("panel: " + jPanel_dialogue.getSize() + " | " + jPanel_dialogue.getPreferredSize());
-        System.out.println("===================================================================================");*/
-    }//GEN-LAST:event_formComponentResized
 }

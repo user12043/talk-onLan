@@ -68,7 +68,6 @@ public class DiscoveryService {
         if (index != -1) {
             user.setUsername(receivedData.substring(index + 1));
         }
-        Utils.addUser(user);
         SwingUtilities.invokeLater(() -> MainUI.getUI().addUser(user));
     }
 

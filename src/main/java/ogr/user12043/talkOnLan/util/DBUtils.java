@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -30,7 +31,7 @@ public class DBUtils {
         return user;
     }
 
-    public static Message resultSetToMessage(ResultSet resultSet) throws SQLException {
+    public static Message resultSetToMessage(ResultSet resultSet) throws SQLException, ParseException {
         Message message = new Message();
         message.setId(resultSet.getInt("id"));
         message.setContent(resultSet.getString("content"));

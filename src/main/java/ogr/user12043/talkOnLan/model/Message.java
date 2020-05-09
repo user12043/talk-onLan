@@ -9,6 +9,7 @@ import java.util.Date;
 public class Message {
     private Integer id;
     private User sender;
+    private User receiver;
     private String content;
     private Date sentDate;
     private int messageType;
@@ -19,12 +20,21 @@ public class Message {
         this.forwardedFrom = new User();
     }
 
-    public Message(User sender, String content, Date sentDate, int messageType) {
+    public Message(User sender, User receiver, String content, Date sentDate, int messageType) {
         this.sender = sender;
+        this.receiver = receiver;
         this.content = content;
         this.sentDate = sentDate;
         this.messageType = messageType;
         this.forwardedFrom = new User();
+    }
+
+    public Message cloneMessage() {
+        Message message = new Message(getSender(), getReceiver(), getContent(), getSentDate(), getMessageType());
+        message.setSent(isSent());
+        message.setForwardedFrom(getForwardedFrom());
+        message.setId(getId());
+        return message;
     }
 
     public Integer getId() {
@@ -41,6 +51,14 @@ public class Message {
 
     public void setSender(User sender) {
         this.sender = sender;
+    }
+
+    public User getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
     }
 
     public String getContent() {

@@ -1,7 +1,11 @@
 package ogr.user12043.talkOnLan.dao;
 
+import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Properties;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import javax.swing.*;
 import java.sql.*;
 
 /**
@@ -9,6 +13,7 @@ import java.sql.*;
  * part of project: talk-onLan
  */
 public class DBConnection {
+    private static final Logger LOGGER = LogManager.getLogger();
     private static DBConnection instance;
     private final Connection connection;
     private Statement statement;
@@ -17,9 +22,15 @@ public class DBConnection {
         connection = DriverManager.getConnection(Properties.databaseUrl, Properties.databaseUsername, Properties.databasePassword);
     }
 
-    public static DBConnection get() throws SQLException {
+    public static DBConnection get() {
         if (instance == null) {
-            instance = new DBConnection();
+            try {
+                instance = new DBConnection();
+            } catch (Exception e) {
+                LOGGER.error("Could not connect to database!", e);
+                JOptionPane.showMessageDialog(MainUI.getUI(), "Could not connect to database!", "Error", JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
+            }
         }
         return instance;
     }
@@ -42,5 +53,9 @@ public class DBConnection {
 
     public void close() throws SQLException {
         connection.close();
+    }
+
+    public Statement createStatement() throws SQLException {
+        return connection.createStatement();
     }
 }

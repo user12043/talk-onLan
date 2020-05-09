@@ -1,10 +1,12 @@
 package ogr.user12043.talkOnLan.ui;
 
 import ogr.user12043.talkOnLan.dao.DBConnection;
+import ogr.user12043.talkOnLan.dao.MessageDao;
 import ogr.user12043.talkOnLan.dao.UserDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.DiscoveryService;
+import ogr.user12043.talkOnLan.net.MessageService;
 import ogr.user12043.talkOnLan.net.NetworkService;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
@@ -33,7 +35,6 @@ public class MainUI extends javax.swing.JFrame {
     private final MessagePanel roomMessagePanel;
     private final JDialog loadingDialog;
     private final int discoveryStartEndWait = 1000;
-    private final UserDao userDao;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private ogr.user12043.talkOnLan.ui.BuddiesPanel buddiesPanel;
     private javax.swing.JButton jButton_addManually;
@@ -57,7 +58,6 @@ public class MainUI extends javax.swing.JFrame {
         loadingDialog = createLoadingDialog();
         initializeGlassPane();
         roomMessagePanel = new MessagePanel(this, null);
-        userDao = new UserDao();
     }
 
     /**
@@ -142,6 +142,7 @@ public class MainUI extends javax.swing.JFrame {
         } else return;
         messagePanel.setVisible(true);
         messagePanel.receiveMessage(message);
+        MessageDao.get().save(message);
     }
 
     /**
@@ -185,17 +186,27 @@ public class MainUI extends javax.swing.JFrame {
     }
 
     public void addUser(User user) {
+        // check database and add if not exists
+        User existing = UserDao.get().findByFields(user);
+        if (existing == null) {
+            UserDao.get().save(user);
+        }
+
+        user = UserDao.get().findByFields(user);
+        Utils.addUser(user);
+
         if (user.isRoom()) {
             roomsPanel.addBuddy(user);
         } else {
             buddiesPanel.addBuddy(user);
         }
-        // check database and add if not exists
-        User existing = userDao.findByFields(user);
-        if (existing == null) {
-            userDao.save(user);
-        }
         pack();
+
+        // retrieve this user's messages and send unsent ones
+        Set<Message> messages = MessageDao.get().findUnsentByReceiver(user);
+        for (Message message : messages) {
+            MessageService.sendMessage(message);
+        }
     }
 
     /**
@@ -500,7 +511,7 @@ public class MainUI extends javax.swing.JFrame {
             room.setAddress(InetAddress.getLocalHost());
             room.setRoom(true);
             Utils.rooms.add(room);
-            roomMessagePanel.receiveMessage(new Message(null, "You just started a room!", new Date(), Constants.MSG_TYPE_ROOM));
+            roomMessagePanel.receiveMessage(new Message(null, null, "You just started a room!", new Date(), Constants.MSG_TYPE_ROOM));
             roomMessagePanel.setVisible(true);
             jButton_hostRoom.setEnabled(false);
             jButton_stopRoom.setEnabled(true);

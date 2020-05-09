@@ -1,5 +1,6 @@
 package ogr.user12043.talkOnLan.util;
 
+import ogr.user12043.talkOnLan.dao.UserDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.ui.MainUI;
@@ -7,10 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
-import java.net.InetAddress;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
+import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -27,6 +25,7 @@ public class Utils {
     public static final Set<User> roomClients = new HashSet<>(); // users connected the room while hosting room
     private static final Logger LOGGER = LogManager.getLogger(Constants.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy"); // Date display format date on ui
+    private static User self;
 
     /**
      * Detects network hardware and sets into {@link Utils#networkInterfaces}
@@ -157,5 +156,28 @@ public class Utils {
         } else {
             buddies.add(user);
         }
+    }
+
+    public static User self() {
+        try {
+            if (self == null) {
+                self = new User(Properties.username, InetAddress.getLocalHost(), false);
+            }
+            return self;
+        } catch (UnknownHostException e) {
+            LOGGER.error(e);
+            System.exit(1);
+        }
+        return new User();
+    }
+
+    public static void saveSelf() {
+        // create self user if not exists
+        User existing = UserDao.get().findByFields(self());
+        if (existing == null) {
+            UserDao.get().save(self());
+            existing = UserDao.get().findByFields(self());
+        }
+        self = existing;
     }
 }

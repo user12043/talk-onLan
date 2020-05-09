@@ -26,7 +26,7 @@ class BuddyPanel extends javax.swing.JPanel {
     BuddyPanel(User user) {
         initComponents();
         this.user = user;
-        jLabel_info.setText(user.getUsername() + " on " + user.getAddress().toString().replace("/", ""));
+        jLabel_info.setText(user.getUsername() + " on " + user.getAddress().getHostAddress());
         if (user.isRoom()) {
             jButton_file.setEnabled(false);
             jButton_file.setVisible(false);
