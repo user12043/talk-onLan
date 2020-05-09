@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
@@ -27,14 +28,15 @@ public class MessageService {
     public static void sendMessage(Message message) {
         LOGGER.debug((message.getMessageType() != 0) ? "Room message" : "Message" + " sending to " + message.getReceiver().getAddress());
         try {
-            Socket socket = new Socket(message.getReceiver().getAddress(), Constants.RECEIVE_PORT);
-            socket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+//            Socket socket = new Socket(message.getReceiver().getAddress(), Constants.RECEIVE_PORT);
+            Socket socket = new Socket();
+            InetSocketAddress address = new InetSocketAddress(message.getReceiver().getAddress(), Constants.RECEIVE_PORT);
+            socket.connect(address, Constants.RECEIVE_TIMEOUT);
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             outputStream.writeUTF(Utils.generateMessage(message));
             socket.close();
             message.setSent(true);
-        } catch (IOException e) {
-            return;
+        } catch (IOException ignored) {
         }
         MessageDao.get().save(message);
     }

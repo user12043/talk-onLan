@@ -7,7 +7,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -32,7 +34,7 @@ public class UserDao implements Dao<User, Integer> {
     }
 
     @Override
-    public Set<User> find() {
+    public List<User> find() {
         {
             String query = "SELECT * FROM users";
             Set<User> users = new HashSet<>();
@@ -44,7 +46,7 @@ public class UserDao implements Dao<User, Integer> {
                     users.add(user);
                 }
                 db.closeStatement();
-                return users;
+                return new ArrayList<>(users);
             } catch (SQLException e) {
                 LOGGER.error(e);
             }

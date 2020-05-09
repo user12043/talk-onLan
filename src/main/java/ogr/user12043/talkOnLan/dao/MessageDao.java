@@ -10,11 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * Created by user12043 on 9.05.2020 - 09:41
@@ -38,7 +34,7 @@ public class MessageDao implements Dao<Message, Integer> {
     }
 
     @Override
-    public Set<Message> find() {
+    public List<Message> find() {
         String query = "SELECT * FROM messages";
         return getMessages(query);
     }
@@ -114,19 +110,16 @@ public class MessageDao implements Dao<Message, Integer> {
         String query = "SELECT * FROM messages WHERE (sender_id=" + sender.getId() + " AND receiver_id="
                 + receiver.getId() + ") OR (sender_id=" + receiver.getId() + " AND receiver_id=" + sender.getId()
                 + ") ORDER BY sent_date";
-        Set<Message> messages = getMessages(query);
-        List<Message> list = messages.stream().collect(Collectors.toList());
-        list.sort(Comparator.comparing(Message::getSentDate));
-        return list;
+        return getMessages(query);
     }
 
-    public Set<Message> findUnsentByReceiver(User user) {
+    public List<Message> findUnsentByReceiver(User user) {
         String query = "SELECT * FROM messages WHERE sent=false AND receiver_id=" + user.getId() +
                 " ORDER BY sent_date";
         return getMessages(query);
     }
 
-    private Set<Message> getMessages(String query) {
+    private List<Message> getMessages(String query) {
         Set<Message> messages = new HashSet<>();
         try {
             db.openStatement();
@@ -137,7 +130,9 @@ public class MessageDao implements Dao<Message, Integer> {
                 messages.add(message);
             }
             db.closeStatement();
-            return messages;
+            List<Message> list = new ArrayList<>(messages);
+            list.sort(Comparator.comparing(Message::getSentDate));
+            return list;
         } catch (SQLException | ParseException e) {
             LOGGER.error(e);
         }
