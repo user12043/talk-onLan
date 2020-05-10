@@ -5,7 +5,6 @@ import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.MessageService;
 import ogr.user12043.talkOnLan.util.Constants;
-import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,11 +47,7 @@ class MessagePanel extends javax.swing.JDialog {
         lineNumber = 0;
         this.user = user;
         participants = new HashSet<>();
-        if (!user.equals(Utils.selfRoom())) {
-            setTitle(user.isRoom() ? "Room of " + user.getUsername() : user.getUsername() + " on " + user.getAddress());
-        } else {
-            setTitle("Room of " + Properties.username);
-        }
+        setTitle((user.isRoom() ? "Room of " + user.getUsername() : user.getUsername()) + " on " + user.getAddress());
         jProgressBar_sending.setVisible(false);
         jTextArea_content.requestFocusInWindow();
         fetchMessages();
@@ -60,7 +55,9 @@ class MessagePanel extends javax.swing.JDialog {
 
     private void fetchMessages() {
         List<Message> messages;
-        if (user.isRoom()) {
+        if (user.equals(Utils.selfRoom())) {
+            messages = MessageDao.get().findSelfRoomConversation();
+        } else if (user.isRoom()) {
             messages = MessageDao.get().findRoomConversation(user);
         } else {
             messages = MessageDao.get().findConversation(Utils.self(), user);
@@ -81,18 +78,22 @@ class MessagePanel extends javax.swing.JDialog {
         Message sendingMessage = new Message();
         sendingMessage.setContent(content);
         sendingMessage.setSentDate(new Date());
-        User sender = Utils.self();
+        sendingMessage.setSender(Utils.self());
         try {
             if (!user.equals(Utils.selfRoom())) {
                 // Direct or connected room
                 sendingMessage.setMessageType(user.isRoom() ? Constants.MSG_TYPE_ROOM : Constants.MSG_TYPE_DIRECT);
-                sendingMessage.setSender(sender);
                 sendingMessage.setReceiver(user);
                 MessageService.sendMessage(sendingMessage);
             } else {
                 // hosting a room
                 sendingMessage.setMessageType(Constants.MSG_TYPE_FWD);
-                sendingMessage.setSender(sender);
+                // send a clone for self
+                Message selfMessage = sendingMessage.cloneMessage();
+                selfMessage.setReceiver(Utils.selfRoom());
+                selfMessage.setMessageType(Constants.MSG_TYPE_ROOM);
+                MessageService.sendMessage(selfMessage);
+                // send to participants
                 for (User participant : participants) {
                     Message forwardedMessage = sendingMessage.cloneMessage();
                     forwardedMessage.setReceiver(participant);

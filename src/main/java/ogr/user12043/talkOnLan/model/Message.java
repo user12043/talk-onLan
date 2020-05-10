@@ -33,7 +33,6 @@ public class Message {
         Message message = new Message(getSender(), getReceiver(), getContent(), getSentDate(), getMessageType());
         message.setSent(isSent());
         message.setForwardedFrom(getForwardedFrom());
-        message.setId(getId());
         return message;
     }
 

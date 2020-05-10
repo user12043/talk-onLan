@@ -133,15 +133,11 @@ public class MainUI extends javax.swing.JFrame {
      */
     public void receiveMessage(Message message) {
         MessagePanel messagePanel;
-        if (message.getMessageType() == Constants.MSG_TYPE_DIRECT) {
-            messagePanel = getMessagePanelOfUser(message.getSender());
-        } else if (message.getMessageType() == Constants.MSG_TYPE_ROOM) {
+        if (message.getMessageType() == Constants.MSG_TYPE_ROOM) {
             messagePanel = roomMessagePanel;
-        } else if (message.getMessageType() == Constants.MSG_TYPE_FWD) {
-            User room = Utils.findRoom(message.getSender().getAddress());
-            messagePanel = getMessagePanelOfUser(room);
-            message.setSender(room);
-        } else return;
+        } else {
+            messagePanel = getMessagePanelOfUser(message.getSender());
+        }
         messagePanel.setVisible(true);
         messagePanel.receiveMessage(message);
         MessageDao.get().save(message);

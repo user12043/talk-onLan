@@ -37,6 +37,7 @@ public class MessageService {
             socket.close();
             message.setSent(true);
         } catch (IOException ignored) {
+            message.setSent(false);
         }
         MessageDao.get().save(message);
     }

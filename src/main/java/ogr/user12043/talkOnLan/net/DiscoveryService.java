@@ -31,12 +31,12 @@ public class DiscoveryService {
 
     public static void sendDiscoveryRequest(InetAddress address) throws IOException {
         sendRequest(address, Constants.DISCOVERY_COMMAND_REQUEST.getBytes());
-//        LOGGER.debug("Discovery request sent to " + address);
+        LOGGER.debug("Discovery request sent to " + address);
     }
 
     public static void sendDiscoveryRequestRoom(InetAddress address) throws IOException {
         sendRequest(address, Constants.DISCOVERY_COMMAND_REQUEST_ROOM.getBytes());
-//        LOGGER.debug("Room discovery request sent to " + address);
+        LOGGER.debug("Room discovery request sent to " + address);
     }
 
     static void sendDiscoveryResponse(InetAddress receiveAddress, boolean isRoom) throws IOException {

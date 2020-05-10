@@ -72,8 +72,6 @@ public class User {
     }
 
     public User cloneUser() {
-        User user = new User(getUsername(), getAddress(), isRoom());
-        user.setId(getId());
-        return user;
+        return new User(getUsername(), getAddress(), isRoom());
     }
 }

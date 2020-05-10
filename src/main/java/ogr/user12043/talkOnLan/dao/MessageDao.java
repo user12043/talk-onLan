@@ -116,11 +116,21 @@ public class MessageDao implements Dao<Message, Integer> {
     }
 
     public List<Message> findRoomConversation(User room) {
-        String query = "SELECT * FROM messages WHERE (type=:messageType: AND sender_id=:roomId:) " +
-                "OR (sender_id=:selfId: AND receiver_id=:roomId:)";
-        query = query.replace(":messageType:", String.valueOf(Constants.MSG_TYPE_FWD));
+        String query = "SELECT * FROM messages WHERE (type=:fwdMessageType: AND sender_id=:roomId:) " +
+                "OR (type=:roomMessageType: AND sender_id=:selfId: AND receiver_id=:roomId:)";
+        query = query.replace(":fwdMessageType:", String.valueOf(Constants.MSG_TYPE_FWD));
+        query = query.replace(":roomMessageType:", String.valueOf(Constants.MSG_TYPE_ROOM));
         query = query.replace(":roomId:", String.valueOf(room.getId()));
         query = query.replace(":selfId:", String.valueOf(Utils.self().getId()));
+        return getMessages(query);
+    }
+
+    public List<Message> findSelfRoomConversation() {
+        String query = "SELECT * FROM messages WHERE (type=:roomMessageType: AND receiver_id=:roomId:)" +
+                "OR (type=:fwdMessageType: AND receiver_id=:roomId:)";
+        query = query.replace(":roomMessageType:", String.valueOf(Constants.MSG_TYPE_ROOM));
+        query = query.replace(":fwdMessageType:", String.valueOf(Constants.MSG_TYPE_FWD));
+        query = query.replace(":roomId:", String.valueOf(Utils.selfRoom().getId()));
         return getMessages(query);
     }
 

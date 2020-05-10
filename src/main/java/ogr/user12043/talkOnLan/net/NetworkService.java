@@ -9,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.*;
-import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -163,8 +162,12 @@ public class NetworkService {
     private static void send() throws IOException {
         // First send to generic broadcast address
         InetAddress broadcastAll = InetAddress.getByName("255.255.255.255");
-        DiscoveryService.sendDiscoveryRequest(broadcastAll);
-        DiscoveryService.sendDiscoveryRequestRoom(broadcastAll);
+        try {
+            DiscoveryService.sendDiscoveryRequest(broadcastAll);
+            DiscoveryService.sendDiscoveryRequestRoom(broadcastAll);
+        } catch (IOException e) {
+            LOGGER.error("Discovery send error to " + broadcastAll + " - " + e.getLocalizedMessage());
+        }
 
         //<editor-fold desc="Broadcast the message over all the network interfaces" defaultstate=collapsed>
         for (NetworkInterface networkInterface : Utils.networkInterfaces) {
@@ -175,8 +178,12 @@ public class NetworkService {
                         continue;
                     }
                     // Send the broadcast package!
-                    DiscoveryService.sendDiscoveryRequest(broadcastAddress);
-                    DiscoveryService.sendDiscoveryRequestRoom(broadcastAddress);
+                    try {
+                        DiscoveryService.sendDiscoveryRequest(broadcastAddress);
+                        DiscoveryService.sendDiscoveryRequestRoom(broadcastAddress);
+                    } catch (IOException e) {
+                        LOGGER.error("Discovery send error to " + broadcastAddress + " - " + e.getLocalizedMessage());
+                    }
                 }
 
                 // If interface is got up after program start, its host address will be added.
@@ -235,7 +242,7 @@ public class NetworkService {
             try {
                 send();
             } catch (Exception e) {
-                LOGGER.error("Error on send() " + Arrays.toString(e.getStackTrace()));
+                LOGGER.error("Error on send() " + e);
             }
         };
 
