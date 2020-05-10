@@ -5,6 +5,7 @@ import ogr.user12043.talkOnLan.util.DBUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.net.InetAddress;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -116,6 +117,20 @@ public class UserDao implements Dao<User, Integer> {
         query = query.replace(":username:", user.getUsername());
         query = query.replace(":address:", user.getAddress().getHostAddress());
         query = query.replace(":isRoom:", String.valueOf(user.isRoom()));
+        return getUser(query);
+    }
+
+    public User findByAddress(InetAddress address, boolean isRoom) {
+        String query = "SELECT * FROM users WHERE address='" + address.getHostAddress() + "' AND is_room=" + isRoom;
+        return getUser(query);
+    }
+
+    public User findByUsername(String username) {
+        String query = "SELECT * FROM users WHERE username='" + username + "' AND is_room=false";
+        return getUser(query);
+    }
+
+    private User getUser(String query) {
         try {
             db.openStatement();
             ResultSet resultSet = db.executeSelectQuery(query);

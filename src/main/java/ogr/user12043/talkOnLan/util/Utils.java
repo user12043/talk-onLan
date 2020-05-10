@@ -114,22 +114,17 @@ public class Utils {
 
     public static User findBuddy(InetAddress inetAddress) {
         Optional<User> first = buddies.stream().filter(user -> user.getAddress().equals(inetAddress)).findFirst();
-        return first.orElse(null);
+        return first.orElseGet(() -> UserDao.get().findByAddress(inetAddress, false));
     }
 
     private static User findBuddyByUsername(String username) {
         Optional<User> first = buddies.stream().filter(user -> user.getUsername().equals(username)).findFirst();
-        return first.orElse(null);
+        return first.orElseGet(() -> UserDao.get().findByUsername(username));
     }
 
     public static User findRoom(InetAddress inetAddress) {
         Optional<User> first = rooms.stream().filter(user -> user.getAddress().equals(inetAddress)).findFirst();
-        return first.orElse(null);
-    }
-
-    public static User findRoomByUsername(String username) {
-        Optional<User> first = rooms.stream().filter(user -> user.getUsername().equals(username)).findFirst();
-        return first.orElse(null);
+        return first.orElseGet(() -> UserDao.get().findByAddress(inetAddress, true));
     }
 
     public static String generateMessage(Message message) {
