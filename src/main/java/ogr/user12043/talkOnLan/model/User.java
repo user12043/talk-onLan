@@ -70,4 +70,10 @@ public class User {
     public int hashCode() {
         return Objects.hash(username, address);
     }
+
+    public User cloneUser() {
+        User user = new User(getUsername(), getAddress(), isRoom());
+        user.setId(getId());
+        return user;
+    }
 }

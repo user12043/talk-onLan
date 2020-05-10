@@ -40,7 +40,7 @@ class MessagePanel extends javax.swing.JDialog {
      * Creates new form MessagePanel
      *
      * @param parent parent frame
-     * @param user   remote user (null for self room hosting)
+     * @param user   remote user
      */
     MessagePanel(Frame parent, User user) {
         super(parent, false);
@@ -48,7 +48,7 @@ class MessagePanel extends javax.swing.JDialog {
         lineNumber = 0;
         this.user = user;
         participants = new HashSet<>();
-        if (user != null) {
+        if (!user.equals(Utils.selfRoom())) {
             setTitle(user.isRoom() ? "Room of " + user.getUsername() : user.getUsername() + " on " + user.getAddress());
         } else {
             setTitle("Room of " + Properties.username);
@@ -59,11 +59,14 @@ class MessagePanel extends javax.swing.JDialog {
     }
 
     private void fetchMessages() {
-        if (user != null) {
-            List<Message> messages = MessageDao.get().findConversation(Utils.self(), user);
-            for (Message message : messages) {
-                addMessage(message, message.getSender().equals(Utils.self()));
-            }
+        List<Message> messages;
+        if (user.isRoom()) {
+            messages = MessageDao.get().findRoomConversation(user);
+        } else {
+            messages = MessageDao.get().findConversation(Utils.self(), user);
+        }
+        for (Message message : messages) {
+            addMessage(message, message.getSender().equals(Utils.self()));
         }
     }
 
@@ -80,7 +83,7 @@ class MessagePanel extends javax.swing.JDialog {
         sendingMessage.setSentDate(new Date());
         User sender = Utils.self();
         try {
-            if (user != null) {
+            if (!user.equals(Utils.selfRoom())) {
                 // Direct or connected room
                 sendingMessage.setMessageType(user.isRoom() ? Constants.MSG_TYPE_ROOM : Constants.MSG_TYPE_DIRECT);
                 sendingMessage.setSender(sender);
@@ -89,7 +92,6 @@ class MessagePanel extends javax.swing.JDialog {
             } else {
                 // hosting a room
                 sendingMessage.setMessageType(Constants.MSG_TYPE_FWD);
-                sender.setRoom(true);
                 sendingMessage.setSender(sender);
                 for (User participant : participants) {
                     Message forwardedMessage = sendingMessage.cloneMessage();

@@ -28,6 +28,7 @@ public class Main {
 
             DBConnection.get(); // init database connection
             Utils.saveSelf();
+            Utils.saveSelfRoom();
 
             Utils.initInterfaces();
             SwingUtilities.invokeLater(() -> MainUI.getUI().setVisible(true)); // display main ui

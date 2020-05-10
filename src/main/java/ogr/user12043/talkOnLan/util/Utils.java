@@ -26,6 +26,7 @@ public class Utils {
     private static final Logger LOGGER = LogManager.getLogger(Constants.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy"); // Date display format date on ui
     private static User self;
+    private static User selfRoom;
 
     /**
      * Detects network hardware and sets into {@link Utils#networkInterfaces}
@@ -140,13 +141,19 @@ public class Utils {
                 Constants.COMMAND_SEPARATOR, message.getForwardedFrom().getUsername());
     }
 
-    public static Message parseMessage(String content) {
+    public static Message parseMessage(String content, InetAddress senderAddress) {
         String[] split = Pattern.compile(String.valueOf(Constants.COMMAND_SEPARATOR), Pattern.LITERAL).split(content);
         Message message = new Message();
         message.setContent(split[0]);
         message.setSentDate(new Date(Long.parseLong(split[1])));
         message.setMessageType(Integer.parseInt(split[2]));
         message.setForwardedFrom(findBuddyByUsername(split[3]));
+        User user = message.getMessageType() != Constants.MSG_TYPE_FWD ? findBuddy(senderAddress)
+                : findRoom(senderAddress);
+        message.setSender(user);
+        message.setReceiver(message.getMessageType() != Constants.MSG_TYPE_ROOM ? Utils.self() : Utils.selfRoom());
+        message.setSent(true);
+
         return message;
     }
 
@@ -171,6 +178,15 @@ public class Utils {
         return new User();
     }
 
+    public static User selfRoom() {
+        if (selfRoom == null) {
+            User self = self();
+            selfRoom = self.cloneUser();
+            selfRoom.setRoom(true);
+        }
+        return selfRoom;
+    }
+
     public static void saveSelf() {
         // create self user if not exists
         User existing = UserDao.get().findByFields(self());
@@ -179,5 +195,15 @@ public class Utils {
             existing = UserDao.get().findByFields(self());
         }
         self = existing;
+    }
+
+    public static void saveSelfRoom() {
+        // create self user if not exists
+        User existing = UserDao.get().findByFields(selfRoom());
+        if (existing == null) {
+            UserDao.get().save(selfRoom());
+            existing = UserDao.get().findByFields(selfRoom());
+        }
+        selfRoom = existing;
     }
 }

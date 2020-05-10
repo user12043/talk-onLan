@@ -58,7 +58,7 @@ public class MainUI extends javax.swing.JFrame {
         messagePanels = new HashSet<>();
         loadingDialog = createLoadingDialog();
         initializeGlassPane();
-        roomMessagePanel = new MessagePanel(this, null);
+        roomMessagePanel = new MessagePanel(this, Utils.selfRoom());
     }
 
     /**
@@ -133,13 +133,14 @@ public class MainUI extends javax.swing.JFrame {
      */
     public void receiveMessage(Message message) {
         MessagePanel messagePanel;
-        if (message.getMessageType() == 0) {
+        if (message.getMessageType() == Constants.MSG_TYPE_DIRECT) {
             messagePanel = getMessagePanelOfUser(message.getSender());
-        } else if (message.getMessageType() == 1) {
+        } else if (message.getMessageType() == Constants.MSG_TYPE_ROOM) {
             messagePanel = roomMessagePanel;
-        } else if (message.getMessageType() == 2) {
+        } else if (message.getMessageType() == Constants.MSG_TYPE_FWD) {
             User room = Utils.findRoom(message.getSender().getAddress());
             messagePanel = getMessagePanelOfUser(room);
+            message.setSender(room);
         } else return;
         messagePanel.setVisible(true);
         messagePanel.receiveMessage(message);
@@ -507,16 +508,15 @@ public class MainUI extends javax.swing.JFrame {
     private void jButton_hostRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hostRoomActionPerformed
         try {
             Properties.roomMode = true;
-            User room = new User();
-            room.setUsername(Properties.username);
-            room.setAddress(InetAddress.getLocalHost());
+            User self = Utils.self();
+            User room = self.cloneUser();
             room.setRoom(true);
             Utils.rooms.add(room);
             roomMessagePanel.receiveMessage(new Message(null, null, "You just started a room!", new Date(), Constants.MSG_TYPE_ROOM));
             roomMessagePanel.setVisible(true);
             jButton_hostRoom.setEnabled(false);
             jButton_stopRoom.setEnabled(true);
-        } catch (IOException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error occurred while making room!", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButton_hostRoomActionPerformed
@@ -524,6 +524,7 @@ public class MainUI extends javax.swing.JFrame {
     private void jButton_stopRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_stopRoomActionPerformed
         Properties.roomMode = false;
         jButton_hostRoom.setEnabled(true);
+        jButton_stopRoom.setEnabled(false);
     }//GEN-LAST:event_jButton_stopRoomActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing

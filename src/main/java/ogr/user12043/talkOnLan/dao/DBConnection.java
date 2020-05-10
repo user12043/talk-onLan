@@ -1,6 +1,5 @@
 package ogr.user12043.talkOnLan.dao;
 
-import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +27,7 @@ public class DBConnection {
                 instance = new DBConnection();
             } catch (Exception e) {
                 LOGGER.error("Could not connect to database!", e);
-                JOptionPane.showMessageDialog(MainUI.getUI(), "Could not connect to database!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Could not connect to database!", "talk-onLan", JOptionPane.ERROR_MESSAGE);
                 System.exit(1);
             }
         }

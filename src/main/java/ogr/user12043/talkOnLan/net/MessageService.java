@@ -2,7 +2,6 @@ package ogr.user12043.talkOnLan.net;
 
 import ogr.user12043.talkOnLan.dao.MessageDao;
 import ogr.user12043.talkOnLan.model.Message;
-import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Utils;
@@ -26,7 +25,8 @@ public class MessageService {
     private static final Logger LOGGER = LogManager.getLogger(MessageService.class);
 
     public static void sendMessage(Message message) {
-        LOGGER.debug((message.getMessageType() != 0) ? "Room message" : "Message" + " sending to " + message.getReceiver().getAddress());
+        LOGGER.debug((message.getMessageType() != Constants.MSG_TYPE_DIRECT ? "Room message"
+                : "Message") + " sending to " + message.getReceiver().getAddress());
         try {
 //            Socket socket = new Socket(message.getReceiver().getAddress(), Constants.RECEIVE_PORT);
             Socket socket = new Socket();
@@ -42,13 +42,9 @@ public class MessageService {
     }
 
     static void receiveMessage(InetAddress senderAddress, String receivedData) {
-        Message message = Utils.parseMessage(receivedData);
+        Message message = Utils.parseMessage(receivedData, senderAddress);
         LOGGER.debug((message.getMessageType() != 0 ? "Room message" : "Message") + " received from " + senderAddress);
-        User user = Utils.findBuddy(senderAddress);
-        message.setSender(user);
-        message.setReceiver(Utils.self());
-        message.setSent(true);
-        if (user != null) {
+        if (message.getSender() != null) {
             SwingUtilities.invokeLater(() -> MainUI.getUI().receiveMessage(message));
         }
     }

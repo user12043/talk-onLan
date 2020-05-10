@@ -2,7 +2,9 @@ package ogr.user12043.talkOnLan.dao;
 
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
+import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.DBUtils;
+import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -110,6 +112,15 @@ public class MessageDao implements Dao<Message, Integer> {
         String query = "SELECT * FROM messages WHERE (sender_id=" + sender.getId() + " AND receiver_id="
                 + receiver.getId() + ") OR (sender_id=" + receiver.getId() + " AND receiver_id=" + sender.getId()
                 + ") ORDER BY sent_date";
+        return getMessages(query);
+    }
+
+    public List<Message> findRoomConversation(User room) {
+        String query = "SELECT * FROM messages WHERE (type=:messageType: AND sender_id=:roomId:) " +
+                "OR (sender_id=:selfId: AND receiver_id=:roomId:)";
+        query = query.replace(":messageType:", String.valueOf(Constants.MSG_TYPE_FWD));
+        query = query.replace(":roomId:", String.valueOf(room.getId()));
+        query = query.replace(":selfId:", String.valueOf(Utils.self().getId()));
         return getMessages(query);
     }
 
