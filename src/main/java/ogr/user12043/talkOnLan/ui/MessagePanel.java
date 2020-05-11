@@ -31,7 +31,7 @@ class MessagePanel extends javax.swing.JDialog {
     private javax.swing.JButton jButton_send;
     private javax.swing.JPanel jPanel_dialogue;
     private javax.swing.JProgressBar jProgressBar_sending;
-    private javax.swing.JScrollPane jScrollPane_dialogue;
+    private javax.swing.JScrollPane jScrollPane_participants;
     private javax.swing.JTextArea jTextArea_content;
     // End of variables declaration//GEN-END:variables
 
@@ -44,6 +44,7 @@ class MessagePanel extends javax.swing.JDialog {
     MessagePanel(Frame parent, User user) {
         super(parent, false);
         initComponents();
+        jScrollPane_participants.setVisible(false);
         lineNumber = 0;
         this.user = user;
         participants = new HashSet<>();
@@ -174,9 +175,10 @@ class MessagePanel extends javax.swing.JDialog {
         javax.swing.JScrollPane jScrollPane_content = new javax.swing.JScrollPane();
         jTextArea_content = new javax.swing.JTextArea();
         jButton_send = new javax.swing.JButton();
-        jScrollPane_dialogue = new javax.swing.JScrollPane();
+        javax.swing.JScrollPane jScrollPane_dialogue = new javax.swing.JScrollPane();
         jPanel_dialogue = new javax.swing.JPanel();
         jProgressBar_sending = new javax.swing.JProgressBar();
+        jScrollPane_participants = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationByPlatform(true);
@@ -213,33 +215,38 @@ class MessagePanel extends javax.swing.JDialog {
 
         jProgressBar_sending.setIndeterminate(true);
 
+        jScrollPane_participants.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
+                                .addComponent(jScrollPane_participants, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jButton_send)
                                                 .addGap(185, 185, 185)
                                                 .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(0, 0, Short.MAX_VALUE))
-                                        .addComponent(jScrollPane_content)
-                                        .addComponent(jScrollPane_dialogue))
-                                .addContainerGap())
+                                                .addContainerGap())
+                                        .addComponent(jScrollPane_dialogue)
+                                        .addComponent(jScrollPane_content)))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jScrollPane_dialogue, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jScrollPane_content, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jButton_send)
-                                        .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(jScrollPane_dialogue, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                                                .addComponent(jScrollPane_content, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jButton_send)
+                                                        .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(jScrollPane_participants))
                                 .addContainerGap())
         );
 

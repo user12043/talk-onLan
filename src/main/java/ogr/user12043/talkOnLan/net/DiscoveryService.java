@@ -34,7 +34,7 @@ public class DiscoveryService {
         LOGGER.debug("Discovery request sent to " + address);
     }
 
-    public static void sendDiscoveryRequestRoom(InetAddress address) throws IOException {
+    static void sendDiscoveryRequestRoom(InetAddress address) throws IOException {
         sendRequest(address, Constants.DISCOVERY_COMMAND_REQUEST_ROOM.getBytes());
         LOGGER.debug("Room discovery request sent to " + address);
     }
@@ -54,12 +54,7 @@ public class DiscoveryService {
     }
 
     static void receiveDiscoveryResponse(InetAddress receiveAddress, String receivedData, boolean isRoom) {
-        // Ignore already discovered
-        if ((!isRoom && Utils.isDiscovered(receiveAddress)) || (isRoom && Utils.isDiscoveredRoom(receiveAddress))) {
-            return;
-        }
         LOGGER.debug((!isRoom ? "Discovery" : "Room discovery") + " response received from " + receiveAddress);
-
         User user = new User();
         user.setAddress(receiveAddress);
         user.setRoom(isRoom);
@@ -67,6 +62,11 @@ public class DiscoveryService {
         int index = receivedData.indexOf(Constants.COMMAND_SEPARATOR);
         if (index != -1) {
             user.setUsername(receivedData.substring(index + 1));
+        }
+        // Ignore already discovered
+        if (Utils.isDiscovered(user)) {
+            Utils.refreshUser(user);
+            return;
         }
         SwingUtilities.invokeLater(() -> MainUI.getUI().addUser(user));
     }

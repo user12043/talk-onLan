@@ -6,7 +6,6 @@ import ogr.user12043.talkOnLan.dao.UserDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.DiscoveryService;
-import ogr.user12043.talkOnLan.net.MessageService;
 import ogr.user12043.talkOnLan.net.NetworkService;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
@@ -59,6 +58,9 @@ public class MainUI extends javax.swing.JFrame {
         loadingDialog = createLoadingDialog();
         initializeGlassPane();
         roomMessagePanel = new MessagePanel(this, Utils.selfRoom());
+        addUsers();
+        pack();
+        jButton_startDiscovery.grabFocus();
     }
 
     /**
@@ -73,6 +75,15 @@ public class MainUI extends javax.swing.JFrame {
             mainUI = new MainUI();
         }
         return mainUI;
+    }
+
+    private void addUsers() {
+        List<User> users = UserDao.get().find();
+        users.forEach(user -> {
+            if (!user.equals(Utils.self()) && !user.equals(Utils.selfRoom())) {
+                addUser(user);
+            }
+        });
     }
 
     /**
@@ -199,12 +210,6 @@ public class MainUI extends javax.swing.JFrame {
             buddiesPanel.addBuddy(user);
         }
         pack();
-
-        // retrieve this user's messages and send unsent ones
-        List<Message> messages = MessageDao.get().findUnsentByReceiver(user);
-        for (Message message : messages) {
-            MessageService.sendMessage(message);
-        }
     }
 
     /**
@@ -325,21 +330,17 @@ public class MainUI extends javax.swing.JFrame {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addContainerGap()
                                                 .addComponent(jLabel_header)
                                                 .addGap(18, 18, Short.MAX_VALUE)
                                                 .addComponent(jLabel_theme)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(jComboBox_themes, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                                                .addContainerGap()
-                                                                .addComponent(jScrollPane_buddiesPanel))
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(layout.createSequentialGroup()
-                                                                .addGap(12, 12, 12)
                                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                                                         .addComponent(jButton_startDiscovery, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                                         .addComponent(jButton_hostRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -349,11 +350,12 @@ public class MainUI extends javax.swing.JFrame {
                                                                                 .addComponent(jButton_hardDiscovery)
                                                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                                                 .addComponent(jButton_addManually))
-                                                                        .addComponent(jButton_stopRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                                        .addComponent(jButton_stopRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                        .addComponent(jScrollPane_buddiesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(layout.createSequentialGroup()
-                                                                .addGap(0, 8, Short.MAX_VALUE)
+                                                                .addGap(0, 0, Short.MAX_VALUE)
                                                                 .addComponent(jButton_hostAddresses)
                                                                 .addGap(18, 18, 18)
                                                                 .addComponent(jButton_endDiscovery, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -381,7 +383,7 @@ public class MainUI extends javax.swing.JFrame {
                                         .addComponent(jButton_stopRoom))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane_roomsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane_roomsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
                                         .addComponent(jScrollPane_buddiesPanel))
                                 .addContainerGap())
         );
@@ -409,8 +411,8 @@ public class MainUI extends javax.swing.JFrame {
                 jButton_hostAddresses.setEnabled(true);
                 jButton_endDiscovery.setEnabled(true);
                 jButton_hostRoom.setEnabled(true);
-                buddiesPanel.setEnabled(true);
                 toggleLoading();
+                jButton_endDiscovery.grabFocus();
             }).start();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Unable to start discovery. Check network connectivity", "ERROR", JOptionPane.ERROR_MESSAGE);

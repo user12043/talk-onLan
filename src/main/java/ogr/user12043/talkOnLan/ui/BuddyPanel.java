@@ -1,11 +1,21 @@
 package ogr.user12043.talkOnLan.ui;
 
+import ogr.user12043.talkOnLan.dao.MessageDao;
+import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.FileTransferService;
+import ogr.user12043.talkOnLan.net.MessageService;
+import ogr.user12043.talkOnLan.net.NetworkService;
+import ogr.user12043.talkOnLan.util.Constants;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by user12043 on 31.07.2018 - 12:11
@@ -18,6 +28,7 @@ class BuddyPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButton_file;
     private javax.swing.JButton jButton_message;
     private javax.swing.JLabel jLabel_info;
+    private javax.swing.JTextField jTextField_status;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -31,6 +42,46 @@ class BuddyPanel extends javax.swing.JPanel {
             jButton_file.setEnabled(false);
             jButton_file.setVisible(false);
         }
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (NetworkService.isServiceUp()) {
+                    refresh();
+                }
+            }
+        }, 0, Constants.DISCOVERY_INTERVAL);
+    }
+
+    private void refresh() {
+        if (user.isOnline()) {
+            SwingUtilities.invokeLater(BuddyPanel.this::online);
+            // retrieve this user's messages and send unsent ones
+            List<Message> messages = MessageDao.get().findUnsentByReceiver(user);
+            for (Message message : messages) {
+                MessageService.sendMessage(message);
+            }
+        } else {
+            SwingUtilities.invokeLater(BuddyPanel.this::offline);
+        }
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void online() {
+        jTextField_status.setText("Online");
+        jTextField_status.setBackground(Color.GREEN);
+        jTextField_status.setBorder(new LineBorder(Color.GREEN));
+        jButton_file.setEnabled(true);
+    }
+
+    public void offline() {
+        jTextField_status.setText("Offline");
+        jTextField_status.setBackground(Color.RED);
+        jTextField_status.setBorder(new LineBorder(Color.RED));
+        jButton_file.setEnabled(false);
     }
 
     /**
@@ -56,6 +107,7 @@ class BuddyPanel extends javax.swing.JPanel {
         jLabel_info = new javax.swing.JLabel();
         jButton_message = new javax.swing.JButton();
         jButton_file = new javax.swing.JButton();
+        jTextField_status = new javax.swing.JTextField();
 
         setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
 
@@ -70,34 +122,48 @@ class BuddyPanel extends javax.swing.JPanel {
         });
 
         jButton_file.setText("File");
+        jButton_file.setEnabled(false);
         jButton_file.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton_fileActionPerformed(evt);
             }
         });
 
+        jTextField_status.setEditable(false);
+        jTextField_status.setBackground(java.awt.Color.red);
+        jTextField_status.setFont(jTextField_status.getFont().deriveFont(jTextField_status.getFont().getStyle() | java.awt.Font.BOLD, jTextField_status.getFont().getSize() - 3));
+        jTextField_status.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField_status.setText("Offline");
+        jTextField_status.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.red));
+        jTextField_status.setFocusable(false);
+        jTextField_status.setHighlighter(null);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel_info, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton_message)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton_file)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jTextField_status)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel_info, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                                                .addComponent(jButton_message)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jButton_file)))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
+                                .addComponent(jTextField_status, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel_info)
                                         .addComponent(jButton_message)
                                         .addComponent(jButton_file))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
     }//GEN-END:initComponents
 

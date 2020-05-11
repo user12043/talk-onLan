@@ -104,6 +104,14 @@ public class Utils {
         return "";
     }
 
+    public static boolean isDiscovered(User user) {
+        if (user.isRoom()) {
+            return rooms.stream().anyMatch(u -> u.equals(user));
+        } else {
+            return buddies.stream().anyMatch(u -> u.equals(user));
+        }
+    }
+
     public static boolean isDiscovered(InetAddress inetAddress) {
         return buddies.stream().anyMatch(user -> user.getAddress().equals(inetAddress));
     }
@@ -200,5 +208,13 @@ public class Utils {
             existing = UserDao.get().findByFields(selfRoom());
         }
         selfRoom = existing;
+    }
+
+    public static void refreshUser(User user) {
+        if (user.isRoom()) {
+            findRoom(user.getAddress()).setLastSeen(new Date());
+        } else {
+            findBuddy(user.getAddress()).setLastSeen(new Date());
+        }
     }
 }

@@ -27,7 +27,7 @@ public class NetworkService {
     private static DatagramSocket receiveSocket; // UDP socket for receive discovery
     private static ServerSocket messageReceiveSocket; // TCP socket for receiving messages
     private static ServerSocket fileReceiveSocket; // TCP socket for receiving files
-    private static boolean end; // Control field for threads. (To safely terminate)
+    private static boolean serviceUp; // Control field for threads. (To safely terminate)
 
     // network tasks
     private static ScheduledFuture<?> discoverySendTask;
@@ -235,7 +235,6 @@ public class NetworkService {
      */
     public static void start() throws IOException {
         initConnections();
-        end = false;
 
         // Create threads
         Runnable sendThread = () -> {
@@ -275,6 +274,7 @@ public class NetworkService {
         discoveryReceiveTask = service.scheduleWithFixedDelay(receiveThread, 0L, 300L, TimeUnit.MILLISECONDS);
         messageReceiveTask = service.scheduleWithFixedDelay(receiveMessageThread, 0L, 100L, TimeUnit.MILLISECONDS);
         fileReceiveTask = service.scheduleWithFixedDelay(receiveFileThread, 0L, 300L, TimeUnit.MILLISECONDS);
+        serviceUp = true;
     }
 
     public static void end() {
@@ -282,6 +282,7 @@ public class NetworkService {
         endTask(discoveryReceiveTask);
         endTask(messageReceiveTask);
         endTask(fileReceiveTask);
+        serviceUp = false;
     }
 
     private static void endTask(ScheduledFuture<?> task) {
@@ -290,4 +291,7 @@ public class NetworkService {
         }
     }
 
+    public static boolean isServiceUp() {
+        return serviceUp;
+    }
 }
