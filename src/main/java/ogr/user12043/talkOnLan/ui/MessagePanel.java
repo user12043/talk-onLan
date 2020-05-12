@@ -27,11 +27,15 @@ class MessagePanel extends javax.swing.JDialog {
     private final Set<User> participants;
     private int lineNumber;
     private boolean shiftPressed;
+    private boolean privateChat = false;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton_send;
+    private javax.swing.JLabel jLabel_participants;
+    private javax.swing.JList<User> jList_participants;
     private javax.swing.JPanel jPanel_dialogue;
     private javax.swing.JProgressBar jProgressBar_sending;
     private javax.swing.JScrollPane jScrollPane_participants;
+    private javax.swing.JSeparator jSeparator;
     private javax.swing.JTextArea jTextArea_content;
     // End of variables declaration//GEN-END:variables
 
@@ -41,17 +45,23 @@ class MessagePanel extends javax.swing.JDialog {
      * @param parent parent frame
      * @param user   remote user
      */
-    MessagePanel(Frame parent, User user) {
+    MessagePanel(Frame parent, User user, boolean isPrivate) {
         super(parent, false);
         initComponents();
-        jScrollPane_participants.setVisible(false);
         lineNumber = 0;
         this.user = user;
         participants = new HashSet<>();
-        setTitle((user.isRoom() ? "Room of " + user.getUsername() : user.getUsername()) + " on " + user.getAddress());
+        setTitle((user.isRoom() ? "Room of " + user.getUsername() : user.getUsername()) + " on " + user.getAddress() +
+                (isPrivate ? "(Private)" : ""));
         jProgressBar_sending.setVisible(false);
         jTextArea_content.requestFocusInWindow();
-        fetchMessages();
+        this.privateChat = isPrivate;
+        if (!isPrivate) {
+            fetchMessages();
+        }
+        jScrollPane_participants.setVisible(isPrivate);
+        jSeparator.setVisible(isPrivate);
+        jLabel_participants.setVisible(isPrivate);
     }
 
     private void fetchMessages() {
@@ -81,7 +91,23 @@ class MessagePanel extends javax.swing.JDialog {
         sendingMessage.setSentDate(new Date());
         sendingMessage.setSender(Utils.self());
         try {
-            if (!user.equals(Utils.selfRoom())) {
+            if (privateChat) {
+                // private chat
+                if (user.equals(Utils.self())) {
+                    // hosting private room, send to participants
+                    sendingMessage.setMessageType(Constants.MSG_TYPE_FWD_PRIVATE);
+                    for (User participant : participants) {
+                        Message forwardedMessage = sendingMessage.cloneMessage();
+                        forwardedMessage.setReceiver(participant);
+                        MessageService.sendMessage(forwardedMessage);
+                    }
+                } else {
+                    // receiving messages from private room
+                    sendingMessage.setMessageType(Constants.MSG_TYPE_PRIVATE_ROOM);
+                    sendingMessage.setReceiver(user);
+                    MessageService.sendMessage(sendingMessage);
+                }
+            } else if (!user.equals(Utils.selfRoom())) {
                 // Direct or connected room
                 sendingMessage.setMessageType(user.isRoom() ? Constants.MSG_TYPE_ROOM : Constants.MSG_TYPE_DIRECT);
                 sendingMessage.setReceiver(user);
@@ -120,10 +146,12 @@ class MessagePanel extends javax.swing.JDialog {
     void receiveMessage(Message message) {
         addMessage(message, false);
         if (message.getSender() != null) {
-            participants.add(message.getSender());
-            if (message.getMessageType() == Constants.MSG_TYPE_ROOM) {
+            addParticipant(message.getSender());
+            if (message.getMessageType() == Constants.MSG_TYPE_ROOM ||
+                    message.getMessageType() == Constants.MSG_TYPE_PRIVATE_ROOM) {
                 // forward message to all clients
-                message.setMessageType(Constants.MSG_TYPE_FWD);
+                message.setMessageType(message.getMessageType() == Constants.MSG_TYPE_PRIVATE_ROOM
+                        ? Constants.MSG_TYPE_FWD_PRIVATE : Constants.MSG_TYPE_FWD);
                 message.setForwardedFrom(message.getSender());
                 for (User participant : participants) {
                     // except sender
@@ -163,6 +191,13 @@ class MessagePanel extends javax.swing.JDialog {
 
     public void addParticipant(User user) {
         participants.add(user);
+        DefaultListModel<User> model = new DefaultListModel<>();
+        model.addAll(participants);
+        jList_participants.setModel(model);
+    }
+
+    public boolean isPrivateChat() {
+        return privateChat;
     }
 
     /**
@@ -179,6 +214,9 @@ class MessagePanel extends javax.swing.JDialog {
         jPanel_dialogue = new javax.swing.JPanel();
         jProgressBar_sending = new javax.swing.JProgressBar();
         jScrollPane_participants = new javax.swing.JScrollPane();
+        jList_participants = new javax.swing.JList<>();
+        jSeparator = new javax.swing.JSeparator();
+        jLabel_participants = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationByPlatform(true);
@@ -187,6 +225,7 @@ class MessagePanel extends javax.swing.JDialog {
         jTextArea_content.setLineWrap(true);
         jTextArea_content.setRows(5);
         jTextArea_content.setWrapStyleWord(true);
+        jTextArea_content.setBorder(javax.swing.BorderFactory.createLineBorder(javax.swing.UIManager.getDefaults().getColor("Actions.Blue")));
         jTextArea_content.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 jTextArea_contentKeyPressed(evt);
@@ -217,36 +256,55 @@ class MessagePanel extends javax.swing.JDialog {
 
         jScrollPane_participants.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
+        jList_participants.setEnabled(false);
+        jScrollPane_participants.setViewportView(jList_participants);
+
+        jSeparator.setOrientation(javax.swing.SwingConstants.VERTICAL);
+
+        jLabel_participants.setText("Participants");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane_participants, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jButton_send)
-                                                .addGap(185, 185, 185)
-                                                .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addContainerGap())
+                                        .addComponent(jScrollPane_participants, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel_participants))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSeparator, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(jScrollPane_dialogue)
-                                        .addComponent(jScrollPane_content)))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(jButton_send)
+                                                                .addGap(185, 185, 185)
+                                                                .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(0, 0, Short.MAX_VALUE))
+                                                        .addComponent(jScrollPane_content))
+                                                .addContainerGap())))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addComponent(jScrollPane_dialogue, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel_participants)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jScrollPane_participants))
+                                        .addComponent(jSeparator)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jScrollPane_dialogue, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(jScrollPane_content, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                                         .addComponent(jButton_send)
-                                                        .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                        .addComponent(jScrollPane_participants))
+                                                        .addComponent(jProgressBar_sending, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                 .addContainerGap())
         );
 

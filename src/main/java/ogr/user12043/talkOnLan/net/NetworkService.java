@@ -209,6 +209,7 @@ public class NetworkService {
     }
 
     private static void initConnections() throws IOException {
+        Utils.initInterfaces();
         if (sendSocket == null) {
             sendSocket = new DatagramSocket(Constants.SEND_PORT);
             sendSocket.setBroadcast(true); // This is important to broadcasting
@@ -286,7 +287,7 @@ public class NetworkService {
     }
 
     private static void endTask(ScheduledFuture<?> task) {
-        if (!task.isDone() || !task.isCancelled()) {
+        if (task != null && (!task.isDone() || !task.isCancelled())) {
             task.cancel(false);
         }
     }

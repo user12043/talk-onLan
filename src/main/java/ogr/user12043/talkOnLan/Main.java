@@ -30,7 +30,6 @@ public class Main {
                 Utils.changeTheme("Windows");
             }
 
-            Utils.initInterfaces();
             SwingUtilities.invokeLater(() -> MainUI.getUI().setVisible(true)); // display main ui
         } catch (Exception e) {
             LOGGER.error("Unexpected error happened!: ", e);

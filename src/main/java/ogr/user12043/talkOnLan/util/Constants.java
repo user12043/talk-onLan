@@ -18,11 +18,13 @@ public class Constants {
     public static final int SEND_PORT = 8889;
     public static final int FILE_RECEIVE_PORT = 8890;
     public static final int RECEIVE_TIMEOUT = 5000;
-    public static final int DISCOVERY_INTERVAL = 3000;
+    public static final int DISCOVERY_INTERVAL = 2000;
     public static final int DISCOVERY_BUFFER_LENGTH = 64;
     public static final int FILE_BUFFER_LENGTH = 16384;
     public static final int NETWORK_THREADS = 4;
     public static final int MSG_TYPE_DIRECT = 0; // Direct messages
     public static final int MSG_TYPE_ROOM = 1; // Messages sent to hosted room
     public static final int MSG_TYPE_FWD = 2; // Messages from connected room
+    public static final int MSG_TYPE_PRIVATE_ROOM = 3; // Messages sent or received as private
+    public static final int MSG_TYPE_FWD_PRIVATE = 4; // Messages sent or received as private
 }

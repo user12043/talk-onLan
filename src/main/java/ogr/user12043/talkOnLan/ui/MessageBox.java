@@ -36,7 +36,9 @@ class MessageBox extends javax.swing.JPanel {
     private String getUser() {
         if (message.getSender() == null) {
             return Properties.username;
-        } else if (message.getMessageType() != Constants.MSG_TYPE_FWD || message.getForwardedFrom() == null) {
+        } else if ((message.getMessageType() != Constants.MSG_TYPE_FWD
+                && message.getMessageType() != Constants.MSG_TYPE_FWD_PRIVATE)
+                || message.getForwardedFrom() == null) {
             return message.getSender().getUsername();
         } else {
             return message.getForwardedFrom().getUsername();

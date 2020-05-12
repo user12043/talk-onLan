@@ -91,6 +91,11 @@ public class User {
         if (getLastSeen() == null) {
             return false;
         }
-        return new Date().getTime() - getLastSeen().getTime() < Constants.DISCOVERY_INTERVAL + 500;
+        return new Date().getTime() - getLastSeen().getTime() < Constants.RECEIVE_TIMEOUT + 3000;
+    }
+
+    @Override
+    public String toString() {
+        return getUsername();
     }
 }

@@ -39,7 +39,9 @@ public class MessageService {
         } catch (IOException ignored) {
             message.setSent(false);
         }
-        MessageDao.get().save(message);
+        if (message.getMessageType() != Constants.MSG_TYPE_FWD_PRIVATE) {
+            MessageDao.get().save(message);
+        }
     }
 
     static void receiveMessage(InetAddress senderAddress, String receivedData) {
