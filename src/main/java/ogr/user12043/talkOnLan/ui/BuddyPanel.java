@@ -3,6 +3,7 @@ package ogr.user12043.talkOnLan.ui;
 import ogr.user12043.talkOnLan.dao.MessageDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
+import ogr.user12043.talkOnLan.net.DiscoveryService;
 import ogr.user12043.talkOnLan.net.FileTransferService;
 import ogr.user12043.talkOnLan.net.MessageService;
 import ogr.user12043.talkOnLan.net.NetworkService;
@@ -54,7 +55,7 @@ class BuddyPanel extends javax.swing.JPanel {
     }
 
     private void refresh() {
-        if (user.isOnline() && NetworkService.isServiceUp()) {
+        if (NetworkService.isServiceUp() && DiscoveryService.isOnline(user)) {
             SwingUtilities.invokeLater(BuddyPanel.this::online);
             // retrieve this user's messages and send unsent ones
             List<Message> messages = MessageDao.get().findUnsentByReceiver(user);

@@ -8,7 +8,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -210,11 +215,11 @@ public class Utils {
         selfRoom = existing;
     }
 
-    public static void refreshUser(User user) {
-        if (user.isRoom()) {
-            findRoom(user.getAddress()).setLastSeen(new Date());
-        } else {
-            findBuddy(user.getAddress()).setLastSeen(new Date());
+    public static void initDatabase() throws IOException {
+        File dbFile = new File(Constants.DB_FILE);
+        if (!dbFile.exists()) {
+            Path initialDbFile = Paths.get("", Constants.DB_FILE_INITIAL);
+            Files.copy(initialDbFile, dbFile.toPath());
         }
     }
 }

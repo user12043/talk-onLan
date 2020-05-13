@@ -11,6 +11,7 @@ import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
  * part of project: talk-onLan
  */
 public class MainUI extends javax.swing.JFrame {
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static MainUI mainUI; // To create one instance of MainUI
     private final Set<MessagePanel> messagePanels;
@@ -500,9 +502,10 @@ public class MainUI extends javax.swing.JFrame {
                 jButton_endDiscovery.grabFocus();
             }).start();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Unable to start discovery. Check network connectivity", "ERROR", JOptionPane.ERROR_MESSAGE);
-            jButton_endDiscovery.doClick();
             toggleLoading();
+            LOGGER.error("Unable to start discovery", e);
+            JOptionPane.showMessageDialog(this, "Unable to start discovery. Check network connectivity", "ERROR", JOptionPane.ERROR_MESSAGE);
+            jButton_startDiscovery.setEnabled(true);
         }
     }//GEN-LAST:event_jButton_startDiscoveryActionPerformed
 
@@ -513,21 +516,23 @@ public class MainUI extends javax.swing.JFrame {
      */
     private void jButton_endDiscoveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_endDiscoveryActionPerformed
         toggleLoading();
-        NetworkService.end();
-        jButton_hardDiscovery.setEnabled(false);
-        jButton_addManually.setEnabled(false);
-        jButton_hostAddresses.setEnabled(false);
-        jButton_endDiscovery.setEnabled(false);
-        jButton_hostRoom.setEnabled(false);
-        jButton_privateRoom.setEnabled(false);
-        messagePanels.forEach(Window::dispose);
         new Thread(() -> {
             try {
-                Thread.sleep(discoveryStartEndWait);
-            } catch (InterruptedException ignored) {
+                NetworkService.end();
+                jButton_hardDiscovery.setEnabled(false);
+                jButton_addManually.setEnabled(false);
+                jButton_hostAddresses.setEnabled(false);
+                jButton_endDiscovery.setEnabled(false);
+                jButton_hostRoom.setEnabled(false);
+                jButton_privateRoom.setEnabled(false);
+                messagePanels.forEach(Window::dispose);
+                jButton_startDiscovery.setEnabled(true);
+                buddiesPanel.setEnabled(false);
+                roomsPanel.setEnabled(false);
+            } catch (IOException e) {
+                LOGGER.error("Error on service end", e);
+                JOptionPane.showMessageDialog(this, "Can not end discovery!", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
-            jButton_startDiscovery.setEnabled(true);
-            buddiesPanel.setEnabled(false);
             toggleLoading();
         }).start();
     }//GEN-LAST:event_jButton_endDiscoveryActionPerformed
@@ -612,11 +617,15 @@ public class MainUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton_stopRoomActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        this.dispose();
         try {
             NetworkService.end();
+        } catch (IOException ignored) {
+        }
+        try {
             DBConnection.get().close();
         } catch (SQLException e) {
-            LogManager.getLogger().error("Error while closing", e);
+            LOGGER.error("Error while closing", e);
         }
     }//GEN-LAST:event_formWindowClosing
 

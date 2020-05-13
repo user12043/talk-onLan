@@ -22,6 +22,8 @@ public class Main {
             System.setProperty("swing.aatext", "true");
             System.setProperty("awt.useSystemAAFontSettings", "on");
 
+            Utils.initDatabase();
+
             DBConnection.get(); // init database connection
             Utils.saveSelf();
             Utils.saveSelfRoom();

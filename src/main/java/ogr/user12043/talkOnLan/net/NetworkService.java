@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.*;
 import java.util.concurrent.Executors;
@@ -117,7 +118,12 @@ public class NetworkService {
 
         // Process data
         DataInputStream inputStream = new DataInputStream(incomingSocket.getInputStream());
-        String message = inputStream.readUTF();
+        String message;
+        try {
+            message = inputStream.readUTF();
+        } catch (EOFException e) {
+            return;
+        }
         // Get messages
         if (message.startsWith(Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR)) {
             message = message.replace((Constants.COMMAND_MESSAGE + Constants.COMMAND_SEPARATOR), "");
@@ -210,22 +216,29 @@ public class NetworkService {
 
     private static void initConnections() throws IOException {
         Utils.initInterfaces();
-        if (sendSocket == null) {
-            sendSocket = new DatagramSocket(Constants.SEND_PORT);
-            sendSocket.setBroadcast(true); // This is important to broadcasting
-        }
-        if (receiveSocket == null) {
-            receiveSocket = new DatagramSocket(Constants.RECEIVE_PORT, InetAddress.getByName("0.0.0.0"));
+        sendSocket = new DatagramSocket(Constants.SEND_PORT);
+        sendSocket.setBroadcast(true); // This is important to broadcasting
+        receiveSocket = new DatagramSocket(Constants.RECEIVE_PORT, InetAddress.getByName("0.0.0.0"));
 //            receiveSocket.setBroadcast(true); // Not necessary here
-            receiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+        receiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+        messageReceiveSocket = new ServerSocket(Constants.RECEIVE_PORT);
+        messageReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+        fileReceiveSocket = new ServerSocket(Constants.FILE_RECEIVE_PORT);
+        fileReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+    }
+
+    private static void stopConnections() throws IOException {
+        if (sendSocket != null) {
+            sendSocket.close();
         }
-        if (messageReceiveSocket == null) {
-            messageReceiveSocket = new ServerSocket(Constants.RECEIVE_PORT);
-            messageReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+        if (receiveSocket != null) {
+            receiveSocket.close();
         }
-        if (fileReceiveSocket == null) {
-            fileReceiveSocket = new ServerSocket(Constants.FILE_RECEIVE_PORT);
-            fileReceiveSocket.setSoTimeout(Constants.RECEIVE_TIMEOUT);
+        if (messageReceiveSocket != null) {
+            messageReceiveSocket.close();
+        }
+        if (fileReceiveSocket != null) {
+            fileReceiveSocket.close();
         }
     }
 
@@ -278,11 +291,16 @@ public class NetworkService {
         serviceUp = true;
     }
 
-    public static void end() {
+    public static void end() throws IOException {
         endTask(discoverySendTask);
         endTask(discoveryReceiveTask);
         endTask(messageReceiveTask);
         endTask(fileReceiveTask);
+        try {
+            service.awaitTermination(Constants.RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ignored) {
+        }
+        stopConnections();
         serviceUp = false;
     }
 

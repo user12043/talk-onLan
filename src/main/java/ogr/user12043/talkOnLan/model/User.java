@@ -1,9 +1,6 @@
 package ogr.user12043.talkOnLan.model;
 
-import ogr.user12043.talkOnLan.util.Constants;
-
 import java.net.InetAddress;
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -17,7 +14,7 @@ public class User {
     private String username;
     private InetAddress address;
     private boolean isRoom;
-    private Date lastSeen;
+    private boolean isOnline;
 
     public User() {
     }
@@ -60,14 +57,6 @@ public class User {
         isRoom = room;
     }
 
-    public Date getLastSeen() {
-        return lastSeen;
-    }
-
-    public void setLastSeen(Date lastSeen) {
-        this.lastSeen = lastSeen;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -87,15 +76,16 @@ public class User {
         return new User(getUsername(), getAddress(), isRoom());
     }
 
-    public boolean isOnline() {
-        if (getLastSeen() == null) {
-            return false;
-        }
-        return new Date().getTime() - getLastSeen().getTime() < Constants.RECEIVE_TIMEOUT + 3000;
-    }
-
     @Override
     public String toString() {
         return getUsername();
+    }
+
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(boolean online) {
+        isOnline = online;
     }
 }

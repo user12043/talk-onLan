@@ -10,10 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.InterfaceAddress;
+import java.net.*;
 
 /**
  * Created by user12043 on 26.07.2018 - 11:57
@@ -65,7 +62,6 @@ public class DiscoveryService {
         }
         // Ignore already discovered
         if (Utils.isDiscovered(user)) {
-            Utils.refreshUser(user);
             return;
         }
         SwingUtilities.invokeLater(() -> MainUI.getUI().addUser(user));
@@ -88,5 +84,22 @@ public class DiscoveryService {
                 }
             }
         }
+    }
+
+    public static boolean isOnline(User user) {
+        try {
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress(user.getAddress(), Constants.RECEIVE_PORT), Constants.DISCOVERY_INTERVAL);
+//            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+//            out.writeUTF(Constants.DISCOVERY_COMMAND_REQUEST);
+            socket.close();
+            user.setOnline(true);
+            return true;
+        } catch (SocketTimeoutException | ConnectException ignored) {
+        } catch (IOException e) {
+            LOGGER.error("Error on isOnline", e);
+        }
+        user.setOnline(false);
+        return false;
     }
 }
