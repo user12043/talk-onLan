@@ -19,7 +19,7 @@ import java.util.*;
  * part of project: talk-onLan
  */
 public class MessageDao implements Dao<Message, Integer> {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(MessageDao.class);
     private static MessageDao instance;
     private final DBConnection db;
 

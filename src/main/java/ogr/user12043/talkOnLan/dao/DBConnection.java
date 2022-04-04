@@ -12,7 +12,7 @@ import java.sql.*;
  * part of project: talk-onLan
  */
 public class DBConnection {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(DBConnection.class);
     private static DBConnection instance;
     private final Connection connection;
     private Statement statement;

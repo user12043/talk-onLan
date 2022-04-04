@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
 import java.net.*;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -27,7 +26,7 @@ public class Utils {
     public static final List<NetworkInterface> networkInterfaces = new ArrayList<>(); // network hardware list of device
     public static final Set<InterfaceAddress> hostAddresses = new HashSet<>(); // self ip addresses on each network hardware
     public static final Set<User> roomClients = new HashSet<>(); // users connected the room while hosting room
-    private static final Logger LOGGER = LogManager.getLogger(Constants.class);
+    private static final Logger LOGGER = LogManager.getLogger(Utils.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy"); // Date display format date on ui
     private static User self;
     private static User selfRoom;

@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * part of project: talk-onLan
  */
 public class MainUI extends javax.swing.JFrame {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(MainUI.class);
 
     private static MainUI mainUI; // To create one instance of MainUI
     private final Set<MessagePanel> messagePanels;

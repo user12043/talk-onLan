@@ -18,7 +18,7 @@ import java.util.Set;
  * part of project: talk-onLan
  */
 public class UserDao implements Dao<User, Integer> {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(UserDao.class);
     private static UserDao instance;
     private final DBConnection db;
 

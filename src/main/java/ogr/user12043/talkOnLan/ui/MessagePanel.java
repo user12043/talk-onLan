@@ -22,7 +22,7 @@ import java.util.Set;
  * part of project: talk-onLan
  */
 class MessagePanel extends javax.swing.JDialog {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger(MessagePanel.class);
     private final User user; // Remote user
     private final Set<User> participants;
     private int lineNumber;
