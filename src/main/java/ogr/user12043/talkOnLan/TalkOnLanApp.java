@@ -1,12 +1,15 @@
 package ogr.user12043.talkOnLan;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
 
 public class TalkOnLanApp extends Application {
     private static final Logger LOGGER = LogManager.getLogger(TalkOnLanApp.class);
@@ -24,9 +27,9 @@ public class TalkOnLanApp extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
-        AnchorPane root = new AnchorPane();
-        primaryStage.setScene(new Scene(root));
+    public void start(Stage primaryStage) throws IOException {
+        Parent p = new FXMLLoader(getClass().getResource("/fxml/main.fxml")).load();
+        primaryStage.setScene(new Scene(p));
         primaryStage.show();
     }
 }

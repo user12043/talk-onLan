@@ -9,4 +9,5 @@ module talkOnLan {
     requires java.sql;
     requires com.h2database; // "Error: automatic module cannot be used with jlink" for "mvn javafx:jlink"
     opens ogr.user12043.talkOnLan;
+    opens ogr.user12043.talkOnLan.controller to javafx.fxml;
 }
