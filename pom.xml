@@ -15,7 +15,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
-    <project.main-class>ogr.user12043.talkOnLan.Main</project.main-class>
+    <project.main-class>ogr.user12043.talkOnLan.TalkOnLanApp</project.main-class>
     <lib-folder>lib</lib-folder>
     <log4j-version>2.17.1</log4j-version>
     <h2.version>2.1.210</h2.version>

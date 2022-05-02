@@ -28,7 +28,8 @@ public class TalkOnLanApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        Parent p = new FXMLLoader(getClass().getResource("/fxml/main.fxml")).load();
+        setUserAgentStylesheet(STYLESHEET_CASPIAN);
+        Parent p = new FXMLLoader(getClass().getResource("controller/main.fxml")).load();
         primaryStage.setScene(new Scene(p));
         primaryStage.show();
     }
