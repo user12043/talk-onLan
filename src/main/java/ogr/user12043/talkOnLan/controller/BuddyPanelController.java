@@ -1,5 +1,6 @@
 package ogr.user12043.talkOnLan.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -37,7 +38,7 @@ public class BuddyPanelController implements Initializable {
         return user;
     }
 
-    private void setUser(User user) {
+    public void setUser(User user) {
         this.user = user;
         label_buddy.setText(user.getUsername() + " on " + user.getAddress().getHostAddress());
         if (user.isRoom()) {
@@ -47,6 +48,9 @@ public class BuddyPanelController implements Initializable {
     }
 
     private void refresh() {
+        if (user == null) {
+            return;
+        }
         if (NetworkService.isServiceUp() && DiscoveryService.isOnline(user)) {
             online();
             // retrieve this user's messages and send unsent ones
@@ -60,11 +64,17 @@ public class BuddyPanelController implements Initializable {
     }
 
     public void online() {
-        label_status.setText(Constants.STATUS_ONLINE);
+        Platform.runLater(() -> {
+            label_status.setText(Constants.STATUS_ONLINE);
+            label_status.getStyleClass().add("online");
+        });
     }
 
     public void offline() {
-        label_status.setText(Constants.STATUS_OFFLINE);
+        Platform.runLater(() -> {
+            label_status.setText(Constants.STATUS_OFFLINE);
+            label_status.getStyleClass().remove("online");
+        });
     }
 
 
@@ -79,5 +89,10 @@ public class BuddyPanelController implements Initializable {
                 }
             }
         }, 0, Constants.DISCOVERY_INTERVAL);
+    }
+
+    public void setDisabled(boolean isDisable) {
+        btn_file.setDisable(isDisable);
+        btn_message.setDisable(isDisable);
     }
 }

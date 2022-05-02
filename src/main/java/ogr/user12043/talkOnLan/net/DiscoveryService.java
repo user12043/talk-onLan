@@ -1,14 +1,14 @@
 package ogr.user12043.talkOnLan.net;
 
+import javafx.application.Platform;
+import ogr.user12043.talkOnLan.controller.MainController;
 import ogr.user12043.talkOnLan.model.User;
-import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.net.*;
 
@@ -64,7 +64,9 @@ public class DiscoveryService {
         if (Utils.isDiscovered(user)) {
             return;
         }
-        SwingUtilities.invokeLater(() -> MainUI.getUI().addUser(user));
+        // TODO: remove line below
+//        SwingUtilities.invokeLater(() -> MainUI.getUI().addUser(user));
+        Platform.runLater(() -> MainController.getInstance().addUser(user));
     }
 
     /**

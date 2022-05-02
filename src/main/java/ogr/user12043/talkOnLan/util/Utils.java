@@ -35,6 +35,8 @@ public class Utils {
      * Detects network hardware and sets into {@link Utils#networkInterfaces}
      */
     public static void initInterfaces() {
+        networkInterfaces.clear();
+        hostAddresses.clear();
         try {
             final Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
             while (enumeration.hasMoreElements()) {

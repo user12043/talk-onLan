@@ -1,0 +1,18 @@
+.root {
+    -fx-base: rgba(60, 63, 65, 255);
+}
+
+.buddyPanel {
+    -fx-background-color: rgba(70, 73, 75, 255);
+}
+
+.statusLabel {
+    -fx-border-width: 2;
+    -fx-border-color: red;
+    -fx-border-radius: 5;
+    -fx-font-weight: bold;
+}
+
+.statusLabel.online {
+    -fx-border-color: green;
+}
