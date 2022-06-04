@@ -5,6 +5,7 @@ import ogr.user12043.talkOnLan.model.User;
 import java.awt.event.WindowEvent;
 
 /**
+ * @deprecated
  * Created by user12043 on 14.08.2018 - 10:47
  * part of project: talk-onLan
  */

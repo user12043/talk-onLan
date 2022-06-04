@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * @deprecated
  * Created by user12043 on 31.07.2018 - 16:22
  * part of project: talk-onLan
  */

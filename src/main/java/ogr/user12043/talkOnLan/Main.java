@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 
 /**
+ * @deprecated
  * Created by user12043 on 23.07.2018 - 13:44
  * part of project: talk-onLan
  */

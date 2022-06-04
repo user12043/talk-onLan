@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * @deprecated
  * Created by user12043 on 31.07.2018 - 12:05
  * part of project: talk-onLan
  */

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * @deprecated
  * Created by user12043 on 31.07.2018 - 12:10
  * part of project: talk-onLan
  */

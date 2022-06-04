@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
+ * @deprecated
  * Created by user12043 on 02.08.2018 - 08:45
  * part of project: talk-onLan
  */
