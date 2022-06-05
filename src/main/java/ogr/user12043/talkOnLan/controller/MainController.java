@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import ogr.user12043.talkOnLan.dao.UserDao;
+import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.NetworkService;
 import ogr.user12043.talkOnLan.util.Utils;
@@ -133,5 +134,13 @@ public class MainController implements Initializable {
         alert.setTitle("Local IP addresses");
         alert.setHeaderText(builder.toString());
         alert.showAndWait();
+    }
+
+    public void receiveMessage(Message message) {
+        buddies.get(message.getSender()).receiveMessage(message);
+    }
+
+    private MessagePanelController getMessagePanelOfUser(User sender) {
+        return null;
     }
 }

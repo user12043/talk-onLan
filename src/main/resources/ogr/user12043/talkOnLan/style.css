@@ -19,3 +19,7 @@
 .statusLabel.offline {
     -fx-border-color: red;
 }
+
+.messageBox {
+    -fx-background-color: rgba(0, 0, 0, 0);
+}

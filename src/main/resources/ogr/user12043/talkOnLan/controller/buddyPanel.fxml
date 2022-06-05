@@ -27,7 +27,7 @@
          <children>
             <Label fx:id="label_buddy" text="&lt;buddy&gt;" />
             <Separator opacity="0.0" prefWidth="200.0" />
-            <Button fx:id="btn_message" mnemonicParsing="false" text="Message">
+            <Button fx:id="btn_message" mnemonicParsing="false" onAction="#messageAction" text="Message">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
