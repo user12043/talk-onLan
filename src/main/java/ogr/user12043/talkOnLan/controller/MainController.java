@@ -75,10 +75,10 @@ public class MainController implements Initializable {
             user = UserDao.get().findByFields(user);
             Utils.addUser(user);
 
-            final FXMLLoader loader = new FXMLLoader(getClass().getResource("buddyPanel.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("buddyPanel.fxml"));
+            BuddyPanelController buddyPanelController = new BuddyPanelController(user);
+            loader.setController(buddyPanelController);
             AnchorPane buddyPanel = loader.load();
-            BuddyPanelController buddyPanelController = loader.getController();
-            buddyPanelController.setUser(user);
             // Keep the references
             buddies.put(user, buddyPanelController);
             if (!user.isRoom()) {

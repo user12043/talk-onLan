@@ -2,7 +2,9 @@ package ogr.user12043.talkOnLan.controller;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -35,19 +37,11 @@ public class BuddyPanelController implements Initializable {
         return user;
     }
 
-    public void setUser(User user) {
+    public BuddyPanelController(User user) {
         this.user = user;
-        label_buddy.setText(user.getUsername() + " on " + user.getAddress().getHostAddress());
-        if (user.isRoom()) {
-            btn_file.setDisable(true);
-            btn_file.setVisible(false);
-        }
     }
 
     private void refresh() {
-        if (user == null) {
-            return;
-        }
         if (DiscoveryService.updateOnlineStatus(user)) {
             online();
             // retrieve this user's messages and send unsent ones
@@ -80,6 +74,11 @@ public class BuddyPanelController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        label_buddy.setText(user.getUsername() + " on " + user.getAddress().getHostAddress());
+        if (user.isRoom()) {
+            btn_file.setDisable(true);
+            btn_file.setVisible(false);
+        }
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
