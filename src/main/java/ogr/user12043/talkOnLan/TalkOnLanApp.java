@@ -41,7 +41,9 @@ public class TalkOnLanApp extends Application {
         primaryStage.show();
         primaryStage.setOnCloseRequest(windowEvent -> {
             try {
-                NetworkService.end();
+                if (NetworkService.isServiceUp()) {
+                    NetworkService.end();
+                }
             } catch (IOException ignored) {
             }
             try {

@@ -12,9 +12,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="482.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ogr.user12043.talkOnLan.controller.MainController">
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="482.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ogr.user12043.talkOnLan.controller.MainController">
    <children>
-      <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="54.0" prefWidth="775.0" text="talk-onLan">
+      <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="54.0" prefWidth="775.0" text="talk-onLan" textAlignment="CENTER">
          <font>
             <Font size="39.0" />
          </font>

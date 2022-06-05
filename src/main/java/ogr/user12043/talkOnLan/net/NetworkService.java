@@ -196,7 +196,7 @@ public class NetworkService {
                 Utils.hostAddresses.addAll(networkInterface.getInterfaceAddresses());
             } else {
                 // If interface is got down after program start, its host address will be removed.
-                Utils.hostAddresses.removeAll(networkInterface.getInterfaceAddresses());
+                networkInterface.getInterfaceAddresses().forEach(Utils.hostAddresses::remove);
             }
         }
         //</editor-fold>
@@ -306,7 +306,7 @@ public class NetworkService {
 
     private static void endTask(ScheduledFuture<?> task) {
         if (task != null && (!task.isDone() || !task.isCancelled())) {
-            task.cancel(false);
+            task.cancel(true);
         }
     }
 

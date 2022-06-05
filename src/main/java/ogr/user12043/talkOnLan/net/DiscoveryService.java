@@ -88,7 +88,7 @@ public class DiscoveryService {
         }
     }
 
-    public static boolean isOnline(User user) {
+    public static boolean updateOnlineStatus(User user) {
         try {
             Socket socket = new Socket();
             socket.connect(new InetSocketAddress(user.getAddress(), Constants.RECEIVE_PORT), Constants.DISCOVERY_INTERVAL);

@@ -8,11 +8,14 @@
 
 .statusLabel {
     -fx-border-width: 2;
-    -fx-border-color: red;
     -fx-border-radius: 5;
     -fx-font-weight: bold;
 }
 
 .statusLabel.online {
     -fx-border-color: green;
+}
+
+.statusLabel.offline {
+    -fx-border-color: red;
 }

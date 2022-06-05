@@ -56,7 +56,7 @@ class BuddyPanel extends javax.swing.JPanel {
     }
 
     private void refresh() {
-        if (NetworkService.isServiceUp() && DiscoveryService.isOnline(user)) {
+        if (NetworkService.isServiceUp() && DiscoveryService.updateOnlineStatus(user)) {
             SwingUtilities.invokeLater(BuddyPanel.this::online);
             // retrieve this user's messages and send unsent ones
             List<Message> messages = MessageDao.get().findUnsentByReceiver(user);
