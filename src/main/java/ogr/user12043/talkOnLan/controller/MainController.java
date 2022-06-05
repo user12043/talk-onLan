@@ -12,21 +12,24 @@ import javafx.scene.layout.VBox;
 import ogr.user12043.talkOnLan.dao.UserDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
+import ogr.user12043.talkOnLan.net.DiscoveryService;
 import ogr.user12043.talkOnLan.net.NetworkService;
+import ogr.user12043.talkOnLan.util.Constants;
+import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
 
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InterfaceAddress;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController implements Initializable {
     private static MainController instance;
     private final Map<User, BuddyPanelController> buddies = new HashMap<>();
+    private final Map<User, MessagePanelController> privateBuddyPanels = new HashMap<>();
+    private MessagePanelController roomMessagePanel;
+    private MessagePanelController privateRoomMessagePanel;
     @FXML
     private TextField textField_manualIP;
     @FXML
@@ -54,7 +57,9 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         instance = this;
         addUsers();
-        buddies.forEach((u, c) -> c.setDisabled(true));
+        // Initialize room and private room windows
+        roomMessagePanel = new MessagePanelController(Utils.selfRoom(), false);
+        privateRoomMessagePanel = new MessagePanelController(Utils.selfRoom(), true);
     }
 
     private void addUsers() {
@@ -137,10 +142,68 @@ public class MainController implements Initializable {
     }
 
     public void receiveMessage(Message message) {
-        buddies.get(message.getSender()).receiveMessage(message);
+        switch (message.getMessageType()) {
+            case Constants.MSG_TYPE_ROOM:
+                // Received the message to hosted room
+                roomMessagePanel.receiveMessage(message);
+                break;
+            case Constants.MSG_TYPE_PRIVATE_ROOM:
+                // Received the message to hosted private room
+                privateRoomMessagePanel.receiveMessage(message);
+                break;
+            case Constants.MSG_TYPE_FWD_PRIVATE:
+                // Received the message to remote private room
+                MessagePanelController privateBuddyMessagePanelController;
+                // Check for panel
+                if ((privateBuddyMessagePanelController = privateBuddyPanels.get(message.getSender())) == null) {
+                    privateBuddyMessagePanelController = new MessagePanelController(message.getSender(), true);
+                    privateBuddyPanels.put(message.getSender(), privateBuddyMessagePanelController);
+                }
+                // pass the message
+                privateBuddyMessagePanelController.receiveMessage(message);
+                break;
+            default:
+                // Received one-to-one message
+                buddies.get(message.getSender()).receiveMessage(message);
+                break;
+        }
     }
 
-    private MessagePanelController getMessagePanelOfUser(User sender) {
-        return null;
+    @FXML
+    private void hostRoomAction(ActionEvent actionEvent) {
+        if (!Properties.roomMode) {
+            Properties.roomMode = true;
+            Utils.rooms.add(Utils.selfRoom());
+            roomMessagePanel.receiveMessage(new Message(Utils.self(), Utils.self(), "You just started a room!", new Date(), Constants.MSG_TYPE_ROOM));
+            btn_hostRoom.setText("Stop the Room");
+        } else {
+            Properties.roomMode = false;
+            Utils.rooms.remove(Utils.selfRoom());
+            btn_hostRoom.setText("Host a Room");
+        }
+    }
+
+    @FXML
+    private void hostPrivateRoomAction(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.WARNING, "This function is not implemented yet!");
+        alert.showAndWait();
+        /*if (Utils.buddies.stream().noneMatch(User::isOnline)) {
+            // show warning like "There is no buddy online!" then return
+        }*/
+        /* TODO:
+         * Make selection from online buddies
+         * create new message panel
+         * add selected buddies as participants
+         * */
+    }
+
+    @FXML
+    private void hardDiscoveryAction(ActionEvent actionEvent) {
+        try {
+            DiscoveryService.hardDiscovery();
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "Error on discovery!");
+            e.printStackTrace();
+        }
     }
 }

@@ -64,8 +64,6 @@ public class DiscoveryService {
         if (Utils.isDiscovered(user)) {
             return;
         }
-        // TODO: remove line below
-//        SwingUtilities.invokeLater(() -> MainUI.getUI().addUser(user));
         Platform.runLater(() -> MainController.getInstance().addUser(user));
     }
 

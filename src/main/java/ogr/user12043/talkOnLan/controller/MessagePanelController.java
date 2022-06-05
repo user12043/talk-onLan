@@ -5,13 +5,17 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import ogr.user12043.talkOnLan.TalkOnLanApp;
 import ogr.user12043.talkOnLan.dao.MessageDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
@@ -25,7 +29,11 @@ import java.util.*;
 
 public class MessagePanelController implements Initializable {
 
-    private final User user;
+    private final User user; // remote user
+    private final Set<User> participants = new HashSet<>(); // involved users of this panel
+    private final boolean isPrivateChat;
+    private final Set<MessageBoxController> messageBoxes = new HashSet<>();
+    private final Stage stage = new Stage();
     @FXML
     private Label label_title;
     @FXML
@@ -35,13 +43,27 @@ public class MessagePanelController implements Initializable {
     @FXML
     private Button btn_send;
 
-    private final boolean isPrivateChat;
-
-    private final Set<MessageBoxController> messageBoxes = new HashSet<>();
+    @FXML
+    private VBox vbox_participants;
 
     public MessagePanelController(User user, boolean isPrivateChat) {
         this.user = user;
         this.isPrivateChat = isPrivateChat;
+        // Inıtialize the chat window
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("messagePanel.fxml"));
+            loader.setController(this);
+            SplitPane messagePanel = loader.load();
+            if (this.user.isRoom()) {
+                messagePanel.setDividerPositions(0.2);
+            }
+            Scene scene = new Scene(messagePanel);
+            scene.getStylesheets().add(Objects.requireNonNull(TalkOnLanApp.class.getResource("style.css")).toExternalForm());
+            stage.setScene(scene);
+            stage.setTitle("Chat with " + user.getUsername());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -82,6 +104,37 @@ public class MessagePanelController implements Initializable {
 
     public void receiveMessage(Message message) {
         addMessage(message, false);
+        if (message.getSender() != null) {
+            addParticipant(message.getSender());
+            if (message.getMessageType() == Constants.MSG_TYPE_ROOM ||
+                    message.getMessageType() == Constants.MSG_TYPE_PRIVATE_ROOM) {
+                // forward message to all clients
+                message.setMessageType(message.getMessageType() == Constants.MSG_TYPE_PRIVATE_ROOM
+                        ? Constants.MSG_TYPE_FWD_PRIVATE : Constants.MSG_TYPE_FWD);
+                message.setForwardedFrom(message.getSender());
+                for (User participant : participants) {
+                    // except sender
+                    if (!participant.equals(message.getSender())) {
+                        Message clone = message.cloneMessage();
+                        clone.setReceiver(participant);
+                        MessageService.sendMessage(clone);
+                    }
+                }
+            }
+        }
+        stage.show();
+        stage.requestFocus();
+    }
+
+    private void addParticipant(User user) {
+        participants.add(user);
+        // Refresh
+        vbox_participants.getChildren().clear();
+        participants.forEach(p -> {
+            Label label = new Label(p.getUsername());
+            label.setMaxWidth(Double.MAX_VALUE);
+            vbox_participants.getChildren().add(label);
+        });
     }
 
     @FXML
@@ -115,14 +168,13 @@ public class MessagePanelController implements Initializable {
         if (isPrivateChat) {
             // private chat
             if (user.equals(Utils.self())) {
-                // TODO: implement the case
                 // hosting private room, send to participants
                 sendingMessage.setMessageType(Constants.MSG_TYPE_FWD_PRIVATE);
-                /*for (User participant : participants) {
+                for (User participant : participants) {
                     Message forwardedMessage = sendingMessage.cloneMessage();
                     forwardedMessage.setReceiver(participant);
                     MessageService.sendMessage(forwardedMessage);
-                }*/
+                }
             } else {
                 // receiving messages from private room
                 sendingMessage.setMessageType(Constants.MSG_TYPE_PRIVATE_ROOM);
@@ -135,7 +187,6 @@ public class MessagePanelController implements Initializable {
             sendingMessage.setReceiver(user);
             MessageService.sendMessage(sendingMessage);
         } else {
-            // TODO: implement the case
             // hosting a room
             sendingMessage.setMessageType(Constants.MSG_TYPE_FWD);
             // send a clone for self
@@ -144,11 +195,11 @@ public class MessagePanelController implements Initializable {
             selfMessage.setMessageType(Constants.MSG_TYPE_ROOM);
             MessageService.sendMessage(selfMessage);
             // send to participants
-            /*for (User participant : participants) {
+            for (User participant : participants) {
                 Message forwardedMessage = sendingMessage.cloneMessage();
                 forwardedMessage.setReceiver(participant);
                 MessageService.sendMessage(forwardedMessage);
-            }*/
+            }
         }
 
         Platform.runLater(() -> {
@@ -157,5 +208,9 @@ public class MessagePanelController implements Initializable {
             textArea_input.requestFocus();
             textArea_input.setDisable(false);
         });
+    }
+
+    public void show() {
+        stage.show();
     }
 }

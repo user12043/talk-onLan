@@ -4,14 +4,9 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import ogr.user12043.talkOnLan.TalkOnLanApp;
 import ogr.user12043.talkOnLan.dao.MessageDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
@@ -19,9 +14,11 @@ import ogr.user12043.talkOnLan.net.DiscoveryService;
 import ogr.user12043.talkOnLan.net.MessageService;
 import ogr.user12043.talkOnLan.util.Constants;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class BuddyPanelController implements Initializable {
     private final SimpleStringProperty statusProperty = new SimpleStringProperty("OFFLINE");
@@ -34,8 +31,6 @@ public class BuddyPanelController implements Initializable {
     private Button btn_message;
     @FXML
     private Button btn_file;
-
-    private Stage chatStage;
     private MessagePanelController messagePanelController;
 
     public BuddyPanelController(User user) {
@@ -64,7 +59,6 @@ public class BuddyPanelController implements Initializable {
             statusProperty.set(Constants.STATUS_ONLINE);
             label_status.getStyleClass().removeAll("offline");
             label_status.getStyleClass().add("online");
-            this.setDisabled(false);
         });
     }
 
@@ -94,35 +88,15 @@ public class BuddyPanelController implements Initializable {
             }
         }, 0, Constants.DISCOVERY_INTERVAL);
         label_status.textProperty().bindBidirectional(statusProperty);
-        // Inıtialize the chat window
-        try {
-            chatStage = new Stage();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("messagePanel.fxml"));
-            messagePanelController = new MessagePanelController(this.user, false);
-            loader.setController(messagePanelController);
-            VBox messagePanel = loader.load();
-            Scene scene = new Scene(messagePanel);
-            scene.getStylesheets().add(Objects.requireNonNull(TalkOnLanApp.class.getResource("style.css")).toExternalForm());
-            chatStage.setScene(scene);
-            chatStage.setTitle("Chat with " + user.getUsername());
-        } catch (IOException e) {
-            throw new RuntimeException("Error while initializing the chat window.", e);
-        }
-    }
-
-    public void setDisabled(boolean isDisable) {
-        btn_file.setDisable(isDisable);
-        btn_message.setDisable(isDisable);
+        messagePanelController = new MessagePanelController(this.user, false);
     }
 
     @FXML
     private void messageAction(ActionEvent actionEvent) {
-        chatStage.show();
+        messagePanelController.show();
     }
 
     public void receiveMessage(Message message) {
         this.messagePanelController.receiveMessage(message);
-        chatStage.show();
-        chatStage.requestFocus();
     }
 }
