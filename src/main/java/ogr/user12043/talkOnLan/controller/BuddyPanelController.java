@@ -9,6 +9,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import ogr.user12043.talkOnLan.TalkOnLanApp;
 import ogr.user12043.talkOnLan.dao.MessageDao;
@@ -38,6 +39,8 @@ public class BuddyPanelController implements Initializable {
     private Button btn_message;
     @FXML
     private Button btn_file;
+    @FXML
+    private HBox hBox_info;
     private MessagePanelController messagePanelController;
 
     public BuddyPanelController(User user) {
@@ -83,8 +86,7 @@ public class BuddyPanelController implements Initializable {
         // Set label and buttons
         label_buddy.setText(user.getUsername() + " on " + user.getAddress().getHostAddress());
         if (user.isRoom()) {
-            btn_file.setDisable(true);
-            btn_file.setVisible(false);
+            hBox_info.getChildren().remove(btn_file);
         }
         // Initialize and start the refresh job
         Timer timer = new Timer();
