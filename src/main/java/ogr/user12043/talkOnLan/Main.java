@@ -33,7 +33,7 @@ public class Main {
 
             SwingUtilities.invokeLater(() -> MainUI.getUI().setVisible(true)); // display main ui
         } catch (Exception e) {
-            LOGGER.severe("Unexpected error happened!: " + e);
+            LOGGER.severe("Unexpected error happened!: \n" + e);
         }
     }
 }

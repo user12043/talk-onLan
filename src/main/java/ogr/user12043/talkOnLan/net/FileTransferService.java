@@ -106,7 +106,7 @@ public class FileTransferService {
                     LOGGER.info("invalid send file response received from " + user.getAddress());
             }
         } catch (SocketException e) {
-            LOGGER.severe("transfer process interrupted! " + e);
+            LOGGER.severe("transfer process interrupted! \n" + e);
             Platform.runLater(() -> {
                 a.get().setAlertType(AlertType.ERROR);
                 a.get().setContentText("Transfer process interrupted!");

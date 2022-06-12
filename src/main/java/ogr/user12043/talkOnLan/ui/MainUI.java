@@ -502,7 +502,7 @@ public class MainUI extends javax.swing.JFrame {
             }).start();
         } catch (Exception e) {
             toggleLoading();
-            LOGGER.severe("Unable to start discovery" + e);
+            LOGGER.severe("Unable to start discovery\n" + e);
             JOptionPane.showMessageDialog(this, "Unable to start discovery. Check network connectivity", "ERROR", JOptionPane.ERROR_MESSAGE);
             jButton_startDiscovery.setEnabled(true);
         }
@@ -529,7 +529,7 @@ public class MainUI extends javax.swing.JFrame {
                 buddiesPanel.setEnabled(false);
                 roomsPanel.setEnabled(false);
             } catch (IOException e) {
-                LOGGER.severe("Error on service end" + e);
+                LOGGER.severe("Error on service end\n" + e);
                 JOptionPane.showMessageDialog(this, "Can not end discovery!", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
             toggleLoading();
@@ -624,7 +624,7 @@ public class MainUI extends javax.swing.JFrame {
         try {
             DBConnection.get().close();
         } catch (SQLException e) {
-            LOGGER.severe("Error while closing" + e);
+            LOGGER.severe("Error while closing\n" + e);
         }
     }//GEN-LAST:event_formWindowClosing
 

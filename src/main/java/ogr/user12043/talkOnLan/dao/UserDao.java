@@ -48,7 +48,7 @@ public class UserDao implements Dao<User, Integer> {
                 db.closeStatement();
                 return new ArrayList<>(users);
             } catch (SQLException e) {
-                LOGGER.severe("Error on UserDao::find" + e);
+                LOGGER.severe("Error on UserDao::find\n" + e);
             }
             return null;
         }
@@ -67,7 +67,7 @@ public class UserDao implements Dao<User, Integer> {
                 return user;
             }
         } catch (SQLException e) {
-            LOGGER.severe("Error on UserDao::findById" + e);
+            LOGGER.severe("Error on UserDao::findById\n" + e);
         }
         return null;
     }
@@ -90,7 +90,7 @@ public class UserDao implements Dao<User, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            LOGGER.severe("Error on UserDao::save" + e);
+            LOGGER.severe("Error on UserDao::save\n" + e);
         }
     }
 
@@ -107,7 +107,7 @@ public class UserDao implements Dao<User, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            LOGGER.severe("Error on UserDao::deleteById" + e);
+            LOGGER.severe("Error on UserDao::deleteById\n" + e);
         }
     }
 
@@ -139,7 +139,7 @@ public class UserDao implements Dao<User, Integer> {
                 return result;
             }
         } catch (SQLException e) {
-            LOGGER.severe("Error on UserDao::getuser" + e);
+            LOGGER.severe("Error on UserDao::getUser\n" + e);
         }
         return null;
     }

@@ -27,7 +27,7 @@ public class TalkOnLanApp extends Application {
             Utils.saveSelf();
             Utils.saveSelfRoom();
         } catch (Exception e) {
-            LOGGER.severe("Unexpected error!" + e);
+            LOGGER.severe("Unexpected error!\n" + e);
         }
         launch(args);
     }
@@ -55,7 +55,7 @@ public class TalkOnLanApp extends Application {
             try {
                 DBConnection.get().close();
             } catch (SQLException e) {
-                LOGGER.severe("Error while closing!" + e);
+                LOGGER.severe("Error while closing!\n" + e);
             }
             Platform.exit();
             System.exit(0);

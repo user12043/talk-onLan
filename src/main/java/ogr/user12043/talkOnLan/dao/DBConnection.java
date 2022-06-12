@@ -25,7 +25,7 @@ public class DBConnection {
             try {
                 instance = new DBConnection();
             } catch (Exception e) {
-                LOGGER.severe("Could not connect to database!" + e);
+                LOGGER.severe("Could not connect to database!\n" + e);
                 JOptionPane.showMessageDialog(null, "Could not connect to database!", "talk-onLan", JOptionPane.ERROR_MESSAGE);
                 System.exit(1);
             }

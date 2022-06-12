@@ -97,7 +97,7 @@ public class NetworkService {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                LOGGER.severe("Error when discovering remote user: " + e);
+                LOGGER.severe("Error when discovering remote user: \n" + e);
             }
         }
 
@@ -171,7 +171,7 @@ public class NetworkService {
             DiscoveryService.sendDiscoveryRequest(broadcastAll);
             DiscoveryService.sendDiscoveryRequestRoom(broadcastAll);
         } catch (IOException e) {
-            LOGGER.severe("Discovery send error to " + broadcastAll + " - " + e.getLocalizedMessage());
+            LOGGER.severe("Discovery send error to " + broadcastAll + " - \n" + e.getLocalizedMessage());
         }
 
         //<editor-fold desc="Broadcast the message over all the network interfaces" defaultstate=collapsed>
@@ -187,7 +187,7 @@ public class NetworkService {
                         DiscoveryService.sendDiscoveryRequest(broadcastAddress);
                         DiscoveryService.sendDiscoveryRequestRoom(broadcastAddress);
                     } catch (IOException e) {
-                        LOGGER.severe("Discovery send error to " + broadcastAddress + " - " + e.getLocalizedMessage());
+                        LOGGER.severe("Discovery send error to " + broadcastAddress + " - \n" + e.getLocalizedMessage());
                     }
                 }
 
@@ -254,7 +254,7 @@ public class NetworkService {
             try {
                 send();
             } catch (Exception e) {
-                LOGGER.severe("Error on send() " + e);
+                LOGGER.severe("Error on send() \n" + e);
             }
         };
 
@@ -262,7 +262,7 @@ public class NetworkService {
             try {
                 receive();
             } catch (Exception e) {
-                LOGGER.severe("Error on receive() " + e);
+                LOGGER.severe("Error on receive() \n" + e);
             }
         });
 
@@ -270,7 +270,7 @@ public class NetworkService {
             try {
                 receiveMessage();
             } catch (Exception e) {
-                LOGGER.severe("Error on receiveMessage() " + e);
+                LOGGER.severe("Error on receiveMessage() \n" + e);
             }
         });
 
@@ -278,7 +278,7 @@ public class NetworkService {
             try {
                 receiveFile();
             } catch (Exception e) {
-                LOGGER.severe("Error on receiveFile() " + e);
+                LOGGER.severe("Error on receiveFile() \n" + e);
             }
         });
 

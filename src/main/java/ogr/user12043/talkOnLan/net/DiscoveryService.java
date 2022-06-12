@@ -96,7 +96,7 @@ public class DiscoveryService {
             return true;
         } catch (SocketTimeoutException | ConnectException ignored) {
         } catch (IOException e) {
-            LOGGER.fine("Error on isOnline: " + e.getMessage());
+            LOGGER.fine("Error on isOnline: \n" + e.getMessage());
         }
         user.setOnline(false);
         return false;

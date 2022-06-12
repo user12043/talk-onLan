@@ -54,7 +54,7 @@ public class MessageDao implements Dao<Message, Integer> {
                 return message;
             }
         } catch (SQLException | ParseException e) {
-            LOGGER.severe("Error on MessageDao::findById" + e);
+            LOGGER.severe("Error on MessageDao::findById\n" + e);
         }
         return null;
     }
@@ -86,7 +86,7 @@ public class MessageDao implements Dao<Message, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            LOGGER.severe("Error on MessageDao::save" + e);
+            LOGGER.severe("Error on MessageDao::save\n" + e);
         }
     }
 
@@ -103,7 +103,7 @@ public class MessageDao implements Dao<Message, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            LOGGER.severe("Error on MessageDao::deleteById" + e);
+            LOGGER.severe("Error on MessageDao::deleteById\n" + e);
         }
     }
 
@@ -154,7 +154,7 @@ public class MessageDao implements Dao<Message, Integer> {
             list.sort(Comparator.comparing(Message::getSentDate));
             return list;
         } catch (SQLException | ParseException e) {
-            LOGGER.severe("Error on MessageDao::getMessages" + e);
+            LOGGER.severe("Error on MessageDao::getMessages\n" + e);
         }
         return null;
     }

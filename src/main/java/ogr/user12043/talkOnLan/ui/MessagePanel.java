@@ -134,7 +134,7 @@ class MessagePanel extends javax.swing.JDialog {
             });
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Cannot send the message!", "ERROR", JOptionPane.ERROR_MESSAGE);
-            LOGGER.severe("Cannot send the message!" + e);
+            LOGGER.severe("Cannot send the message!\n" + e);
             SwingUtilities.invokeLater(() -> {
                 jTextArea_content.setText(sendingMessage.getContent());
                 setInputEnabled(true);

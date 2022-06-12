@@ -49,7 +49,7 @@ public class Utils {
                 hostAddresses.addAll(networkInterface.getInterfaceAddresses());
             }
         } catch (SocketException e) {
-            LOGGER.severe("Error on getting network devices info" + e);
+            LOGGER.severe("Error on getting network devices info\n" + e);
         }
     }
 
@@ -181,7 +181,7 @@ public class Utils {
             }
             return self;
         } catch (UnknownHostException e) {
-            LOGGER.severe("Error on Utils::self" + e);
+            LOGGER.severe("Error on Utils::self\n" + e);
             System.exit(1);
         }
         return new User();
