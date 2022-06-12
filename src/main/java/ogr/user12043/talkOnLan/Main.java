@@ -3,18 +3,16 @@ package ogr.user12043.talkOnLan;
 import ogr.user12043.talkOnLan.dao.DBConnection;
 import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Utils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
+import java.util.logging.Logger;
 
 /**
- * @deprecated
- * Created by user12043 on 23.07.2018 - 13:44
+ * @deprecated Created by user12043 on 23.07.2018 - 13:44
  * part of project: talk-onLan
  */
 public class Main {
-    private static final Logger LOGGER = LogManager.getLogger(Main.class);
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
         try {
@@ -35,7 +33,7 @@ public class Main {
 
             SwingUtilities.invokeLater(() -> MainUI.getUI().setVisible(true)); // display main ui
         } catch (Exception e) {
-            LOGGER.error("Unexpected error happened!: ", e);
+            LOGGER.severe("Unexpected error happened!: " + e);
         }
     }
 }

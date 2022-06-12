@@ -6,8 +6,6 @@ import ogr.user12043.talkOnLan.dao.UserDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.ui.MainUI;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.io.File;
@@ -16,6 +14,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -28,7 +27,7 @@ public class Utils {
     public static final List<NetworkInterface> networkInterfaces = new ArrayList<>(); // network hardware list of device
     public static final Set<InterfaceAddress> hostAddresses = new HashSet<>(); // self ip addresses on each network hardware
     public static final Set<User> roomClients = new HashSet<>(); // users connected the room while hosting room
-    private static final Logger LOGGER = LogManager.getLogger(Utils.class);
+    private static final Logger LOGGER = Logger.getLogger(Utils.class.getName());
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy"); // Date display format date on ui
     private static User self;
     private static User selfRoom;
@@ -50,7 +49,7 @@ public class Utils {
                 hostAddresses.addAll(networkInterface.getInterfaceAddresses());
             }
         } catch (SocketException e) {
-            LOGGER.error("Error on getting network devices info");
+            LOGGER.severe("Error on getting network devices info" + e);
         }
     }
 
@@ -182,7 +181,7 @@ public class Utils {
             }
             return self;
         } catch (UnknownHostException e) {
-            LOGGER.error(e);
+            LOGGER.severe("Error on Utils::self" + e);
             System.exit(1);
         }
         return new User();

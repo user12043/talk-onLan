@@ -3,8 +3,6 @@ package ogr.user12043.talkOnLan.net;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -14,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * Created by user12043 on 26.07.2018 - 11:53
@@ -22,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * The main class for network operations
  */
 public class NetworkService {
-    private static final Logger LOGGER = LogManager.getLogger(NetworkService.class);
+    private static final Logger LOGGER = Logger.getLogger(NetworkService.class.getName());
     private static final ScheduledExecutorService service = Executors.newScheduledThreadPool(Constants.NETWORK_THREADS);
     static DatagramSocket sendSocket; // UDP socket for send discovery
     private static DatagramSocket receiveSocket; // UDP socket for receive discovery
@@ -98,7 +97,7 @@ public class NetworkService {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                LOGGER.error("Error when discovering remote user: ", e);
+                LOGGER.severe("Error when discovering remote user: " + e);
             }
         }
 
@@ -155,7 +154,7 @@ public class NetworkService {
             } catch (IOException e) {
                 throw e;
             } catch (Exception e) {
-                LOGGER.error("invalid file send request from " + incomingSocket.getInetAddress());
+                LOGGER.severe("invalid file send request from " + incomingSocket.getInetAddress());
             }
         }
     }
@@ -172,7 +171,7 @@ public class NetworkService {
             DiscoveryService.sendDiscoveryRequest(broadcastAll);
             DiscoveryService.sendDiscoveryRequestRoom(broadcastAll);
         } catch (IOException e) {
-            LOGGER.error("Discovery send error to " + broadcastAll + " - " + e.getLocalizedMessage());
+            LOGGER.severe("Discovery send error to " + broadcastAll + " - " + e.getLocalizedMessage());
         }
 
         //<editor-fold desc="Broadcast the message over all the network interfaces" defaultstate=collapsed>
@@ -188,7 +187,7 @@ public class NetworkService {
                         DiscoveryService.sendDiscoveryRequest(broadcastAddress);
                         DiscoveryService.sendDiscoveryRequestRoom(broadcastAddress);
                     } catch (IOException e) {
-                        LOGGER.error("Discovery send error to " + broadcastAddress + " - " + e.getLocalizedMessage());
+                        LOGGER.severe("Discovery send error to " + broadcastAddress + " - " + e.getLocalizedMessage());
                     }
                 }
 
@@ -255,7 +254,7 @@ public class NetworkService {
             try {
                 send();
             } catch (Exception e) {
-                LOGGER.error("Error on send() " + e);
+                LOGGER.severe("Error on send() " + e);
             }
         };
 
@@ -263,7 +262,7 @@ public class NetworkService {
             try {
                 receive();
             } catch (Exception e) {
-                LOGGER.error("Error on receive() ", e);
+                LOGGER.severe("Error on receive() " + e);
             }
         });
 
@@ -271,7 +270,7 @@ public class NetworkService {
             try {
                 receiveMessage();
             } catch (Exception e) {
-                LOGGER.error("Error on receiveMessage() ", e);
+                LOGGER.severe("Error on receiveMessage() " + e);
             }
         });
 
@@ -279,7 +278,7 @@ public class NetworkService {
             try {
                 receiveFile();
             } catch (Exception e) {
-                LOGGER.error("Error on receiveFile() ", e);
+                LOGGER.severe("Error on receiveFile() " + e);
             }
         });
 

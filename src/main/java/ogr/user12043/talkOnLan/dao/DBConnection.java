@@ -1,18 +1,17 @@
 package ogr.user12043.talkOnLan.dao;
 
 import ogr.user12043.talkOnLan.util.Properties;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.sql.*;
+import java.util.logging.Logger;
 
 /**
  * Created by user12043 on 9.05.2020 - 00:10
  * part of project: talk-onLan
  */
 public class DBConnection {
-    private static final Logger LOGGER = LogManager.getLogger(DBConnection.class);
+    private static final Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
     private static DBConnection instance;
     private final Connection connection;
     private Statement statement;
@@ -26,7 +25,7 @@ public class DBConnection {
             try {
                 instance = new DBConnection();
             } catch (Exception e) {
-                LOGGER.error("Could not connect to database!", e);
+                LOGGER.severe("Could not connect to database!" + e);
                 JOptionPane.showMessageDialog(null, "Could not connect to database!", "talk-onLan", JOptionPane.ERROR_MESSAGE);
                 System.exit(1);
             }

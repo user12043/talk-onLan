@@ -6,8 +6,6 @@ import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.MessageService;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Utils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,14 +14,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
- * @deprecated
- * Created by user12043 on 31.07.2018 - 16:22
+ * @deprecated Created by user12043 on 31.07.2018 - 16:22
  * part of project: talk-onLan
  */
 class MessagePanel extends javax.swing.JDialog {
-    private static final Logger LOGGER = LogManager.getLogger(MessagePanel.class);
+    private static final Logger LOGGER = Logger.getLogger(MessagePanel.class.getName());
     private final User user; // Remote user
     private final Set<User> participants;
     private int lineNumber;
@@ -136,7 +134,7 @@ class MessagePanel extends javax.swing.JDialog {
             });
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Cannot send the message!", "ERROR", JOptionPane.ERROR_MESSAGE);
-            LOGGER.error("Cannot send the message!", e);
+            LOGGER.severe("Cannot send the message!" + e);
             SwingUtilities.invokeLater(() -> {
                 jTextArea_content.setText(sendingMessage.getContent());
                 setInputEnabled(true);

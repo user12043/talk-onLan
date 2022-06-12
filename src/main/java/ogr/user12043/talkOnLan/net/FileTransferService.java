@@ -11,8 +11,6 @@ import ogr.user12043.talkOnLan.ui.MainUI;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.io.*;
@@ -20,6 +18,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
 /**
  * Created by ME99735 on 10.08.2018 - 09:03
@@ -28,7 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Does file transferring
  */
 public class FileTransferService {
-    private static final Logger LOGGER = LogManager.getLogger(FileTransferService.class);
+    private static final Logger LOGGER = Logger.getLogger(FileTransferService.class.getName());
 
     public static void sendFile(User user, File file) throws IOException {
         // Create send dialog by Alert
@@ -107,7 +106,7 @@ public class FileTransferService {
                     LOGGER.info("invalid send file response received from " + user.getAddress());
             }
         } catch (SocketException e) {
-            LOGGER.error("transfer process interrupted! ", e);
+            LOGGER.severe("transfer process interrupted! " + e);
             Platform.runLater(() -> {
                 a.get().setAlertType(AlertType.ERROR);
                 a.get().setContentText("Transfer process interrupted!");

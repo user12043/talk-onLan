@@ -6,14 +6,13 @@ import ogr.user12043.talkOnLan.dao.MessageDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Utils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.logging.Logger;
 
 /**
  * Created by user12043 on 31.07.2018 - 09:36
@@ -22,10 +21,10 @@ import java.net.Socket;
  * Does message communication
  */
 public class MessageService {
-    private static final Logger LOGGER = LogManager.getLogger(MessageService.class);
+    private static final Logger LOGGER = Logger.getLogger(MessageService.class.getName());
 
     public static void sendMessage(Message message) {
-        LOGGER.debug((message.getMessageType() != Constants.MSG_TYPE_DIRECT ? "Room message"
+        LOGGER.fine((message.getMessageType() != Constants.MSG_TYPE_DIRECT ? "Room message"
                 : "Message") + " sending to " + message.getReceiver().getAddress());
         try {
 //            Socket socket = new Socket(message.getReceiver().getAddress(), Constants.RECEIVE_PORT);
@@ -46,7 +45,7 @@ public class MessageService {
 
     static void receiveMessage(InetAddress senderAddress, String receivedData) {
         Message message = Utils.parseMessage(receivedData, senderAddress);
-        LOGGER.debug((message.getMessageType() != 0 ? "Room message" : "Message") + " received from " + senderAddress);
+        LOGGER.fine((message.getMessageType() != 0 ? "Room message" : "Message") + " received from " + senderAddress);
         if (message.getSender() != null) {
             Platform.runLater(() -> MainController.getInstance().receiveMessage(message));
         }

@@ -9,15 +9,14 @@ import javafx.stage.Stage;
 import ogr.user12043.talkOnLan.dao.DBConnection;
 import ogr.user12043.talkOnLan.net.NetworkService;
 import ogr.user12043.talkOnLan.util.Utils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class TalkOnLanApp extends Application {
-    private static final Logger LOGGER = LogManager.getLogger(TalkOnLanApp.class);
+    private static final Logger LOGGER = Logger.getLogger(TalkOnLanApp.class.getName());
 
     private static Stage primaryStage;
 
@@ -28,7 +27,7 @@ public class TalkOnLanApp extends Application {
             Utils.saveSelf();
             Utils.saveSelfRoom();
         } catch (Exception e) {
-            LOGGER.error("Unexpected error!", e);
+            LOGGER.severe("Unexpected error!" + e);
         }
         launch(args);
     }
@@ -56,7 +55,7 @@ public class TalkOnLanApp extends Application {
             try {
                 DBConnection.get().close();
             } catch (SQLException e) {
-                LOGGER.error("Error while closing!", e);
+                LOGGER.severe("Error while closing!" + e);
             }
             Platform.exit();
             System.exit(0);

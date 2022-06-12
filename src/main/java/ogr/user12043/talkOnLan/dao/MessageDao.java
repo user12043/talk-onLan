@@ -5,21 +5,20 @@ import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.DBUtils;
 import ogr.user12043.talkOnLan.util.Utils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Created by user12043 on 9.05.2020 - 09:41
  * part of project: talk-onLan
  */
 public class MessageDao implements Dao<Message, Integer> {
-    private static final Logger LOGGER = LogManager.getLogger(MessageDao.class);
+    private static final Logger LOGGER = Logger.getLogger(MessageDao.class.getName());
     private static MessageDao instance;
     private final DBConnection db;
 
@@ -55,7 +54,7 @@ public class MessageDao implements Dao<Message, Integer> {
                 return message;
             }
         } catch (SQLException | ParseException e) {
-            LOGGER.error(e);
+            LOGGER.severe("Error on MessageDao::findById" + e);
         }
         return null;
     }
@@ -87,7 +86,7 @@ public class MessageDao implements Dao<Message, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            LOGGER.error(e);
+            LOGGER.severe("Error on MessageDao::save" + e);
         }
     }
 
@@ -104,7 +103,7 @@ public class MessageDao implements Dao<Message, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            LOGGER.error(e);
+            LOGGER.severe("Error on MessageDao::deleteById" + e);
         }
     }
 
@@ -155,7 +154,7 @@ public class MessageDao implements Dao<Message, Integer> {
             list.sort(Comparator.comparing(Message::getSentDate));
             return list;
         } catch (SQLException | ParseException e) {
-            LOGGER.error(e);
+            LOGGER.severe("Error on MessageDao::getMessages" + e);
         }
         return null;
     }

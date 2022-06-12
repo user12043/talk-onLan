@@ -2,8 +2,6 @@ package ogr.user12043.talkOnLan.dao;
 
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.util.DBUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.net.InetAddress;
 import java.sql.ResultSet;
@@ -12,13 +10,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Created by user12043 on 9.05.2020 - 09:42
  * part of project: talk-onLan
  */
 public class UserDao implements Dao<User, Integer> {
-    private static final Logger LOGGER = LogManager.getLogger(UserDao.class);
+    private static final Logger LOGGER = Logger.getLogger(UserDao.class.getName());
     private static UserDao instance;
     private final DBConnection db;
 
@@ -49,7 +48,7 @@ public class UserDao implements Dao<User, Integer> {
                 db.closeStatement();
                 return new ArrayList<>(users);
             } catch (SQLException e) {
-                LOGGER.error(e);
+                LOGGER.severe("Error on UserDao::find" + e);
             }
             return null;
         }
@@ -68,7 +67,7 @@ public class UserDao implements Dao<User, Integer> {
                 return user;
             }
         } catch (SQLException e) {
-            LOGGER.error(e);
+            LOGGER.severe("Error on UserDao::findById" + e);
         }
         return null;
     }
@@ -91,7 +90,7 @@ public class UserDao implements Dao<User, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            LOGGER.error(e);
+            LOGGER.severe("Error on UserDao::save" + e);
         }
     }
 
@@ -108,7 +107,7 @@ public class UserDao implements Dao<User, Integer> {
             db.executeUpdateQuery(query);
             db.closeStatement();
         } catch (SQLException e) {
-            LOGGER.error(e);
+            LOGGER.severe("Error on UserDao::deleteById" + e);
         }
     }
 
@@ -140,7 +139,7 @@ public class UserDao implements Dao<User, Integer> {
                 return result;
             }
         } catch (SQLException e) {
-            LOGGER.error(e);
+            LOGGER.severe("Error on UserDao::getuser" + e);
         }
         return null;
     }

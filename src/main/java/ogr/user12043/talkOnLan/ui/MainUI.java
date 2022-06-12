@@ -10,8 +10,6 @@ import ogr.user12043.talkOnLan.net.NetworkService;
 import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,15 +23,15 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- * @deprecated
- * Created by user12043 on 31.07.2018 - 12:05
+ * @deprecated Created by user12043 on 31.07.2018 - 12:05
  * part of project: talk-onLan
  */
 public class MainUI extends javax.swing.JFrame {
-    private static final Logger LOGGER = LogManager.getLogger(MainUI.class);
+    private static final Logger LOGGER = Logger.getLogger(MainUI.class.getName());
 
     private static MainUI mainUI; // To create one instance of MainUI
     private final Set<MessagePanel> messagePanels;
@@ -504,7 +502,7 @@ public class MainUI extends javax.swing.JFrame {
             }).start();
         } catch (Exception e) {
             toggleLoading();
-            LOGGER.error("Unable to start discovery", e);
+            LOGGER.severe("Unable to start discovery" + e);
             JOptionPane.showMessageDialog(this, "Unable to start discovery. Check network connectivity", "ERROR", JOptionPane.ERROR_MESSAGE);
             jButton_startDiscovery.setEnabled(true);
         }
@@ -531,7 +529,7 @@ public class MainUI extends javax.swing.JFrame {
                 buddiesPanel.setEnabled(false);
                 roomsPanel.setEnabled(false);
             } catch (IOException e) {
-                LOGGER.error("Error on service end", e);
+                LOGGER.severe("Error on service end" + e);
                 JOptionPane.showMessageDialog(this, "Can not end discovery!", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
             toggleLoading();
@@ -626,7 +624,7 @@ public class MainUI extends javax.swing.JFrame {
         try {
             DBConnection.get().close();
         } catch (SQLException e) {
-            LOGGER.error("Error while closing", e);
+            LOGGER.severe("Error while closing" + e);
         }
     }//GEN-LAST:event_formWindowClosing
 
