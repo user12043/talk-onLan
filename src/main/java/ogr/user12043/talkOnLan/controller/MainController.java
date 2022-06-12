@@ -104,15 +104,9 @@ public class MainController implements Initializable {
         try {
             if (NetworkService.isServiceUp()) {
                 btn_startStopHardDiscovery.setDisable(true);
-                btn_hostRoom.setDisable(true);
-                btn_hostPrivateRoom.setDisable(true);
-                btn_addManually.setDisable(true);
                 NetworkService.end();
             } else {
                 btn_startStopHardDiscovery.setDisable(false);
-                btn_hostRoom.setDisable(false);
-                btn_hostPrivateRoom.setDisable(false);
-                btn_addManually.setDisable(false);
                 NetworkService.start();
             }
         } catch (IOException e) {
