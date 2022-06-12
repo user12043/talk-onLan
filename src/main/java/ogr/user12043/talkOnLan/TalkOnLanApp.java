@@ -28,6 +28,7 @@ public class TalkOnLanApp extends Application {
             Utils.saveSelfRoom();
         } catch (Exception e) {
             LOGGER.severe("Unexpected error!\n" + e);
+            System.exit(-1);
         }
         launch(args);
     }

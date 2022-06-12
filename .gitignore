@@ -185,3 +185,6 @@ buildNumber.properties
 
 ### H2 database files
 *.mv.db
+
+### SQLITE database files
+*.db

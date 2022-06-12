@@ -222,53 +222,29 @@ public class Utils {
             final DBConnection connection = DBConnection.get();
             connection.openStatement();
             connection.executeUpdateQuery( // Contents from db.sql
-                    "-- ID Sequences\n" +
-                            "CREATE SEQUENCE PUBLIC.SEQ_USER;\n" +
-                            "CREATE SEQUENCE PUBLIC.SEQ_MESSAGE;\n" +
-                            "\n" +
-                            "-- PUBLIC.USERS definition\n" +
-                            "\n" +
-                            "-- Drop table\n" +
-                            "\n" +
-                            "-- DROP TABLE PUBLIC.USERS;\n" +
-                            "\n" +
-                            "CREATE TABLE PUBLIC.USERS (\n" +
-                            "\tID INTEGER DEFAULT NEXT VALUE FOR \"PUBLIC\".\"SEQ_USER\" NOT NULL,\n" +
+                    "CREATE TABLE USERS (\n" +
+                            "\tID INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                             "\tUSERNAME VARCHAR(100) NOT NULL,\n" +
                             "\tADDRESS VARCHAR(15) NOT NULL,\n" +
-                            "\tIS_ROOM BOOLEAN,\n" +
-                            "\tCONSTRAINT USERS_PK PRIMARY KEY (ID)\n" +
-                            ");\n" +
-                            "CREATE UNIQUE INDEX PRIMARY_KEY_61 ON PUBLIC.USERS (ID);\n" +
-                            "\n" +
-                            "-- PUBLIC.MESSAGES definition\n" +
-                            "\n" +
-                            "-- Drop table\n" +
-                            "\n" +
-                            "-- DROP TABLE PUBLIC.MESSAGES;\n" +
-                            "\n" +
-                            "CREATE TABLE PUBLIC.MESSAGES (\n" +
-                            "\tID INTEGER DEFAULT NEXT VALUE FOR \"PUBLIC\".\"SEQ_MESSAGE\" NOT NULL,\n" +
+                            "\tIS_ROOM BOOLEAN\n" +
+                            ")");
+            connection.executeUpdateQuery("CREATE UNIQUE INDEX PRIMARY_KEY_61 ON USERS (ID);");
+            connection.executeUpdateQuery(
+                    "CREATE TABLE MESSAGES (\n" +
+                            "\tID INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                             "\tCONTENT VARCHAR(500),\n" +
                             "\tSENT_DATE BIGINT NOT NULL,\n" +
                             "\t\"TYPE\" SMALLINT NOT NULL,\n" +
                             "\tSENDER_ID INTEGER NOT NULL,\n" +
                             "\tRECEIVER_ID INTEGER NOT NULL,\n" +
                             "\tFWD_USER_ID INTEGER,\n" +
-                            "\tSENT BOOLEAN,\n" +
-                            "\tCONSTRAINT MESSAGES_PK PRIMARY KEY (ID)\n" +
-                            ");\n" +
-                            "CREATE INDEX MESSAGES_FK_FWD_INDEX_8 ON PUBLIC.MESSAGES (FWD_USER_ID);\n" +
-                            "CREATE INDEX MESSAGES_FK_RECEIVER_INDEX_8 ON PUBLIC.MESSAGES (RECEIVER_ID);\n" +
-                            "CREATE INDEX MESSAGES_FK_SENDER_INDEX_8 ON PUBLIC.MESSAGES (SENDER_ID);\n" +
-                            "CREATE UNIQUE INDEX PRIMARY_KEY_8 ON PUBLIC.MESSAGES (ID);\n" +
-                            "\n" +
-                            "\n" +
-                            "-- PUBLIC.MESSAGES foreign keys\n" +
-                            "\n" +
-                            "ALTER TABLE PUBLIC.MESSAGES ADD CONSTRAINT MESSAGES_FK_FWD FOREIGN KEY (FWD_USER_ID) REFERENCES PUBLIC.USERS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT;\n" +
-                            "ALTER TABLE PUBLIC.MESSAGES ADD CONSTRAINT MESSAGES_FK_RECEIVER FOREIGN KEY (RECEIVER_ID) REFERENCES PUBLIC.USERS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT;\n" +
-                            "ALTER TABLE PUBLIC.MESSAGES ADD CONSTRAINT MESSAGES_FK_SENDER FOREIGN KEY (SENDER_ID) REFERENCES PUBLIC.USERS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT;");
+                            "\tSENT BOOLEAN\n" +
+                            ")"
+            );
+            connection.executeUpdateQuery("CREATE INDEX MESSAGES_FK_FWD_INDEX_8 ON MESSAGES (FWD_USER_ID)");
+            connection.executeUpdateQuery("CREATE INDEX MESSAGES_FK_RECEIVER_INDEX_8 ON MESSAGES (RECEIVER_ID)");
+            connection.executeUpdateQuery("CREATE INDEX MESSAGES_FK_SENDER_INDEX_8 ON MESSAGES (SENDER_ID)");
+            connection.executeUpdateQuery("CREATE UNIQUE INDEX PRIMARY_KEY_8 ON MESSAGES (ID)");
             connection.closeStatement();
         }
     }

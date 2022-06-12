@@ -17,7 +17,7 @@ public class DBConnection {
     private Statement statement;
 
     private DBConnection() throws SQLException {
-        connection = DriverManager.getConnection(Properties.databaseUrl, Properties.databaseUsername, Properties.databasePassword);
+        connection = DriverManager.getConnection(Properties.databaseUrl);
     }
 
     public static DBConnection get() {

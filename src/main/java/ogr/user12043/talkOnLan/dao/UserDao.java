@@ -78,7 +78,7 @@ public class UserDao implements Dao<User, Integer> {
         if (user.getId() != null) {
             query = "UPDATE users SET username=':username:', address=':address:', is_room=:isRoom: WHERE id=" + user.getId();
         } else {
-            query = "INSERT INTO users VALUES(DEFAULT, ':username:', ':address:', :isRoom:)";
+            query = "INSERT INTO users (USERNAME, ADDRESS, IS_ROOM) VALUES(':username:', ':address:', :isRoom:)";
         }
 
         query = query.replace(":username:", user.getUsername());

@@ -27,7 +27,7 @@ public class Constants {
     public static final int MSG_TYPE_FWD = 2; // Messages from connected room
     public static final int MSG_TYPE_PRIVATE_ROOM = 3; // Messages sent or received as private
     public static final int MSG_TYPE_FWD_PRIVATE = 4; // Messages sent or received as private
-    public static final String DB_FILE = "data.mv.db";
+    public static final String DB_FILE = "data.db";
     public static final String STATUS_OFFLINE = "OFFLINE";
     public static final String STATUS_ONLINE = "ONLINE";
 }

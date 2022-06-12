@@ -17,7 +17,7 @@
     <maven.compiler.release>11</maven.compiler.release>
     <project.main-class>ogr.user12043.talkOnLan.TalkOnLanApp</project.main-class>
     <lib-folder>lib</lib-folder>
-    <h2.version>2.1.210</h2.version>
+    <sqlite.version>3.36.0.3</sqlite.version>
     <javafx.version>18</javafx.version>
   </properties>
 
@@ -31,10 +31,11 @@
 
     <!--=========================================DATABASE=========================================-->
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>${h2.version}</version>
+      <groupId>org.xerial</groupId>
+      <artifactId>sqlite-jdbc</artifactId>
+      <version>${sqlite.version}</version>
     </dependency>
+
 
     <!--=========================================JAVAFX=========================================-->
     <dependency>

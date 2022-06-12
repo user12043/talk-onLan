@@ -66,7 +66,7 @@ public class MessageDao implements Dao<Message, Integer> {
             query = "UPDATE messages SET content=':content:', sent_date=':sentDate:', type=:messageType:" +
                     ", sender_id=:senderId:, receiver_id=:receiverId:, fwd_user_id=:fwdUserId:, sent=:sent: WHERE id=" + message.getId();
         } else {
-            query = "INSERT INTO messages VALUES(DEFAULT, ':content:', ':sentDate:', :messageType:, :senderId:, :receiverId:" +
+            query = "INSERT INTO messages (CONTENT, SENT_DATE, TYPE, SENDER_ID, RECEIVER_ID, FWD_USER_ID, SENT) VALUES(':content:', ':sentDate:', :messageType:, :senderId:, :receiverId:" +
                     ", :fwdUserId:, :sent:)";
         }
 
