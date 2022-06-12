@@ -11,5 +11,5 @@ public class Properties {
     public static boolean roomMode = false;
     public static String databaseUrl = "jdbc:h2:./data";
     public static String databaseUsername = "talk-onLan";
-    public static String databasePassword = "myAwesomePassword";
+    public static String databasePassword = "a3c33518-d429-42f7-8dd0-31eaa828905c";
 }
