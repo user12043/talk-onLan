@@ -19,6 +19,8 @@ import java.util.Objects;
 public class TalkOnLanApp extends Application {
     private static final Logger LOGGER = LogManager.getLogger(TalkOnLanApp.class);
 
+    private static Stage primaryStage;
+
     public static void main(String[] args) {
         try {
             System.setProperty("java.net.preferIPv4Stack", "true"); // Set prefer to ipv4 addresses in java
@@ -31,8 +33,13 @@ public class TalkOnLanApp extends Application {
         launch(args);
     }
 
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
     @Override
     public void start(Stage primaryStage) throws IOException {
+        TalkOnLanApp.primaryStage = primaryStage;
         Parent p = new FXMLLoader(getClass().getResource("controller/main.fxml")).load();
         Scene scene = new Scene(p);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());

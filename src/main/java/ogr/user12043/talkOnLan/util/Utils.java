@@ -1,5 +1,6 @@
 package ogr.user12043.talkOnLan.util;
 
+import javafx.application.Platform;
 import ogr.user12043.talkOnLan.dao.DBConnection;
 import ogr.user12043.talkOnLan.dao.UserDao;
 import ogr.user12043.talkOnLan.model.Message;
@@ -14,6 +15,7 @@ import java.net.*;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
 /**
@@ -269,6 +271,23 @@ public class Utils {
                             "ALTER TABLE PUBLIC.MESSAGES ADD CONSTRAINT MESSAGES_FK_RECEIVER FOREIGN KEY (RECEIVER_ID) REFERENCES PUBLIC.USERS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT;\n" +
                             "ALTER TABLE PUBLIC.MESSAGES ADD CONSTRAINT MESSAGES_FK_SENDER FOREIGN KEY (SENDER_ID) REFERENCES PUBLIC.USERS(ID) ON DELETE RESTRICT ON UPDATE RESTRICT;");
             connection.closeStatement();
+        }
+    }
+
+    // JavaFX does not provide Platform.runAndWait(). So I need to implement my own one.
+    public static void platformRunAndWait(Runnable r) {
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                r.run();
+            } finally {
+                latch.countDown();
+            }
+        });
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }

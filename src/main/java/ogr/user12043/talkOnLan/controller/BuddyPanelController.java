@@ -5,15 +5,22 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.FileChooser;
+import ogr.user12043.talkOnLan.TalkOnLanApp;
 import ogr.user12043.talkOnLan.dao.MessageDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.net.DiscoveryService;
+import ogr.user12043.talkOnLan.net.FileTransferService;
 import ogr.user12043.talkOnLan.net.MessageService;
 import ogr.user12043.talkOnLan.util.Constants;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -94,6 +101,21 @@ public class BuddyPanelController implements Initializable {
     @FXML
     private void messageAction(ActionEvent actionEvent) {
         messagePanelController.show();
+    }
+
+    @FXML
+    private void fileAction(ActionEvent actionEvent) {
+        FileChooser chooser = new FileChooser();
+        final File file = chooser.showOpenDialog(TalkOnLanApp.getPrimaryStage());
+        if (file != null) {
+            new Thread(() -> {
+                try {
+                    FileTransferService.sendFile(user, file);
+                } catch (IOException e) {
+                    Platform.runLater(() -> new Alert(AlertType.ERROR, ("Unable to send file:\n" + e)).showAndWait());
+                }
+            }).start();
+        }
     }
 
     public void receiveMessage(Message message) {

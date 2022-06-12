@@ -1,5 +1,10 @@
 package ogr.user12043.talkOnLan.net;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ProgressIndicator;
 import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.ui.FileTransferDialog;
 import ogr.user12043.talkOnLan.ui.MainUI;
@@ -13,6 +18,8 @@ import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by ME99735 on 10.08.2018 - 09:03
@@ -23,8 +30,20 @@ import java.net.SocketException;
 public class FileTransferService {
     private static final Logger LOGGER = LogManager.getLogger(FileTransferService.class);
 
-    public static void sendFile(User user, File file) throws IOException, SecurityException {
-        FileTransferDialog dialog = new FileTransferDialog(MainUI.getUI(), user, true, file.getName());
+    public static void sendFile(User user, File file) throws IOException {
+        // Create send dialog by Alert
+        AtomicReference<Alert> a = new AtomicReference<>(); // Alert will be used by multiple threads
+        AtomicBoolean dialogClosed = new AtomicBoolean(false); // To be set true when sender cancels
+        Utils.platformRunAndWait(() -> {
+            a.set(new Alert(AlertType.NONE));
+            a.get().setTitle(file.getName());
+            a.get().getButtonTypes().add(ButtonType.CANCEL);
+            final ProgressIndicator indicator = new ProgressIndicator(0.0);
+            a.get().setGraphic(indicator);
+            a.get().setHeaderText("Send file to " + user.getUsername() + " at " + user.getAddress());
+            a.get().setOnCloseRequest(event -> dialogClosed.set(true));
+            a.get().show();
+        });
 
         Socket socket = null;
         DataOutputStream outputStream;
@@ -35,50 +54,64 @@ public class FileTransferService {
             outputStream = new DataOutputStream(socket.getOutputStream());
             inputStream = new DataInputStream(socket.getInputStream());
             fileInputStream = new DataInputStream(new FileInputStream(file));
-            // Send send request
+            // Send the file send request
             outputStream.writeUTF(Constants.COMMAND_FILE_TRANSFER_REQUEST + Constants.COMMAND_SEPARATOR + file.length() + Constants.COMMAND_SEPARATOR + file.getName());
             LOGGER.info("file send request sent to " + user.getAddress() + "for file \"" + file.getName() + "\"");
+            Utils.platformRunAndWait(() ->
+                    a.get().setContentText("Waiting for approval on " + user.getUsername() + " side..."));
 
-            // Receive ok response
             String response = inputStream.readUTF();
             switch (response) {
                 case Constants.COMMAND_FILE_TRANSFER_RESPONSE_ACCEPT:
+                    // Receive ok response
                     LOGGER.info("sending file \"" + file.getName() + "\" to " + user.getAddress());
 
-                    dialog.startTransfer();
+                    Utils.platformRunAndWait(() -> a.get().setContentText("Sending the file..."));
                     byte[] buffer = new byte[Constants.FILE_BUFFER_LENGTH];
                     int readBytes;
-                    long ration = file.length() / 100;
-                    long amountProcessed = 0;
-                    try {
-                        while ((readBytes = fileInputStream.read(buffer)) != -1) {
-                            if (dialog.cancelled()) {
-                                socket.shutdownOutput();
-                                socket.close();
-                                fileInputStream.close();
-                                return;
-                            }
-                            outputStream.write(buffer, 0, readBytes);
-                            amountProcessed += readBytes;
-                            dialog.setProgress((int) (amountProcessed / ration));
+                    double amountProcessed = 0;
+                    while ((readBytes = fileInputStream.read(buffer)) != -1) {
+                        if (dialogClosed.get()) {
+                            socket.shutdownOutput();
+                            socket.close();
+                            fileInputStream.close();
+                            LOGGER.info("sending interrupted, user closed the dialog");
+                            return;
                         }
-                    } catch (SocketException e) {
-                        if (e.getMessage().equals("Software caused connection abort: socket write error")) {
-                            JOptionPane.showMessageDialog(dialog, ("File did not send! Transfer interrupted by receiver"), "ERROR", JOptionPane.ERROR_MESSAGE);
-                            dialog.dispose();
-                        } else {
-                            throw e;
-                        }
+                        outputStream.write(buffer, 0, readBytes);
+                        amountProcessed += readBytes;
+                        double progress = amountProcessed / file.length();
+                        Utils.platformRunAndWait(() -> {
+                            ((ProgressIndicator) a.get().getGraphic()).setProgress(progress);
+                            a.get().setTitle("%" + Math.ceil(progress) + " " + file.getName());
+                        });
                     }
 
                     LOGGER.info("\"" + file.getName() + "\" file sent to " + user.getAddress());
+                    Utils.platformRunAndWait(() -> {
+                        a.get().setAlertType(AlertType.INFORMATION);
+                        a.get().setContentText("Successfully sent the file");
+                        a.get().getButtonTypes().clear();
+                        a.get().getButtonTypes().add(ButtonType.FINISH);
+                    });
                     break;
                 case Constants.COMMAND_FILE_TRANSFER_RESPONSE_REJECT:
-                    dialog.dispose();
-                    throw new SecurityException();
+                    // Receive negative response
+                    Utils.platformRunAndWait(() -> {
+                        a.get().setAlertType(AlertType.WARNING);
+                        a.get().setContentText("File did not send. Target user rejected the request");
+                        a.get().getButtonTypes().clear();
+                        a.get().getButtonTypes().add(ButtonType.CLOSE);
+                    });
                 default:
                     LOGGER.info("invalid send file response received from " + user.getAddress());
             }
+        } catch (SocketException e) {
+            LOGGER.error("transfer process interrupted! ", e);
+            Platform.runLater(() -> {
+                a.get().setAlertType(AlertType.ERROR);
+                a.get().setContentText("Transfer process interrupted!");
+            });
         } finally {
             if (socket != null) {
                 socket.close();
