@@ -1,6 +1,8 @@
 package ogr.user12043.talkOnLan.util;
 
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import ogr.user12043.talkOnLan.dao.DBConnection;
 import ogr.user12043.talkOnLan.dao.UserDao;
 import ogr.user12043.talkOnLan.model.Message;
@@ -14,6 +16,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -264,5 +267,28 @@ public class Utils {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String getUserFriendlyFileSize(long fileSize) {
+        String fileSizeString = "";
+        if (fileSize < 1024) {
+            fileSizeString = (fileSize + " Bytes");
+        } else if (fileSize < 1024 * 1024) {
+            fileSizeString = (fileSize / 1024) + " KB";
+        } else if (fileSize < 1024 * 1024 * 1024) {
+            fileSizeString = (fileSize / 1024 / 1024) + " MB";
+        }
+        return fileSizeString;
+    }
+
+    public static boolean getConfirmationByAlert(String message) {
+        AtomicBoolean confirmed = new AtomicBoolean(false);
+        platformRunAndWait(() -> {
+            final Optional<ButtonType> buttonType = new Alert(Alert.AlertType.CONFIRMATION, message).showAndWait();
+            if (buttonType.isPresent() && buttonType.get() == ButtonType.OK) {
+                confirmed.set(true);
+            }
+        });
+        return confirmed.get();
     }
 }
