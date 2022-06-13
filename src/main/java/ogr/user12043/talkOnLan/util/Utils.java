@@ -7,7 +7,6 @@ import ogr.user12043.talkOnLan.dao.DBConnection;
 import ogr.user12043.talkOnLan.dao.UserDao;
 import ogr.user12043.talkOnLan.model.Message;
 import ogr.user12043.talkOnLan.model.User;
-import ogr.user12043.talkOnLan.ui.MainUI;
 
 import javax.swing.*;
 import java.io.File;
@@ -75,33 +74,6 @@ public class Utils {
 //        List<String> installed = Arrays.stream(Themes.INSTALLED_LOOK_AND_FEELS).map(UIManager.LookAndFeelInfo::getName).collect(Collectors.toList());
 //        installed.addAll(Arrays.asList(Themes.THEMES));
         return Arrays.stream(Themes.INSTALLED_LOOK_AND_FEELS).map(UIManager.LookAndFeelInfo::getName).toArray(String[]::new);
-    }
-
-    /**
-     * Changes look and feel and updates the {@link MainUI}
-     *
-     * @param themeName Theme name to set
-     * @return true if theme found and applied
-     */
-    public static boolean changeTheme(String themeName) {
-        try {
-            LookAndFeel lookAndFeel = Themes.get(themeName);
-            if (lookAndFeel != null) {
-                UIManager.setLookAndFeel(lookAndFeel);
-                SwingUtilities.updateComponentTreeUI(MainUI.getUI());
-                return true;
-            } else {
-                for (UIManager.LookAndFeelInfo lookAndFeelInfo : UIManager.getInstalledLookAndFeels()) {
-                    if (lookAndFeelInfo.getName().equals(themeName)) {
-                        UIManager.setLookAndFeel(lookAndFeelInfo.getClassName());
-                        SwingUtilities.updateComponentTreeUI(MainUI.getUI());
-                        return true;
-                    }
-                }
-            }
-        } catch (Exception ignored) {
-        }
-        return false;
     }
 
     public static String getCurrentTheme() {
