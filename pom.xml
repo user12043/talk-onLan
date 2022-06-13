@@ -49,6 +49,25 @@
       <version>${javafx.version}</version>
     </dependency>
 
+    <!-- Uncomment for cross-platform fat jar-->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>${javafx.version}</version>
+      <classifier>win</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>${javafx.version}</version>
+      <classifier>linux</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>${javafx.version}</version>
+      <classifier>mac</classifier>
+    </dependency>
   </dependencies>
 
   <!--Note about in project repository: If there is a mirror in "settings.xml" file, then the mirror must be excluded for the in project repository with:
