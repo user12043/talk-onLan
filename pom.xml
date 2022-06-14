@@ -19,6 +19,8 @@
     <lib-folder>lib</lib-folder>
     <sqlite.version>3.36.0.3</sqlite.version>
     <javafx.version>18</javafx.version>
+    <jlink-image-name>${project.name}</jlink-image-name>
+    <sqlite-jar-name>sqlite-jdbc.jar</sqlite-jar-name>
   </properties>
 
   <dependencies>
@@ -123,11 +125,44 @@ or
         <version>0.0.8</version>
         <configuration>
           <mainClass>talkOnLan/ogr.user12043.talkOnLan.TalkOnLanApp</mainClass>
-          <jlinkImageName>talk-onLan</jlinkImageName>
+          <jlinkImageName>${jlink-image-name}</jlinkImageName>
           <launcher>talk-onLan-${project.version}</launcher>
           <compress>2</compress>
           <noHeaderFiles>true</noHeaderFiles>
           <noManPages>true</noManPages>
+          <options>-cp ../lib/${sqlite-jar-name}</options>
+        </configuration>
+      </plugin>
+
+      <!-- Include non-modular dependencies like sqlite in the output -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <artifactItems>
+            <!-- Copy sqlite jar to jlink image -->
+            <artifactItem>
+              <groupId>org.xerial</groupId>
+              <artifactId>sqlite-jdbc</artifactId>
+              <version>${sqlite.version}</version>
+              <type>jar</type>
+              <overWrite>true</overWrite>
+              <!--<outputDirectory>${project.build.directory}/${jlink-image-name}/lib</outputDirectory>-->
+              <destFileName>${sqlite-jar-name}</destFileName>
+            </artifactItem>
+          </artifactItems>
+          <outputDirectory>${project.build.directory}/${jlink-image-name}/lib</outputDirectory>
+          <overWriteReleases>true</overWriteReleases>
+          <overWriteSnapshots>true</overWriteSnapshots>
         </configuration>
       </plugin>
     </plugins>
