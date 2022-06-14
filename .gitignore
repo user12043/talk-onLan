@@ -188,3 +188,6 @@ buildNumber.properties
 
 ### SQLITE database files
 *.db
+
+### Release folder
+release/
