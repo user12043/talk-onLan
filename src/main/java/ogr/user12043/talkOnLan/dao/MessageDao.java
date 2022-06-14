@@ -78,7 +78,7 @@ public class MessageDao implements Dao<Message, Integer> {
         query = query.replace(":receiverId:", String.valueOf(message.getReceiver().getId()));
         query = query.replace(":fwdUserId:",
                 message.getForwardedFrom() != null ? String.valueOf(message.getForwardedFrom().getId())
-                        : "DEFAULT"
+                        : "null"
         );
 
         try {
