@@ -204,6 +204,7 @@ public class Utils {
                             "\tIS_ROOM BOOLEAN\n" +
                             ")");
             connection.executeUpdateQuery("CREATE UNIQUE INDEX PRIMARY_KEY_61 ON USERS (ID);");
+            connection.executeUpdateQuery("CREATE UNIQUE INDEX USERS_USERNAME_IDX ON USERS (USERNAME,ADDRESS,IS_ROOM);");
             connection.executeUpdateQuery(
                     "CREATE TABLE MESSAGES (\n" +
                             "\tID INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
