@@ -6,9 +6,10 @@ import ogr.user12043.talkOnLan.util.Constants;
 import ogr.user12043.talkOnLan.util.DBUtils;
 import ogr.user12043.talkOnLan.util.Utils;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.Types;
 import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -37,21 +38,35 @@ public class MessageDao implements Dao<Message, Integer> {
     @Override
     public List<Message> find() {
         String query = "SELECT * FROM messages";
-        return getMessages(query);
+        Set<Message> messages = new HashSet<>();
+        try {
+            db.openStatement();
+            final ResultSet resultSet = db.executeSelectQuery(query);
+            while (!resultSet.isClosed() && resultSet.next()) {
+                Message message = DBUtils.resultSetToMessage(resultSet);
+                messages.add(message);
+            }
+            db.closeStatement();
+            return new ArrayList<>(messages);
+        } catch (SQLException | ParseException e) {
+            LOGGER.severe("Erron on MessageDao::find\n" + e);
+            return null;
+        }
     }
 
     @Override
     public Message findById(Integer id) {
-        String query = "SELECT * FROM messages WHERE id=" + id;
+        String query = "SELECT * FROM messages WHERE id=?";
         Message message;
         try {
-            db.openStatement();
-            ResultSet resultSet = db.executeSelectQuery(query);
-            if (resultSet.next()) {
-                message = DBUtils.resultSetToMessage(resultSet);
-                fillUsers(message, resultSet);
-                db.closeStatement();
-                return message;
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setInt(1, id);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    message = DBUtils.resultSetToMessage(resultSet);
+                    fillUsers(message, resultSet);
+                    return message;
+                }
             }
         } catch (SQLException | ParseException e) {
             LOGGER.severe("Error on MessageDao::findById\n" + e);
@@ -63,28 +78,31 @@ public class MessageDao implements Dao<Message, Integer> {
     public void save(Message message) {
         String query;
         if (message.getId() != null) {
-            query = "UPDATE messages SET content=':content:', sent_date=':sentDate:', type=:messageType:" +
-                    ", sender_id=:senderId:, receiver_id=:receiverId:, fwd_user_id=:fwdUserId:, sent=:sent: WHERE id=" + message.getId();
+            query = "UPDATE messages SET content=?, sent_date=?, type=?" +
+                    ", sender_id=?, receiver_id=?, fwd_user_id=?, sent=? WHERE id=?";
         } else {
-            query = "INSERT INTO messages (CONTENT, SENT_DATE, TYPE, SENDER_ID, RECEIVER_ID, FWD_USER_ID, SENT) VALUES(':content:', ':sentDate:', :messageType:, :senderId:, :receiverId:" +
-                    ", :fwdUserId:, :sent:)";
+            query = "INSERT INTO messages (CONTENT, SENT_DATE, TYPE, SENDER_ID, RECEIVER_ID, FWD_USER_ID, SENT)" +
+                    "VALUES(?, ?, ?, ?, ?, ?, ?)";
         }
 
-        query = query.replace(":content:", message.getContent());
-        query = query.replace(":sentDate:", String.valueOf(message.getSentDate().getTime()));
-        query = query.replace(":messageType:", String.valueOf(message.getMessageType()));
-        query = query.replace(":sent:", String.valueOf(message.isSent()));
-        query = query.replace(":senderId:", String.valueOf(message.getSender().getId()));
-        query = query.replace(":receiverId:", String.valueOf(message.getReceiver().getId()));
-        query = query.replace(":fwdUserId:",
-                message.getForwardedFrom() != null ? String.valueOf(message.getForwardedFrom().getId())
-                        : "null"
-        );
-
         try {
-            db.openStatement();
-            db.executeUpdateQuery(query);
-            db.closeStatement();
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setString(1, message.getContent());
+                preparedStatement.setLong(2, message.getSentDate().getTime());
+                preparedStatement.setInt(3, message.getMessageType());
+                preparedStatement.setInt(4, message.getSender().getId());
+                preparedStatement.setInt(5, message.getReceiver().getId());
+                if (message.getForwardedFrom() != null && message.getForwardedFrom().getId() != null) {
+                    preparedStatement.setInt(6, message.getForwardedFrom().getId());
+                } else {
+                    preparedStatement.setNull(6, Types.INTEGER);
+                }
+                preparedStatement.setBoolean(7, message.isSent());
+                if (message.getId() != null) {
+                    preparedStatement.setInt(8, message.getId());
+                }
+                preparedStatement.executeUpdate();
+            }
         } catch (SQLException e) {
             LOGGER.severe("Error on MessageDao::save\n" + e);
         }
@@ -97,59 +115,94 @@ public class MessageDao implements Dao<Message, Integer> {
 
     @Override
     public void deleteById(Integer id) {
-        String query = "DELETE FROM messages WHERE id=" + id;
+        String query = "DELETE FROM messages WHERE id=?";
         try {
-            db.openStatement();
-            db.executeUpdateQuery(query);
-            db.closeStatement();
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setInt(1, id);
+                preparedStatement.executeUpdate();
+            }
         } catch (SQLException e) {
             LOGGER.severe("Error on MessageDao::deleteById\n" + e);
         }
     }
 
     public List<Message> findConversation(User sender, User receiver) {
-        String query = "SELECT * FROM messages WHERE (sender_id=" + sender.getId() + " AND receiver_id="
-                + receiver.getId() + ") OR (sender_id=" + receiver.getId() + " AND receiver_id=" + sender.getId()
-                + ") ORDER BY sent_date";
-        return getMessages(query);
+        String query = "SELECT * FROM messages WHERE (sender_id=? AND receiver_id=?)" +
+                " OR (sender_id=? AND receiver_id=?) ORDER BY sent_date";
+        try {
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setInt(1, sender.getId());
+                preparedStatement.setInt(2, receiver.getId());
+                preparedStatement.setInt(3, receiver.getId());
+                preparedStatement.setInt(4, sender.getId());
+                final ResultSet resultSet = preparedStatement.executeQuery();
+                return getMessages(resultSet);
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error on MessageDao::findConversation\n" + e);
+            return null;
+        }
     }
 
     public List<Message> findRoomConversation(User room) {
-        String query = "SELECT * FROM messages WHERE (type=:fwdMessageType: AND sender_id=:roomId:) " +
-                "OR (type=:roomMessageType: AND sender_id=:selfId: AND receiver_id=:roomId:)";
-        query = query.replace(":fwdMessageType:", String.valueOf(Constants.MSG_TYPE_FWD));
-        query = query.replace(":roomMessageType:", String.valueOf(Constants.MSG_TYPE_ROOM));
-        query = query.replace(":roomId:", String.valueOf(room.getId()));
-        query = query.replace(":selfId:", String.valueOf(Utils.self().getId()));
-        return getMessages(query);
+        String query = "SELECT * FROM messages WHERE (type=? AND sender_id=?) " +
+                "OR (type=? AND sender_id=? AND receiver_id=?)";
+        try {
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setInt(1, Constants.MSG_TYPE_FWD);
+                preparedStatement.setInt(2, room.getId());
+                preparedStatement.setInt(3, Constants.MSG_TYPE_ROOM);
+                preparedStatement.setInt(4, Utils.self().getId());
+                preparedStatement.setInt(5, room.getId());
+                final ResultSet resultSet = preparedStatement.executeQuery();
+                return getMessages(resultSet);
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error on MessageDao::findRoomConversation\n" + e);
+            return null;
+        }
     }
 
     public List<Message> findSelfRoomConversation() {
-        String query = "SELECT * FROM messages WHERE (type=:roomMessageType: AND receiver_id=:roomId:)" +
-                "OR (type=:fwdMessageType: AND receiver_id=:roomId:)";
-        query = query.replace(":roomMessageType:", String.valueOf(Constants.MSG_TYPE_ROOM));
-        query = query.replace(":fwdMessageType:", String.valueOf(Constants.MSG_TYPE_FWD));
-        query = query.replace(":roomId:", String.valueOf(Utils.selfRoom().getId()));
-        return getMessages(query);
+        String query = "SELECT * FROM messages WHERE (type=? AND receiver_id=?)" +
+                "OR (type=? AND receiver_id=?)";
+        try {
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setInt(1, Constants.MSG_TYPE_ROOM);
+                preparedStatement.setInt(2, Utils.selfRoom().getId());
+                preparedStatement.setInt(3, Constants.MSG_TYPE_FWD);
+                preparedStatement.setInt(4, Utils.selfRoom().getId());
+                final ResultSet resultSet = preparedStatement.executeQuery();
+                return getMessages(resultSet);
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error on MessageDao::findSelfRoomConversation\n" + e);
+            return null;
+        }
     }
 
     public List<Message> findUnsentByReceiver(User user) {
-        String query = "SELECT * FROM messages WHERE sent=false AND receiver_id=" + user.getId() +
-                " ORDER BY sent_date";
-        return getMessages(query);
+        String query = "SELECT * FROM messages WHERE sent=0 AND receiver_id=? ORDER BY sent_date";
+        try {
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setInt(1, user.getId());
+                final ResultSet resultSet = preparedStatement.executeQuery();
+                return getMessages(resultSet);
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error on MessageDao::findUnsentByReceiver\n" + e);
+            return null;
+        }
     }
 
-    private List<Message> getMessages(String query) {
+    private List<Message> getMessages(ResultSet resultSet) {
         Set<Message> messages = new HashSet<>();
         try {
-            db.openStatement();
-            ResultSet resultSet = db.executeSelectQuery(query);
             while (!resultSet.isClosed() && resultSet.next()) {
                 Message message = DBUtils.resultSetToMessage(resultSet);
                 fillUsers(message, resultSet);
                 messages.add(message);
             }
-            db.closeStatement();
             List<Message> list = new ArrayList<>(messages);
             list.sort(Comparator.comparing(Message::getSentDate));
             return list;
@@ -160,23 +213,24 @@ public class MessageDao implements Dao<Message, Integer> {
     }
 
     private void fillUsers(Message message, ResultSet resultSet) throws SQLException {
-        String senderQuery = "SELECT * FROM users WHERE id=" + resultSet.getInt("sender_id");
-        String receiverQuery = "SELECT * FROM users WHERE id=" + resultSet.getInt("receiver_id");
-        String forwardedFromQuery = "SELECT * FROM users where id=" + resultSet.getInt("fwd_user_id");
-        Statement statement = db.createStatement();
-        ResultSet rs = statement.executeQuery(senderQuery);
+        String senderQuery = "SELECT * FROM users WHERE id=?";
+        PreparedStatement statement = db.createPreparedStatement(senderQuery);
+        statement.setInt(1, resultSet.getInt("sender_id"));
+        ResultSet rs = statement.executeQuery();
         if (rs.next()) {
             User sender = DBUtils.resultSetToUser(rs);
             message.setSender(sender);
         }
 
-        rs = statement.executeQuery(receiverQuery);
+        statement.setInt(1, resultSet.getInt("receiver_id"));
+        rs = statement.executeQuery();
         if (rs.next()) {
             User receiver = DBUtils.resultSetToUser(rs);
             message.setReceiver(receiver);
         }
 
-        rs = statement.executeQuery(forwardedFromQuery);
+        statement.setInt(1, resultSet.getInt("fwd_user_id"));
+        rs = statement.executeQuery();
         if (rs.next()) {
             User fwdFrom = DBUtils.resultSetToUser(rs);
             message.setForwardedFrom(fwdFrom);

@@ -56,4 +56,9 @@ public class DBConnection {
     public Statement createStatement() throws SQLException {
         return connection.createStatement();
     }
+
+    public PreparedStatement createPreparedStatement(String query) throws SQLException {
+        return connection.prepareStatement(query);
+    }
+
 }

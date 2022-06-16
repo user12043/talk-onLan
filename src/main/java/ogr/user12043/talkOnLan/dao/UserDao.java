@@ -4,6 +4,7 @@ import ogr.user12043.talkOnLan.model.User;
 import ogr.user12043.talkOnLan.util.DBUtils;
 
 import java.net.InetAddress;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -35,36 +36,32 @@ public class UserDao implements Dao<User, Integer> {
 
     @Override
     public List<User> find() {
-        {
-            String query = "SELECT * FROM users";
-            Set<User> users = new HashSet<>();
-            try {
-                db.openStatement();
-                ResultSet resultSet = db.executeSelectQuery(query);
-                while (!resultSet.isClosed() && resultSet.next()) {
-                    User user = DBUtils.resultSetToUser(resultSet);
-                    users.add(user);
-                }
-                db.closeStatement();
-                return new ArrayList<>(users);
-            } catch (SQLException e) {
-                LOGGER.severe("Error on UserDao::find\n" + e);
+        String query = "SELECT * FROM users";
+        Set<User> users = new HashSet<>();
+        try {
+            db.openStatement();
+            ResultSet resultSet = db.executeSelectQuery(query);
+            while (!resultSet.isClosed() && resultSet.next()) {
+                User user = DBUtils.resultSetToUser(resultSet);
+                users.add(user);
             }
+            db.closeStatement();
+            return new ArrayList<>(users);
+        } catch (SQLException e) {
+            LOGGER.severe("Error on UserDao::find\n" + e);
             return null;
         }
     }
 
     @Override
     public User findById(Integer id) {
-        String query = "SELECT * FROM users WHERE id=" + id;
+        String query = "SELECT * FROM users WHERE id=?";
         User user;
         try {
-            db.openStatement();
-            ResultSet resultSet = db.executeSelectQuery(query);
-            if (resultSet.next()) {
-                user = DBUtils.resultSetToUser(resultSet);
-                db.closeStatement();
-                return user;
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setInt(1, id);
+                final ResultSet resultSet = preparedStatement.executeQuery();
+                return getUser(resultSet);
             }
         } catch (SQLException e) {
             LOGGER.severe("Error on UserDao::findById\n" + e);
@@ -76,19 +73,21 @@ public class UserDao implements Dao<User, Integer> {
     public void save(User user) {
         String query;
         if (user.getId() != null) {
-            query = "UPDATE users SET username=':username:', address=':address:', is_room=:isRoom: WHERE id=" + user.getId();
+            query = "UPDATE users SET username=?, address=?, is_room=? WHERE id=?";
         } else {
-            query = "INSERT INTO users (USERNAME, ADDRESS, IS_ROOM) VALUES(':username:', ':address:', :isRoom:)";
+            query = "INSERT INTO users (USERNAME, ADDRESS, IS_ROOM) VALUES(?, ?, ?)";
         }
 
-        query = query.replace(":username:", user.getUsername());
-        query = query.replace(":address:", user.getAddress().getHostAddress());
-        query = query.replace(":isRoom:", String.valueOf(user.isRoom()));
-
         try {
-            db.openStatement();
-            db.executeUpdateQuery(query);
-            db.closeStatement();
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setString(1, user.getUsername());
+                preparedStatement.setString(2, user.getAddress().getHostAddress());
+                preparedStatement.setBoolean(3, user.isRoom());
+                if (user.getId() != null) {
+                    preparedStatement.setInt(4, user.getId());
+                }
+                preparedStatement.executeUpdate();
+            }
         } catch (SQLException e) {
             LOGGER.severe("Error on UserDao::save\n" + e);
         }
@@ -101,42 +100,66 @@ public class UserDao implements Dao<User, Integer> {
 
     @Override
     public void deleteById(Integer id) {
-        String query = "DELETE FROM users WHERE id=" + id;
+        String query = "DELETE FROM users WHERE id=?";
         try {
-            db.openStatement();
-            db.executeUpdateQuery(query);
-            db.closeStatement();
+            final PreparedStatement statement = db.createPreparedStatement(query);
+            statement.setInt(1, id);
+            statement.execute();
+            statement.close();
         } catch (SQLException e) {
             LOGGER.severe("Error on UserDao::deleteById\n" + e);
         }
     }
 
     public User findByFields(User user) {
-        String query = "SELECT * FROM users WHERE username=':username:' AND address=':address:' AND is_room=:isRoom:";
-        query = query.replace(":username:", user.getUsername());
-        query = query.replace(":address:", user.getAddress().getHostAddress());
-        query = query.replace(":isRoom:", String.valueOf(user.isRoom()));
-        return getUser(query);
+        String query = "SELECT * FROM users WHERE username=? AND address=? AND is_room=?";
+        try {
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setString(1, user.getUsername());
+                preparedStatement.setString(2, user.getAddress().getHostAddress());
+                preparedStatement.setBoolean(3, user.isRoom());
+                final ResultSet resultSet = preparedStatement.executeQuery();
+                return getUser(resultSet);
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error on UserDao::findByFields\n" + e);
+        }
+        return null;
     }
 
     public User findByAddress(InetAddress address, boolean isRoom) {
-        String query = "SELECT * FROM users WHERE address='" + address.getHostAddress() + "' AND is_room=" + isRoom;
-        return getUser(query);
+        String query = "SELECT * FROM users WHERE address=? AND is_room=?";
+        try {
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setString(1, address.getHostAddress());
+                preparedStatement.setBoolean(2, isRoom);
+                final ResultSet resultSet = preparedStatement.executeQuery();
+                return getUser(resultSet);
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error on UserDao::findByAddress\n" + e);
+        }
+        return null;
     }
 
     public User findByUsername(String username) {
-        String query = "SELECT * FROM users WHERE username='" + username + "' AND is_room=false";
-        return getUser(query);
+        String query = "SELECT * FROM users WHERE username=? AND is_room=0";
+        try {
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setString(1, username);
+                final ResultSet resultSet = preparedStatement.executeQuery();
+                return getUser(resultSet);
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error on UserDao::findByUsername\n" + e);
+        }
+        return null;
     }
 
-    private User getUser(String query) {
+    private User getUser(ResultSet resultSet) {
         try {
-            db.openStatement();
-            ResultSet resultSet = db.executeSelectQuery(query);
             if (resultSet.next()) {
-                User result = DBUtils.resultSetToUser(resultSet);
-                db.closeStatement();
-                return result;
+                return DBUtils.resultSetToUser(resultSet);
             }
         } catch (SQLException e) {
             LOGGER.severe("Error on UserDao::getUser\n" + e);

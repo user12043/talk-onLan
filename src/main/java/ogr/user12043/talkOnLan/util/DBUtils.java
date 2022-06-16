@@ -27,7 +27,7 @@ public class DBUtils {
         } catch (UnknownHostException e) {
             throw new SQLException("IP address format invalid");
         }
-        user.setRoom(Boolean.parseBoolean(resultSet.getString("is_room")));
+        user.setRoom(resultSet.getBoolean("is_room"));
         return user;
     }
 
