@@ -205,8 +205,8 @@ public class MessagePanelController implements Initializable {
         Platform.runLater(() -> {
             addMessage(sendingMessage, true);
             textArea_input.setText("");
-            textArea_input.requestFocus();
             textArea_input.setDisable(false);
+            textArea_input.requestFocus();
         });
     }
 
