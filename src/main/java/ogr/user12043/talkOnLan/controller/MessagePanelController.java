@@ -5,15 +5,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import ogr.user12043.talkOnLan.TalkOnLanApp;
 import ogr.user12043.talkOnLan.dao.MessageDao;
@@ -34,6 +33,7 @@ public class MessagePanelController implements Initializable {
     private final boolean isPrivateChat;
     private final Set<MessageBoxController> messageBoxes = new HashSet<>();
     private final Stage stage = new Stage();
+    private Tooltip newMessageTooltip;
     @FXML
     private Label label_title;
     @FXML
@@ -42,9 +42,10 @@ public class MessagePanelController implements Initializable {
     private TextArea textArea_input;
     @FXML
     private Button btn_send;
-
     @FXML
     private VBox vbox_participants;
+    @FXML
+    private ScrollPane scrollPane_messages;
 
     public MessagePanelController(User user, boolean isPrivateChat) {
         this.user = user;
@@ -73,6 +74,26 @@ public class MessagePanelController implements Initializable {
         if (!isPrivateChat) {
             fetchMessages();
         }
+
+        newMessageTooltip = new Tooltip("new message(s)");
+        newMessageTooltip.setTextAlignment(TextAlignment.CENTER);
+        // scroll automatically when new message added (it means the gridPane_messages height has changed)
+        gridPane_messages.heightProperty().addListener(observable -> {
+            final double vValue = scrollPane_messages.getVvalue();
+            if (vValue > 0.7) {
+                scrollPane_messages.setVvalue(1.0);
+            } else {
+                final Bounds bounds = scrollPane_messages.localToScreen(scrollPane_messages.getBoundsInLocal());
+                newMessageTooltip.show(scrollPane_messages, bounds.getCenterX() - newMessageTooltip.getWidth() / 2,
+                        bounds.getMinY() + scrollPane_messages.getHeight() - newMessageTooltip.getHeight());
+            }
+        });
+
+        scrollPane_messages.vvalueProperty().addListener(observable -> {
+            if (scrollPane_messages.getVvalue() > 0.95 && newMessageTooltip.isShowing()) {
+                newMessageTooltip.hide();
+            }
+        });
     }
 
     private void fetchMessages() {

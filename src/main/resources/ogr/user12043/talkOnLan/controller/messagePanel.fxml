@@ -13,8 +13,9 @@
                    textAlignment="CENTER"/>
             <SplitPane dividerPositions="0.8" orientation="VERTICAL" VBox.vgrow="ALWAYS">
                <items>
-                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxWidth="1.7976931348623157E308"
-                              onKeyPressed="#inputAction" onKeyReleased="#inputAction" pannable="true">
+                  <ScrollPane fx:id="scrollPane_messages" fitToWidth="true" hbarPolicy="NEVER"
+                              maxWidth="1.7976931348623157E308" onKeyPressed="#inputAction" onKeyReleased="#inputAction"
+                              pannable="true" vvalue="1.0">
                      <content>
                         <GridPane fx:id="gridPane_messages" alignment="TOP_CENTER" maxHeight="1.7976931348623157E308"
                                   maxWidth="1.7976931348623157E308">
