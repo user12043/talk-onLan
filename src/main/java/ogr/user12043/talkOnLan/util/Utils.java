@@ -149,6 +149,14 @@ public class Utils {
         }
     }
 
+    public static void removeUser(User user) {
+        if (user.isRoom()) {
+            rooms.remove(user);
+        } else {
+            buddies.remove(user);
+        }
+    }
+
     public static User self() {
         try {
             if (self == null) {
@@ -224,8 +232,8 @@ public class Utils {
             connection.closeStatement();
         }
     }
-
     // JavaFX does not provide Platform.runAndWait(). So I need to implement my own one.
+
     public static void platformRunAndWait(Runnable r) {
         CountDownLatch latch = new CountDownLatch(1);
         Platform.runLater(() -> {

@@ -69,7 +69,7 @@ public class User {
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, address);
+        return Objects.hash(username, address, isRoom);
     }
 
     public User cloneUser() {

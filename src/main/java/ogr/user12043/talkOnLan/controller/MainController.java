@@ -4,9 +4,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import ogr.user12043.talkOnLan.dao.MessageDao;
@@ -28,6 +27,7 @@ import java.util.*;
 public class MainController implements Initializable {
     private static MainController instance;
     private final Map<User, BuddyPanelController> buddies = new HashMap<>();
+    private final Map<User, AnchorPane> buddyPanels = new HashMap<>();
     private final Map<User, MessagePanelController> privateBuddyPanels = new HashMap<>();
     private MessagePanelController roomMessagePanel;
     private MessagePanelController privateRoomMessagePanel;
@@ -88,14 +88,39 @@ public class MainController implements Initializable {
             AnchorPane buddyPanel = loader.load();
             // Keep the references
             buddies.put(user, buddyPanelController);
+            buddyPanels.put(user, buddyPanel);
             if (!user.isRoom()) {
                 buddiesPane.getChildren().add(buddyPanel);
             } else {
                 roomsPane.getChildren().add(buddyPanel);
             }
+
+            // Add remove option
+            MenuItem removeItem = new MenuItem("Remove buddy");
+            final ContextMenu contextMenu = new ContextMenu(removeItem);
+            removeItem.setOnAction(event -> removeUser(buddyPanelController.getUser()));
+            buddyPanel.setOnMouseClicked(event -> {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    contextMenu.show(buddyPanel, event.getScreenX(), event.getScreenY());
+                }
+            });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // TODO: add blacklist option to make this function meaningful. The user will be discovered again
+    protected void removeUser(User user) {
+        UserDao.get().deleteById(user.getId());
+        MessageDao.get().clearAll(user);
+        Utils.removeUser(user);
+        buddies.remove(user);
+        if (!user.isRoom()) {
+            buddiesPane.getChildren().remove(buddyPanels.get(user));
+        } else {
+            roomsPane.getChildren().remove(buddyPanels.get(user));
+        }
+        buddyPanels.remove(user);
     }
 
     @FXML

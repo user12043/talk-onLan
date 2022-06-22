@@ -108,6 +108,7 @@ public class UserDao implements Dao<User, Integer> {
             statement.close();
         } catch (SQLException e) {
             LOGGER.severe("Error on UserDao::deleteById\n" + e);
+            throw new RuntimeException(e);
         }
     }
 
