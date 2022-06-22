@@ -126,6 +126,20 @@ public class MessageDao implements Dao<Message, Integer> {
         }
     }
 
+    public void clearAll(User user) {
+        String query = "DELETE FROM messages where SENDER_ID=? OR RECEIVER_ID=?";
+        try {
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setInt(1, user.getId());
+                preparedStatement.setInt(2, user.getId());
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            LOGGER.severe("Error on MessageDao::clearAll\n" + e);
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<Message> findConversation(User sender, User receiver) {
         String query = "SELECT * FROM messages WHERE (sender_id=? AND receiver_id=?)" +
                 " OR (sender_id=? AND receiver_id=?) ORDER BY sent_date";

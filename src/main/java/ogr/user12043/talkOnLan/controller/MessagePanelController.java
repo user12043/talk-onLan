@@ -80,7 +80,7 @@ public class MessagePanelController implements Initializable {
         // scroll automatically when new message added (it means the gridPane_messages height has changed)
         gridPane_messages.heightProperty().addListener(observable -> {
             final double vValue = scrollPane_messages.getVvalue();
-            if (vValue > 0.7) {
+            if (vValue > 0.7 || gridPane_messages.getChildren().size() == 0) {
                 scrollPane_messages.setVvalue(1.0);
             } else {
                 final Bounds bounds = scrollPane_messages.localToScreen(scrollPane_messages.getBoundsInLocal());
@@ -94,6 +94,13 @@ public class MessagePanelController implements Initializable {
                 newMessageTooltip.hide();
             }
         });
+
+        MenuItem item = new MenuItem("Clear messages");
+        item.setOnAction(event -> {
+            MessageDao.get().clearAll(user);
+            gridPane_messages.getChildren().clear();
+        });
+        scrollPane_messages.setContextMenu(new ContextMenu(item));
     }
 
     private void fetchMessages() {
