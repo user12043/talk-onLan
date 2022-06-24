@@ -23,6 +23,4 @@ Simple chatting and file transfer app works on the local network.
 
 ### To-do list
 
-- Remove users from list *(Need to discover again to display)*
 - Blacklist specific users *(Will be ignored even re-discovered)*
-- Scroll the message panel on new message

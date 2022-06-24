@@ -15,6 +15,7 @@ public class User {
     private InetAddress address;
     private boolean isRoom;
     private boolean isOnline;
+    private boolean isBlocked;
 
     public User() {
     }
@@ -87,5 +88,13 @@ public class User {
 
     public void setOnline(boolean online) {
         isOnline = online;
+    }
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
     }
 }

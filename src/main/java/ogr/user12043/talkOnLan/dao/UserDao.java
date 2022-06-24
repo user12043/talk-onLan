@@ -73,9 +73,9 @@ public class UserDao implements Dao<User, Integer> {
     public void save(User user) {
         String query;
         if (user.getId() != null) {
-            query = "UPDATE users SET username=?, address=?, is_room=? WHERE id=?";
+            query = "UPDATE users SET USERNAME=?, ADDRESS=?, IS_ROOM=?, IS_BLOCKED=? WHERE ID=?";
         } else {
-            query = "INSERT INTO users (USERNAME, ADDRESS, IS_ROOM) VALUES(?, ?, ?)";
+            query = "INSERT INTO users (USERNAME, ADDRESS, IS_ROOM, IS_BLOCKED) VALUES(?, ?, ?, ?)";
         }
 
         try {
@@ -83,8 +83,9 @@ public class UserDao implements Dao<User, Integer> {
                 preparedStatement.setString(1, user.getUsername());
                 preparedStatement.setString(2, user.getAddress().getHostAddress());
                 preparedStatement.setBoolean(3, user.isRoom());
+                preparedStatement.setBoolean(4, user.isBlocked());
                 if (user.getId() != null) {
-                    preparedStatement.setInt(4, user.getId());
+                    preparedStatement.setInt(5, user.getId());
                 }
                 preparedStatement.executeUpdate();
             }

@@ -209,7 +209,8 @@ public class Utils {
                             "\tID INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                             "\tUSERNAME VARCHAR(100) NOT NULL,\n" +
                             "\tADDRESS VARCHAR(15) NOT NULL,\n" +
-                            "\tIS_ROOM BOOLEAN\n" +
+                            "\tIS_ROOM BOOLEAN,\n" +
+                            "\tIS_BLOCKED BOOLEAN\n" +
                             ")");
             connection.executeUpdateQuery("CREATE UNIQUE INDEX PRIMARY_KEY_61 ON USERS (ID);");
             connection.executeUpdateQuery("CREATE UNIQUE INDEX USERS_USERNAME_IDX ON USERS (USERNAME,ADDRESS,IS_ROOM);");

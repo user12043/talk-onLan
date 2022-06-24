@@ -80,6 +80,10 @@ public class MainController implements Initializable {
             }
 
             user = UserDao.get().findByFields(user);
+            // Ignore blocked buddies
+            if (user.isBlocked()) {
+                return;
+            }
             Utils.addUser(user);
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("buddyPanel.fxml"));
@@ -96,7 +100,7 @@ public class MainController implements Initializable {
             }
 
             // Add remove option
-            MenuItem removeItem = new MenuItem("Remove buddy");
+            MenuItem removeItem = new MenuItem("Remove buddy and add to the blacklist");
             final ContextMenu contextMenu = new ContextMenu(removeItem);
             removeItem.setOnAction(event -> removeUser(buddyPanelController.getUser()));
             buddyPanel.setOnMouseClicked(event -> {
@@ -109,9 +113,10 @@ public class MainController implements Initializable {
         }
     }
 
-    // TODO: add blacklist option to make this function meaningful. The user will be discovered again
+    // Remove and add to blacklist
     protected void removeUser(User user) {
-        UserDao.get().deleteById(user.getId());
+        user.setBlocked(true);
+        UserDao.get().save(user);
         MessageDao.get().clearAll(user);
         Utils.removeUser(user);
         buddies.remove(user);

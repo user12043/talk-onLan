@@ -28,6 +28,7 @@ public class DBUtils {
             throw new SQLException("IP address format invalid");
         }
         user.setRoom(resultSet.getBoolean("is_room"));
+        user.setBlocked(resultSet.getBoolean("is_blocked"));
         return user;
     }
 
