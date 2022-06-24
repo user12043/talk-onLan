@@ -45,6 +45,10 @@ public class MessageService {
 
     static void receiveMessage(InetAddress senderAddress, String receivedData) {
         Message message = Utils.parseMessage(receivedData, senderAddress);
+        if (message.getSender().isBlocked()) {
+            LOGGER.warning("Message from " + message.getSender() + " ignored");
+            return;
+        }
         LOGGER.fine((message.getMessageType() != 0 ? "Room message" : "Message") + " received from " + senderAddress);
         if (message.getSender() != null) {
             Platform.runLater(() -> MainController.getInstance().receiveMessage(message));

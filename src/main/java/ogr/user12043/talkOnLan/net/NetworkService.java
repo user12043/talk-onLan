@@ -89,18 +89,6 @@ public class NetworkService {
             return null;
         }
 
-        // Discover user if not discovered yet
-        final boolean exists = Utils.isDiscovered(incomingSocket.getInetAddress());
-        if (!exists) {
-            DiscoveryService.sendDiscoveryRequest(incomingSocket.getInetAddress());
-            // Wait for discovery
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                LOGGER.severe("Error when discovering remote user: \n" + e);
-            }
-        }
-
         return incomingSocket;
     }
 
