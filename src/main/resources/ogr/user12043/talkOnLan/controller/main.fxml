@@ -17,16 +17,6 @@
       </Label>
       <VBox alignment="CENTER" prefHeight="102.0" prefWidth="600.0">
          <children>
-            <HBox alignment="TOP_CENTER" prefHeight="39.0" prefWidth="600.0">
-               <children>
-                  <TextField fx:id="textField_manualIP" promptText="Enter target IP address">
-                     <HBox.margin>
-                        <Insets right="5.0" />
-                     </HBox.margin>
-                  </TextField>
-                  <Button fx:id="btn_addManually" disable="true" mnemonicParsing="false" text="Add Manually" />
-               </children>
-            </HBox>
             <HBox alignment="TOP_CENTER" prefHeight="70.0" prefWidth="662.0">
                <children>
                   <Button fx:id="btn_startStopDiscovery" defaultButton="true" mnemonicParsing="false"
@@ -42,8 +32,21 @@
                         <Font size="12.0"/>
                      </font>
                      <HBox.margin>
+                        <Insets/>
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btn_addManually" alignment="CENTER" contentDisplay="CENTER" disable="true"
+                          mnemonicParsing="false" onAction="#addManuallyAction" prefHeight="38.0">
+                     <HBox.margin>
                         <Insets right="10.0"/>
                      </HBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../../icon/plus.png"/>
+                           </image>
+                        </ImageView>
+                     </graphic>
                   </Button>
                   <Button fx:id="btn_startStopHardDiscovery" disable="true" mnemonicParsing="false"
                           onAction="#hardDiscoveryAction" text="Hard Discovery">

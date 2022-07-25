@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -19,9 +20,7 @@ import ogr.user12043.talkOnLan.util.Properties;
 import ogr.user12043.talkOnLan.util.Utils;
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InterfaceAddress;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 
 public class MainController implements Initializable {
@@ -31,8 +30,6 @@ public class MainController implements Initializable {
     private final Map<User, MessagePanelController> privateBuddyPanels = new HashMap<>();
     private MessagePanelController roomMessagePanel;
     private MessagePanelController privateRoomMessagePanel;
-    @FXML
-    private TextField textField_manualIP;
     @FXML
     private Button btn_addManually;
     @FXML
@@ -134,9 +131,11 @@ public class MainController implements Initializable {
         try {
             if (NetworkService.isServiceUp()) {
                 btn_startStopHardDiscovery.setDisable(true);
+                btn_addManually.setDisable(true);
                 NetworkService.end();
             } else {
                 btn_startStopHardDiscovery.setDisable(false);
+                btn_addManually.setDisable(false);
                 NetworkService.start();
             }
         } catch (IOException e) {
@@ -160,7 +159,7 @@ public class MainController implements Initializable {
                 builder.append(address.substring(1)).append("\n");
             }
         }
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Local IP addresses");
         alert.setHeaderText(builder.toString());
         alert.showAndWait();
@@ -214,7 +213,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void hostPrivateRoomAction(ActionEvent actionEvent) {
-        Alert alert = new Alert(Alert.AlertType.WARNING, "This function is not implemented yet!");
+        Alert alert = new Alert(AlertType.WARNING, "This function is not implemented yet!");
         alert.showAndWait();
         /*if (Utils.buddies.stream().noneMatch(User::isOnline)) {
             // show warning like "There is no buddy online!" then return
@@ -231,8 +230,30 @@ public class MainController implements Initializable {
         try {
             DiscoveryService.hardDiscovery();
         } catch (IOException e) {
-            new Alert(Alert.AlertType.ERROR, "Error on discovery!");
+            new Alert(AlertType.ERROR, "Error on discovery!").showAndWait();
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void addManuallyAction(ActionEvent actionEvent) {
+        final TextInputDialog dialog = new TextInputDialog("Enter target IP address...");
+        dialog.setContentText("Enter target IP address:");
+        dialog.setHeaderText("Add Manually");
+        final Optional<String> s = dialog.showAndWait();
+        if (s.isPresent()) {
+            InetAddress address;
+            try {
+                address = InetAddress.getByName(s.get());
+            } catch (UnknownHostException e) {
+                new Alert(AlertType.ERROR, "Invalid address!").show();
+                return;
+            }
+            try {
+                DiscoveryService.sendDiscoveryRequest(address);
+            } catch (Exception e) {
+                new Alert(AlertType.ERROR, "Error during discovery!: " + e.getMessage());
+            }
         }
     }
 }
