@@ -56,7 +56,6 @@ public class UserDao implements Dao<User, Integer> {
     @Override
     public User findById(Integer id) {
         String query = "SELECT * FROM users WHERE id=?";
-        User user;
         try {
             try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
                 preparedStatement.setInt(1, id);
@@ -156,6 +155,24 @@ public class UserDao implements Dao<User, Integer> {
             LOGGER.severe("Error on UserDao::findByUsername\n" + e);
         }
         return null;
+    }
+
+    public List<User> findBlocked() {
+        String query = "SELECT * FROM users WHERE IS_BLOCKED=?";
+        Set<User> users = new HashSet<>();
+        try {
+            try (PreparedStatement preparedStatement = db.createPreparedStatement(query)) {
+                preparedStatement.setString(1, "1");
+                final ResultSet resultSet = preparedStatement.executeQuery();
+                while (!resultSet.isClosed() && resultSet.next()) {
+                    users.add(DBUtils.resultSetToUser(resultSet));
+                }
+            }
+            return new ArrayList<>(users);
+        } catch (SQLException e) {
+            LOGGER.severe("Error on UserDao::findBlocked\n" + e);
+            return null;
+        }
     }
 
     private User getUser(ResultSet resultSet) {

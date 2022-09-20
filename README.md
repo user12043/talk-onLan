@@ -23,4 +23,4 @@ Simple chatting and file transfer app works on the local network.
 
 ### To-do list
 
-- Blacklist specific users *(Will be ignored even re-discovered)*
+- 

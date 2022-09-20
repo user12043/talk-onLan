@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -22,6 +23,7 @@ import ogr.user12043.talkOnLan.util.Utils;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainController implements Initializable {
     private static MainController instance;
@@ -46,6 +48,9 @@ public class MainController implements Initializable {
     private VBox buddiesPane;
     @FXML
     private VBox roomsPane;
+
+    @FXML
+    private Hyperlink link_manageBlacklist;
 
     public static MainController getInstance() {
         return instance;
@@ -255,5 +260,41 @@ public class MainController implements Initializable {
                 new Alert(AlertType.ERROR, "Error during discovery!: " + e.getMessage());
             }
         }
+    }
+
+    @FXML
+    private void manageBlackListAction(ActionEvent actionEvent) {
+        final Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.getDialogPane().getButtonTypes().addAll(
+                new ButtonType("OK", ButtonData.APPLY),
+                new ButtonType("Cancel", ButtonData.CANCEL_CLOSE)
+        );
+        dialog.setHeaderText("Manage the Blacklist");
+        dialog.setContentText("Select the buddies that you want to remove from blacklist");
+
+        VBox vBox = new VBox();
+        final List<User> users = UserDao.get().findBlocked();
+        List<User> unBlockedUsers = new ArrayList<>();
+
+        final List<CheckBox> checkBoxes = users.stream().map(user -> {
+            final CheckBox checkBox = new CheckBox(
+                    String.format("%s %s", user.getUsername(), user.isRoom() ? "(Room)" : ""));
+            checkBox.setOnAction(event -> {
+                if (checkBox.isSelected()) {
+                    unBlockedUsers.add(user);
+                } else {
+                    unBlockedUsers.remove(user);
+                }
+            });
+            return checkBox;
+        }).collect(Collectors.toUnmodifiableList());
+
+        vBox.getChildren().addAll(checkBoxes);
+        dialog.setGraphic(vBox);
+        dialog.showAndWait().filter(response -> response.getButtonData().equals(ButtonData.APPLY)).ifPresent(r -> {
+            unBlockedUsers.forEach(user -> user.setBlocked(false));
+            unBlockedUsers.forEach(UserDao.get()::save);
+            unBlockedUsers.forEach(this::addUser);
+        });
     }
 }
