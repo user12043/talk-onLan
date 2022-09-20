@@ -55,8 +55,9 @@ public class MessagePanelController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("messagePanel.fxml"));
             loader.setController(this);
             SplitPane messagePanel = loader.load();
-            if (this.user.isRoom()) {
+            if (user.isRoom()) {
                 messagePanel.setDividerPositions(0.2);
+                vbox_participants.getChildren().add(new Label(user.getUsername()));
             }
             Scene scene = new Scene(messagePanel);
             scene.getStylesheets().add(Objects.requireNonNull(TalkOnLanApp.class.getResource("style.css")).toExternalForm());
