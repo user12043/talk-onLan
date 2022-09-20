@@ -8,6 +8,7 @@ Simple chatting and file transfer app works on the local network.
 - Chat with others
 - File sharing
 - Rooms for group chats
+- Add discovered users to blacklist to block any messages
 
 > WARNING: This application is designed for use in small local network.
 > but doesn't need to be used in. Be aware that there is no encryption
