@@ -17,7 +17,7 @@
     <maven.compiler.release>11</maven.compiler.release>
     <project.main-class>ogr.user12043.talkOnLan.Main</project.main-class>
     <lib-folder>lib</lib-folder>
-    <sqlite.version>3.36.0.3</sqlite.version>
+    <sqlite.version>3.41.2.2</sqlite.version>
     <javafx.version>18</javafx.version>
     <jlink-image-name>${project.name}</jlink-image-name>
     <sqlite-jar-name>sqlite-jdbc.jar</sqlite-jar-name>
